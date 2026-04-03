@@ -1710,3 +1710,26 @@ img::-moz-selection {
   background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
   pointer-events: none;  /* 让渐变不阻挡点击 */
 }
+/* 强制覆盖导航栏字体颜色 - 淡蓝色 */
+.navbar-custom .nav li a {
+  color: #66ccff !important;
+}
+
+/* 导航栏悬停颜色 */
+.navbar-custom .nav li a:hover {
+  color: #3399ff !important;
+}
+
+/* 网站标题（左上角 PDevil Blog） */
+.navbar-custom .navbar-brand {
+  color: #66ccff !important;
+}
+
+.navbar-custom .navbar-brand:hover {
+  color: #3399ff !important;
+}
+
+/* 导航栏背景半透明 */
+.navbar-custom {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+}
