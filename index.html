@@ -3,6 +3,74 @@ layout: page
 description: "「代码即利刃，逆向即真相」"
 ---
 
+<style>
+.post-card {
+  display: flex !important;
+  gap: 30px !important;
+  padding: 30px 0 !important;
+  border-bottom: 1px solid #eaeaea !important;
+  align-items: center !important;
+}
+
+.post-card-image {
+  flex-shrink: 0 !important;
+  width: 200px !important;
+  height: 200px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.post-card-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+.post-card-content {
+  flex: 1 !important;
+}
+
+.post-card-date {
+  font-size: 13px !important;
+  color: #999 !important;
+  margin-bottom: 8px !important;
+}
+
+.post-card-title {
+  margin: 0 0 12px 0 !important;
+  font-size: 22px !important;
+  font-weight: 600 !important;
+}
+
+.post-card-title a {
+  color: #333 !important;
+  text-decoration: none !important;
+}
+
+.post-card-excerpt {
+  font-size: 14px !important;
+  color: #666 !important;
+  line-height: 1.6 !important;
+  margin-bottom: 12px !important;
+}
+
+.post-card-meta {
+  font-size: 13px !important;
+  color: #aaa !important;
+}
+
+@media (max-width: 768px) {
+  .post-card {
+    flex-direction: column !important;
+  }
+  .post-card-image {
+    width: 100% !important;
+    height: 180px !important;
+  }
+}
+</style>
+
 {% for post in paginator.posts %}
   {% assign cycle_index = forloop.index | modulo: 4 %}
   
