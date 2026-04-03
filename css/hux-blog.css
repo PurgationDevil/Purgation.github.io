@@ -1696,6 +1696,7 @@ img::-moz-selection {
 }
 .intro-header {
   position: relative;
+  min-height: 450px;
   background: no-repeat center center;
   background-size: cover;
 }
