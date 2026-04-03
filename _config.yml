@@ -12,10 +12,7 @@ future: true
 
 # SNS settings
 RSS: false
-weibo_username: PDevil
-zhihu_username: PDevil
-github_username: PDevil
-twitter_username: PDevil
+github_username: PurgationDevil
 #facebook_username:  PDevil
 #linkedin_username:  firstname-lastname-idxxxx
 
