@@ -987,7 +987,7 @@ samp {
 }
 .navbar-custom .navbar-brand {
   font-weight: 800;
-  color: white;
+  color: #66ccff;
   height: 56px;
   line-height: 25px;
 }
@@ -1000,6 +1000,7 @@ samp {
   line-height: 20px;
   font-weight: 800;
   letter-spacing: 1px;
+  color: #66ccff;
 }
 .navbar-custom .nav li a:active {
   background: rgba(0, 0, 0, 0.12);
