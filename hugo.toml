@@ -1,4 +1,0 @@
-baseURL = 'https://PurgationDevil.github.io/myblog/'
-languageCode = 'zh-cn'
-title = 'PDevil Blog'
-theme = 'ananke'
