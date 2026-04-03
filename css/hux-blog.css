@@ -622,7 +622,7 @@ pre.highlight {
   width: 100%;
   font-size: 30px;
   font-weight: bold;
-  color: #66ccff;
+  color: #404040;
 }
 @media only screen and (min-width: 768px) {
   .search-page #search-input {
@@ -659,7 +659,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Arial", "PingFang SC", "Hiragino Sans GB", "STHeiti", "Microsoft YaHei", "Microsoft JhengHei", "Source Han Sans SC", "Noto Sans CJK SC", "Source Han Sans CN", "Noto Sans SC", "Source Han Sans TC", "Noto Sans CJK TC", "WenQuanYi Micro Hei", SimSun, sans-serif;
   line-height: 1.7;
   font-size: 16px;
-  color: #66ccff;
+  color: #404040;
   overflow-x: hidden;
   text-rendering: auto;
   -webkit-font-smoothing: antialiased;
@@ -692,7 +692,7 @@ h4 {
   font-size: 21px;
 }
 a {
-  color: #66ccff;
+  color: #404040;
 }
 a:hover,
 a:focus {
@@ -972,9 +972,6 @@ samp {
   }
 }
 .navbar-custom {
-  background-color: rgba(255, 255, 255, 0.8);  /* 半透明白色 */
-  backdrop-filter: blur(10px);  /* 可选：模糊效果，更现代 */
-  border-bottom: 1px solid rgba(0,0,0,0.05);  /* 可选：底部细线 */
   border: none;
   position: absolute;
   top: 0;
@@ -1025,7 +1022,7 @@ samp {
     color: rgba(255, 255, 255, 0.8);
   }
   .navbar-custom .nav li a {
-    color: white;
+    color: #66ccff;
     padding: 20px;
   }
   .navbar-custom .nav li a:hover,
