@@ -1,1 +1,32 @@
-{% include head.html %} {% include nav.html %} {% include search.html %} {{ content }} {% include footer.html %} 
+{% include head.html %}
+{% include nav.html %}
+{% include search.html %}
+
+{{ content }}
+
+{% include footer.html %}
+
+<!-- 粒子背景 -->
+<div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+  particlesJS("particles-js", {
+    "particles": {
+      "number": { "value": 100 },
+      "color": { "value": "#00ffff" },
+      "shape": { "type": "circle" },
+      "opacity": { "value": 0.6, "random": true },
+      "size": { "value": 3, "random": true },
+      "line_linked": { "enable": false },
+      "move": { "enable": true, "speed": 2, "direction": "none", "random": true }
+    },
+    "interactivity": {
+      "detect_on": "canvas",
+      "events": {
+        "onhover": { "enable": false },
+        "onclick": { "enable": false }
+      }
+    }
+  });
+</script> 
