@@ -9,7 +9,7 @@ tags: [web]
 # upload-lebs纯文本速查
 
 推荐用phpstudy2016版搭建靶场，可以复原所有环境。
-工具：==burpsuite==、==中国蚁剑==（或哥斯拉）
+工具：*burpsuite*、*中国蚁剑（或哥斯拉）*
 
 ## Pass-1(JS限制)
 
@@ -21,15 +21,15 @@ tags: [web]
 
 ## Pass-2(MIME限制)
 
-MIME检查会在==POSE请求之后==进行，所以可以用burpsuite进行改包。
+MIME检查会在**POSE请求之后**进行，所以可以用burpsuite进行改包。
 
-*注意：*把POST下方传入的文件的==Content-Type==改成imge/jpeg、image/png、image/gif这种典型的白名单。
+*注意：*把POST下方传入的文件的**Content-Type**改成imge/jpeg、image/png、image/gif这种典型的白名单。
 
 ## Pass-3(其他文件名)
 
 改后缀名.php3、.php5、phtml、pht、phar、pHp等
 
-## Pass-4(.htaccess[^④])
+## Pass-4(.htaccess)
 
 .htaccess管Apache的规则。（扔里整个文件夹就会被运行）
 
@@ -38,8 +38,9 @@ AddType application/x-httpd-php .txt
 ```
 
 然后连接文件路径至文件名。（不要带.php）
+*.htaccess：监听80/443端口，把浏览器发来的HTTP请求传给对应的服务器，再把结果成HTTP的响应返回。*
 
-## Pass-5(.user.ini[^⑤])
+## Pass-5(.user.ini)
 
 .user.ini管PHP的配置。（扔里整个文件夹就会被运行）
 
@@ -48,6 +49,7 @@ auto_prepend_file=shell.jpg
 ```
 
 然后连接文件路径至文件名。（不要带.php）
+*.user.ini：把.php文件里的HTML+PHP代码逐行执行，生成纯HTML（或JSON、图片等）。*
 
 ## Pass-6(大小写)
 
@@ -65,11 +67,12 @@ auto_prepend_file=shell.jpg
 
 *Linux 仍然不生效，保存文件会保留`.`。*
 
-## Pass-9(加`::$DATA`[^⑥])
+## Pass-9(加`::$DATA`)
 
 上传`.php::$DATA`，连接`.php`
 
 *Linux 和 macOS 不支持 `::$DATA` 语法，与PHP版本无关*
+*::$DATA：在 Windows 系统中，`::$DATA` 是 NTFS 文件系统中的一种**数据流标识**，用于访问文件的**主要数据流**。*
 
 ## Pass-10(加`. .`)
 
@@ -148,9 +151,13 @@ http://127.0.0.1/upload/include.php?file=upload/1120260319071146.gif
 
 **条件竞争**针对的是 **「文件落地了，但还没被处理掉」** 的那一瞬间。只要存在这个时间窗口，就有可能用并发挤进去执行代码。
 
-==*先上传保存，再检测删除*==          *==先上传保存，再重命名==*          *==先上传保存，再改内容==*          *==文件锁竞争[^⑦]==*          *==缓存/CDN 同步延迟[^⑧]==*          *==日志文件竞争[^⑨]==*          *==`Session`文件竞争[^⑩]==*
+*先上传保存，再检测删除*          *先上传保存，再重命名*          *先上传保存，再改内容*          *文件锁竞争*          *缓存/CDN 同步延迟*          *日志文件竞争*          *`Session`文件竞争*
 
 (Python代码问ai)
+*文件锁竞争：多线程同时上传同名文件时，可能一个线程在写，另一个线程在读，读到不完整的内容，但能触发代码执行。*
+*缓存/CDN 同步延迟：文件保存到本地后，同步到 CDN 或备份服务器之前，如果先被访问到，可能绕过一些检查。*
+*日志文件竞争：如果日志文件中能写入 PHP 代码，在日志被写入后、被清理前，如果能包含进来，也能形成竞争。（写日志时包含用户输入）*
+*`Session`文件竞争：如果 Session 文件中能写入用户控制的代码，在 Session 写入后、被覆盖前，如果能包含进来，也能利用。*
 
 ## Pass-19
 
