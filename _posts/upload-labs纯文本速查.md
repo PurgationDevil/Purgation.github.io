@@ -1,3 +1,11 @@
+---
+layout: post
+title: "upload-lebs纯文本速查"
+date: 2026-04-03
+categories: 分类名称
+tags: [web]
+---
+
 # upload-lebs纯文本速查
 
 推荐用phpstudy2016版搭建靶场，可以复原所有环境。
