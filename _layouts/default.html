@@ -74,3 +74,38 @@
     }
   });
 </script> 
+
+<!-- 鼠标点击爱心特效 -->
+<script>
+(function() {
+    function createHeart(x, y) {
+        var heart = document.createElement('div');
+        heart.innerHTML = ['❤️', '🌸', '✨'];
+        heart.style.position = 'fixed';
+        heart.style.left = x + 'px';
+        heart.style.top = y + 'px';
+        heart.style.fontSize = '20px';
+        heart.style.pointerEvents = 'none';
+        heart.style.zIndex = '9999';
+        heart.style.opacity = '1';
+        heart.style.transition = 'all 1s ease-out';
+        document.body.appendChild(heart);
+        
+        // 向上飘，逐渐变小变透明
+        setTimeout(function() {
+            heart.style.transform = 'translateY(-80px)';
+            heart.style.opacity = '0';
+            heart.style.fontSize = '12px';
+        }, 10);
+        
+        // 1秒后移除
+        setTimeout(function() {
+            heart.remove();
+        }, 1000);
+    }
+    
+    document.addEventListener('click', function(e) {
+        createHeart(e.clientX, e.clientY);
+    });
+})();
+</script>
