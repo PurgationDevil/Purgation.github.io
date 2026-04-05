@@ -84,6 +84,11 @@ service-worker: true
 # MathJax rendering for layout:page (e.g. post preview)
 page-mathjax: false
 
+# 开启文章目录
+markdown: kramdown
+kramdown:
+  toc_levels: 2..3  # 只提取 h2 和 h3 作为目录
+
 # Friends
 friends:
   []
