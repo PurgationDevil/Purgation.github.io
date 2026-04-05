@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "upload-lebs纯文本速查"
+toc: true
 date: 2026-04-03
 categories: 分类名称
 tags: [web]
