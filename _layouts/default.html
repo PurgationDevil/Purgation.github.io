@@ -1,3 +1,71 @@
+<!-- 回到顶部按钮 -->
+<style>
+.go-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  background: #0085a1;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 999;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  text-decoration: none;
+  border: none;
+}
+
+.go-top:hover {
+  background: #006680;
+  transform: scale(1.08);
+}
+
+.go-top.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 768px) {
+  .go-top {
+    bottom: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+}
+</style>
+
+<div class="go-top" id="goTopBtn">↑</div>
+
+<script>
+(function() {
+  var btn = document.getElementById('goTopBtn');
+  if (!btn) return;
+  
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 300) {
+      btn.classList.add('show');
+    } else {
+      btn.classList.remove('show');
+    }
+  });
+  
+  btn.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
 {% include head.html %}
 {% include nav.html %}
 {% include search.html %}
