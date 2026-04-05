@@ -2,33 +2,104 @@
 layout: default
 ---
 
-<!-- 文章目录 -->
+<!-- 固定目录（跟随滚动） -->
+<style>
+.toc-fixed {
+  position: fixed;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 260px;
+  max-height: 70vh;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 16px;
+  overflow-y: auto;
+  z-index: 999;
+  border: 1px solid #eaeaea;
+}
+
+.toc-fixed h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #0085a1;
+}
+
+.toc-fixed ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-fixed li {
+  margin: 8px 0;
+}
+
+.toc-fixed a {
+  color: #555;
+  text-decoration: none;
+  font-size: 13px;
+  display: block;
+  transition: all 0.2s;
+}
+
+.toc-fixed a:hover {
+  color: #0085a1;
+  transform: translateX(2px);
+}
+
+.toc-fixed a.active {
+  color: #0085a1;
+  font-weight: 500;
+  border-left: 2px solid #0085a1;
+  padding-left: 8px;
+}
+
+/* 滚动条 */
+.toc-fixed::-webkit-scrollbar {
+  width: 4px;
+}
+
+.toc-fixed::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.toc-fixed::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+/* 手机端隐藏 */
+@media (max-width: 992px) {
+  .toc-fixed {
+    display: none;
+  }
+}
+</style>
+
 <script>
 (function() {
-  // 等待页面加载完成
   function initToc() {
     var article = document.querySelector('.post-container');
-    if (!article) {
-      console.log('没找到 post-container');
-      return;
-    }
+    if (!article) return;
     
     var headers = article.querySelectorAll('h2, h3');
-    if (headers.length === 0) {
-      console.log('没找到标题');
-      return;
-    }
-    
-    console.log('找到了', headers.length, '个标题');
+    if (headers.length === 0) return;
     
     // 创建目录
     var tocDiv = document.createElement('div');
-    tocDiv.className = 'post-toc-sidebar';
-    tocDiv.innerHTML = '<div class="toc-inner"><h4>📖 目录</h4><ul></ul></div>';
+    tocDiv.className = 'toc-fixed';
+    tocDiv.innerHTML = '<h4>📖 目录</h4><ul></ul>';
     var tocList = tocDiv.querySelector('ul');
     
     headers.forEach(function(header, index) {
-      var id = 'section-' + index;
+      var id = 'toc-' + index;
       header.id = id;
       
       var li = document.createElement('li');
@@ -37,23 +108,37 @@ layout: default
       a.textContent = header.textContent;
       a.addEventListener('click', function(e) {
         e.preventDefault();
-        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
       li.appendChild(a);
       tocList.appendChild(li);
     });
     
-    // 放到左侧边栏
-    var sidebar = document.querySelector('.sidebar-container');
-    if (sidebar) {
-      sidebar.insertBefore(tocDiv, sidebar.firstChild);
-    } else {
-      // 如果没有侧边栏，放到文章开头
-      article.insertBefore(tocDiv, article.firstChild);
-    }
+    document.body.appendChild(tocDiv);
+    
+    // 高亮当前章节
+    var tocLinks = document.querySelectorAll('.toc-fixed a');
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + 100;
+      var currentId = null;
+      
+      headers.forEach(function(header) {
+        var offsetTop = header.offsetTop;
+        if (offsetTop <= scrollPos) {
+          currentId = header.id;
+        }
+      });
+      
+      tocLinks.forEach(function(link) {
+        link.classList.remove('active');
+        var href = link.getAttribute('href').substring(1);
+        if (href === currentId) {
+          link.classList.add('active');
+        }
+      });
+    });
   }
   
-  // 确保 DOM 加载完成
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initToc);
   } else {
@@ -61,43 +146,6 @@ layout: default
   }
 })();
 </script>
-
-<style>
-.post-toc-sidebar {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 30px;
-}
-
-.post-toc-sidebar h4 {
-  margin: 0 0 10px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-}
-
-.post-toc-sidebar ul {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
-
-.post-toc-sidebar li {
-  margin: 6px 0;
-}
-
-.post-toc-sidebar a {
-  color: #555;
-  text-decoration: none;
-  font-size: 13px;
-  display: block;
-}
-
-.post-toc-sidebar a:hover {
-  color: #0085a1;
-}
-</style>
 
 <!-- Image to hack wechat -->
 <!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
