@@ -6,6 +6,13 @@ layout: default
 <!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
 <!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
 
+{% if page.toc %}
+<div class="post-toc">
+  <h4>目录</h4>
+  {{ content | toc_only }}
+</div>
+{% endif %}
+
 <!-- Post Header -->
 {% include intro-header.html type='post' %}
 
