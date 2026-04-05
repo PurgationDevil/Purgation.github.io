@@ -2,172 +2,92 @@
 layout: default
 ---
 
-<!-- 固定侧边栏目录 -->
+<!-- 文章目录（放在文章开头） -->
+<style>
+.post-toc-local {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 30px;
+  border-left: 4px solid #0085a1;
+}
+
+.post-toc-local h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.post-toc-local ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.post-toc-local li {
+  margin: 0;
+}
+
+.post-toc-local a {
+  color: #555;
+  text-decoration: none;
+  font-size: 13px;
+  background: #fff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  display: inline-block;
+  border: 1px solid #eaeaea;
+}
+
+.post-toc-local a:hover {
+  color: #0085a1;
+  border-color: #0085a1;
+}
+</style>
+
 <script>
 (function() {
   // 找到文章内容区域
   var article = document.querySelector('.post-container');
+  if (!article) {
+    // 如果找不到，尝试其他常见容器
+    article = document.querySelector('.post-content') || document.querySelector('article') || document.querySelector('.content');
+  }
   if (!article) return;
   
-  // 获取所有标题（h2, h3, h4）
-  var headers = article.querySelectorAll('h2, h3, h4');
+  // 获取所有标题
+  var headers = article.querySelectorAll('h2, h3');
   if (headers.length === 0) return;
   
-  // 创建目录侧边栏
-  var tocSidebar = document.createElement('div');
-  tocSidebar.className = 'toc-sidebar';
-  tocSidebar.innerHTML = '<div class="toc-wrapper"><div class="toc-title">📖 文章目录</div><ul class="toc-nav"></ul></div>';
+  // 创建目录容器
+  var tocDiv = document.createElement('div');
+  tocDiv.className = 'post-toc-local';
+  tocDiv.innerHTML = '<h4>📖 文章目录</h4><ul></ul>';
+  var tocList = tocDiv.querySelector('ul');
   
-  var tocList = tocSidebar.querySelector('.toc-nav');
-  
-  // 遍历标题，生成目录
   headers.forEach(function(header, index) {
-    // 给标题添加 id
-    var id = 'section-' + index;
+    var id = 'toc-' + index;
     header.id = id;
     
-    // 获取标题层级
-    var tagName = header.tagName.toLowerCase();
-    var level = parseInt(tagName.charAt(1));
-    
-    // 计算缩进
-    var indent = (level - 2) * 16;
-    
-    // 创建目录项
     var li = document.createElement('li');
-    li.className = 'toc-item toc-level-' + level;
-    li.style.paddingLeft = indent + 'px';
-    
     var a = document.createElement('a');
     a.href = '#' + id;
     a.textContent = header.textContent;
-    
-    // 点击平滑滚动
     a.addEventListener('click', function(e) {
       e.preventDefault();
-      document.getElementById(id).scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
     });
-    
     li.appendChild(a);
     tocList.appendChild(li);
   });
   
-  // 添加到页面
-  document.body.appendChild(tocSidebar);
-  
-  // 高亮当前章节
-  var tocLinks = document.querySelectorAll('.toc-nav a');
-  
-  window.addEventListener('scroll', function() {
-    var scrollPos = window.scrollY + 100;
-    var currentId = null;
-    
-    headers.forEach(function(header) {
-      var offsetTop = header.offsetTop;
-      if (offsetTop <= scrollPos) {
-        currentId = header.id;
-      }
-    });
-    
-    tocLinks.forEach(function(link) {
-      link.classList.remove('active');
-      var href = link.getAttribute('href').substring(1);
-      if (href === currentId) {
-        link.classList.add('active');
-      }
-    });
-  });
+  // 插入到文章开头
+  article.insertBefore(tocDiv, article.firstChild);
 })();
 </script>
-
-<style>
-/* 固定侧边栏目录 */
-.toc-sidebar {
-  position: fixed;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 260px;
-  max-height: 70vh;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  z-index: 1000;
-  overflow-y: auto;
-  border: 1px solid #eaeaea;
-}
-
-.toc-wrapper {
-  padding: 16px;
-}
-
-.toc-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #0085a1;
-  display: inline-block;
-}
-
-.toc-nav {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
-
-.toc-item {
-  margin: 8px 0;
-  line-height: 1.4;
-}
-
-.toc-item a {
-  color: #555;
-  text-decoration: none;
-  font-size: 13px;
-  display: block;
-  transition: all 0.2s;
-}
-
-.toc-item a:hover {
-  color: #0085a1;
-  transform: translateX(2px);
-}
-
-.toc-item a.active {
-  color: #0085a1;
-  font-weight: 500;
-  border-left: 2px solid #0085a1;
-  padding-left: 8px;
-}
-
-/* 滚动条样式 */
-.toc-sidebar::-webkit-scrollbar {
-  width: 4px;
-}
-
-.toc-sidebar::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.toc-sidebar::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
-}
-
-/* 手机端隐藏目录 */
-@media (max-width: 992px) {
-  .toc-sidebar {
-    display: none;
-  }
-}
-</style>
 
 <!-- Image to hack wechat -->
 <!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
