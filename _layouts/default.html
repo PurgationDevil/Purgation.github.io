@@ -77,60 +77,6 @@
 
 <style>
 
-<!-- 搜索功能脚本 -->
-<script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script>
-
-<script>
-(function() {
-  // 打开/关闭搜索页面
-  var searchIcon = document.querySelector('.search-icon');
-  var searchPage = document.querySelector('.search-page');
-  var searchClose = document.querySelector('.search-icon-close');
-  
-  if (searchIcon && searchPage) {
-    searchIcon.addEventListener('click', function(e) {
-      e.preventDefault();
-      searchPage.classList.add('search-active');
-      document.body.style.overflow = 'hidden';
-      setTimeout(function() {
-        var input = document.getElementById('search-input');
-        if (input) input.focus();
-      }, 100);
-    });
-    
-    if (searchClose) {
-      searchClose.addEventListener('click', function() {
-        searchPage.classList.remove('search-active');
-        document.body.style.overflow = '';
-      });
-    }
-  }
-  
-  // 初始化搜索
-  var searchInput = document.getElementById('search-input');
-  var searchResults = document.getElementById('search-results');
-  
-  if (searchInput && searchResults) {
-    fetch('/search.json')
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        SimpleJekyllSearch({
-          searchInput: searchInput,
-          resultsContainer: searchResults,
-          json: data,
-          searchResultTemplate: '<div class="post-preview"><a href="{url}"><h2 class="post-title">{title}</h2><div class="post-content-preview">{subtitle}</div></a><p class="post-meta">{date}</p></div>',
-          noResultsText: '没有找到相关文章',
-          limit: 10
-        });
-      })
-      .catch(function(err) {
-        console.log('搜索加载失败:', err);
-        searchResults.innerHTML = '<p style="color:red;">搜索功能加载失败</p>';
-      });
-  }
-})();
-</script>
-
 <style>
 .search-page {
   position: fixed;
