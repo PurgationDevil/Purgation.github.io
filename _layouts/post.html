@@ -2,92 +2,102 @@
 layout: default
 ---
 
-<!-- 文章目录（放在文章开头） -->
+<!-- 文章目录 -->
+<script>
+(function() {
+  // 等待页面加载完成
+  function initToc() {
+    var article = document.querySelector('.post-container');
+    if (!article) {
+      console.log('没找到 post-container');
+      return;
+    }
+    
+    var headers = article.querySelectorAll('h2, h3');
+    if (headers.length === 0) {
+      console.log('没找到标题');
+      return;
+    }
+    
+    console.log('找到了', headers.length, '个标题');
+    
+    // 创建目录
+    var tocDiv = document.createElement('div');
+    tocDiv.className = 'post-toc-sidebar';
+    tocDiv.innerHTML = '<div class="toc-inner"><h4>📖 目录</h4><ul></ul></div>';
+    var tocList = tocDiv.querySelector('ul');
+    
+    headers.forEach(function(header, index) {
+      var id = 'section-' + index;
+      header.id = id;
+      
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.href = '#' + id;
+      a.textContent = header.textContent;
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+      });
+      li.appendChild(a);
+      tocList.appendChild(li);
+    });
+    
+    // 放到左侧边栏
+    var sidebar = document.querySelector('.sidebar-container');
+    if (sidebar) {
+      sidebar.insertBefore(tocDiv, sidebar.firstChild);
+    } else {
+      // 如果没有侧边栏，放到文章开头
+      article.insertBefore(tocDiv, article.firstChild);
+    }
+  }
+  
+  // 确保 DOM 加载完成
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToc);
+  } else {
+    initToc();
+  }
+})();
+</script>
+
 <style>
-.post-toc-local {
+.post-toc-sidebar {
   background: #f8f9fa;
   border-radius: 8px;
-  padding: 16px 20px;
+  padding: 12px 16px;
   margin-bottom: 30px;
-  border-left: 4px solid #0085a1;
 }
 
-.post-toc-local h4 {
-  margin: 0 0 12px 0;
-  font-size: 16px;
+.post-toc-sidebar h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
   font-weight: 600;
+  color: #333;
 }
 
-.post-toc-local ul {
+.post-toc-sidebar ul {
   list-style: none;
   padding-left: 0;
   margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
 }
 
-.post-toc-local li {
-  margin: 0;
+.post-toc-sidebar li {
+  margin: 6px 0;
 }
 
-.post-toc-local a {
+.post-toc-sidebar a {
   color: #555;
   text-decoration: none;
   font-size: 13px;
-  background: #fff;
-  padding: 4px 12px;
-  border-radius: 20px;
-  display: inline-block;
-  border: 1px solid #eaeaea;
+  display: block;
 }
 
-.post-toc-local a:hover {
+.post-toc-sidebar a:hover {
   color: #0085a1;
-  border-color: #0085a1;
 }
 </style>
-
-<script>
-(function() {
-  // 找到文章内容区域
-  var article = document.querySelector('.post-container');
-  if (!article) {
-    // 如果找不到，尝试其他常见容器
-    article = document.querySelector('.post-content') || document.querySelector('article') || document.querySelector('.content');
-  }
-  if (!article) return;
-  
-  // 获取所有标题
-  var headers = article.querySelectorAll('h2, h3');
-  if (headers.length === 0) return;
-  
-  // 创建目录容器
-  var tocDiv = document.createElement('div');
-  tocDiv.className = 'post-toc-local';
-  tocDiv.innerHTML = '<h4>📖 文章目录</h4><ul></ul>';
-  var tocList = tocDiv.querySelector('ul');
-  
-  headers.forEach(function(header, index) {
-    var id = 'toc-' + index;
-    header.id = id;
-    
-    var li = document.createElement('li');
-    var a = document.createElement('a');
-    a.href = '#' + id;
-    a.textContent = header.textContent;
-    a.addEventListener('click', function(e) {
-      e.preventDefault();
-      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-    });
-    li.appendChild(a);
-    tocList.appendChild(li);
-  });
-  
-  // 插入到文章开头
-  article.insertBefore(tocDiv, article.firstChild);
-})();
-</script>
 
 <!-- Image to hack wechat -->
 <!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
