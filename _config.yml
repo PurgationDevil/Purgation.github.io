@@ -13,7 +13,7 @@ future: true
 # SNS settings
 RSS: false
 github_username: PurgationDevil
-#facebook_username:  PDevil
+#facebook_username:  PurgationDevil
 #linkedin_username:  firstname-lastname-idxxxx
 
 # Build settings
@@ -55,7 +55,7 @@ kramdown:
       start_line: 1
 
 # Disqus settings
-disqus_username: hux
+disqus_username: PurgationDevil
 
 # Netease settings
 netease_comment: false
