@@ -115,9 +115,9 @@ description: "「代码即利刃，逆向即真相」"
       <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
     </div>
   </div>
-  
-  <!-- 第4篇：图4在右 -->
-  {% else %}
+
+    <!-- 第4篇：图4在右 -->
+  {% elsif cycle_index == 4 %}
   <div class="post-card post-card-right">
     <div class="post-card-content">
       <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
@@ -127,6 +127,34 @@ description: "「代码即利刃，逆向即真相」"
     </div>
     <div class="post-card-image">
       <img src="/img/posts/4.jpg" alt="{{ post.title }}">
+    </div>
+  </div>
+
+    <!-- 第5篇：图5在左 -->
+  {% elsif cycle_index == 5 %}
+  <div class="post-card post-card-left">
+    <div class="post-card-image">
+      <img src="/img/posts/5.jpg" alt="{{ post.title }}">
+    </div>
+    <div class="post-card-content">
+      <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
+      <h2 class="post-card-title"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
+      <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
+      <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
+    </div>
+  </div>
+
+  <!-- 第6篇：6在右 -->
+  {% else %}
+  <div class="post-card post-card-right">
+    <div class="post-card-content">
+      <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
+      <h2 class="post-card-title"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
+      <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
+      <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
+    </div>
+    <div class="post-card-image">
+      <img src="/img/posts/6.jpg" alt="{{ post.title }}">
     </div>
   </div>
   {% endif %}
