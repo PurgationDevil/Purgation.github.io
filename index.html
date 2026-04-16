@@ -72,7 +72,7 @@ description: "「代码即利刃，逆向即真相」"
 </style>
 
 {% for post in paginator.posts %}
-  {% assign cycle_index = forloop.index | modulo: 4 %}
+  {% assign cycle_index = forloop.index | modulo: 6 %}
   
   <!-- 第1篇：图1在左 -->
   {% if cycle_index == 1 %}
