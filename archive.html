@@ -12,18 +12,29 @@ header-img: "img/bg-little-universe.jpg"
 <div class="container">
 	<div class="row">
 		<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-			<div class="archive-container">
+			<!-- 标签筛选按钮 -->
+			<div id="tag_cloud" class="tags tags-sup">
+				<a class="tag-button--all active" data-tag="all">全部 <sup>{{ site.posts.size }}</sup></a>
+				{% for tag in site.tags %}
+				<a class="tag-button" data-tag="{{ tag[0] | slugify }}">{{ tag[0] }} <sup>{{ tag[1].size }}</sup></a>
+				{% endfor %}
+			</div>
+
+			<!-- 文章列表容器 -->
+			<div class="archive-list-container">
 				{% assign posts_by_year = site.posts | group_by_exp:"post", "post.date | date: '%Y'" %}
 				{% for year in posts_by_year %}
+				<div class="archive-group" data-year="{{ year.name }}">
 					<h2 class="archive-year">{{ year.name }}</h2>
 					<ul class="archive-list">
 						{% for post in year.items %}
-							<li class="archive-item">
-								<span class="archive-date">{{ post.date | date: "%m-%d" }}</span>
-								<a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-							</li>
+						<li class="archive-item" data-tags="{{ post.tags | join: ',' | downcase | slugify }}">
+							<span class="archive-date">{{ post.date | date: "%m-%d" }}</span>
+							<a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+						</li>
 						{% endfor %}
 					</ul>
+				</div>
 				{% endfor %}
 			</div>
 		</div>
@@ -31,6 +42,36 @@ header-img: "img/bg-little-universe.jpg"
 </div>
 
 <style>
+/* 标签筛选按钮样式 */
+#tag_cloud {
+	margin-bottom: 30px;
+	text-align: center;
+}
+
+#tag_cloud a {
+	display: inline-block;
+	padding: 4px 12px;
+	margin: 4px;
+	border-radius: 20px;
+	background: #f5f5f5;
+	color: #555;
+	font-size: 13px;
+	text-decoration: none;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+#tag_cloud a.active {
+	background: #0085a1;
+	color: #fff;
+}
+
+#tag_cloud a:hover {
+	background: #0085a1;
+	color: #fff;
+}
+
+/* 归档列表样式 */
 .archive-year {
 	font-size: 24px;
 	font-weight: 600;
@@ -67,15 +108,66 @@ header-img: "img/bg-little-universe.jpg"
 	color: #0085a1;
 }
 
+/* 隐藏/显示 */
+.archive-group.hide {
+	display: none;
+}
+
 @media (max-width: 600px) {
 	.archive-item {
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 5px;
-		margin: 15px 0;
-	}
-	.archive-date {
-		font-size: 12px;
 	}
 }
 </style>
+
+<script>
+(function() {
+	var btns = document.querySelectorAll('#tag_cloud a');
+	var groups = document.querySelectorAll('.archive-group');
+	
+	function filterByTag(tag) {
+		groups.forEach(function(group) {
+			var items = group.querySelectorAll('.archive-item');
+			var hasVisible = false;
+			
+			items.forEach(function(item) {
+				if (tag === 'all') {
+					item.style.display = '';
+					hasVisible = true;
+				} else {
+					var itemTags = (item.getAttribute('data-tags') || '').toLowerCase();
+					if (itemTags.indexOf(tag.toLowerCase()) !== -1) {
+						item.style.display = '';
+						hasVisible = true;
+					} else {
+						item.style.display = 'none';
+					}
+				}
+			});
+			
+			// 如果该年份下没有可见文章，隐藏整个年份组
+			if (!hasVisible) {
+				group.classList.add('hide');
+			} else {
+				group.classList.remove('hide');
+			}
+		});
+	}
+	
+	btns.forEach(function(btn) {
+		btn.addEventListener('click', function(e) {
+			e.preventDefault();
+			var tag = this.getAttribute('data-tag');
+			
+			// 更新按钮激活状态
+			btns.forEach(function(b) { b.classList.remove('active'); });
+			this.classList.add('active');
+			
+			// 筛选文章
+			filterByTag(tag);
+		});
+	});
+})();
+</script>
