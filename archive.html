@@ -42,17 +42,13 @@ header-img: "img/bg-little-universe.jpg"
 </div>
 
 <style>
-/* 标签筛选按钮样式 */
-#tag_cloud {
-	margin-bottom: 30px;
-	text-align: center;
-}
-
-#tag_cloud a {
+/* 所有按钮统一基础样式 */
+#tag_cloud a,
+#tag_cloud .tag-button--all {
 	display: inline-block;
-	padding: 4px 12px;
+	padding: 6px 16px;
 	margin: 4px;
-	border-radius: 20px;
+	border-radius: 24px;
 	background: #f0f0f0;
 	color: #555;
 	font-size: 13px;
@@ -60,19 +56,24 @@ header-img: "img/bg-little-universe.jpg"
 	text-decoration: none;
 	cursor: pointer;
 	transition: all 0.2s;
+	border: none;
 }
 
-#tag_cloud a.active {
-	background: #f0f0f0;
-	color: #0085a1;
-	font-weight: 500;
+/* 选中状态：全部或普通标签都一样 */
+#tag_cloud a.active,
+#tag_cloud .tag-button--all.active {
+	background: #0085a1;
+	color: #fff;
 }
 
-#tag_cloud a:hover {
+/* 悬停状态统一 */
+#tag_cloud a:hover,
+#tag_cloud .tag-button--all:hover {
 	background: #e0e0e0;
-	color: #0085a1;
+	color: #555;
 }
 
+/* 数字样式 */
 #tag_cloud sup {
 	font-size: 11px;
 	margin-left: 2px;
@@ -80,8 +81,9 @@ header-img: "img/bg-little-universe.jpg"
 	font-weight: normal;
 }
 
-#tag_cloud a.active sup {
-	color: #f0f0f0;
+#tag_cloud a.active sup,
+#tag_cloud .tag-button--all.active sup {
+	color: #fff;
 }
 
 /* 归档列表样式 */
