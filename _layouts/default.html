@@ -276,3 +276,27 @@
 
 <!-- Live2D 看板娘 -->
 <script src="https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
+<script>
+  (function() {
+    setTimeout(function() {
+      if (window.L2Dwidget && window.L2Dwidget.init) {
+        L2Dwidget.init({
+          model: {
+            jsonPath: "https://raw.githubusercontent.com/PurgationDevil/PurgationDevil.github.io/main/live2d/model/kesshouban/model.json",
+            scale: 1
+          },
+          display: {
+            position: "left",
+            width: 150,
+            height: 200,
+            hOffset: 0,
+            vOffset: -20
+          },
+          mobile: {
+            show: false
+          }
+        });
+      }
+    }, 100);
+  })();
+</script>
