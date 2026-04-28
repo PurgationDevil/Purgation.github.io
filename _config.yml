@@ -86,4 +86,6 @@ page-mathjax: false
 
 # Friends
 friends:
-  []
+  [
+  { title: "七月的博客", href: "http://qiyue.jiushi.gay/" }
+  ]
