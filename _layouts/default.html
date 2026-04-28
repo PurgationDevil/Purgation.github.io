@@ -249,37 +249,19 @@
 {% include footer.html %}
 
 <!-- Live2D 看板娘（强制 Pio 酱） -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
-<script src="https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
-<script>
-  (function() {
-    // 等待并覆盖默认配置
-    function initPio() {
-      if (typeof L2Dwidget !== 'undefined') {
-        // 强制重新初始化，覆盖默认模型
-        L2Dwidget.init({
-          model: {
-            jsonPath: "https://cdn.jsdelivr.net/gh/PurgationDevil/PurgationDevil.github.io/live2d/model/kesshouban/model.json",
-            scale: 1
-          },
-          display: {
-            position: "left",
-            width: 150,
-            height: 200,
-            hOffset: 0,
-            vOffset: -20
-          },
-          mobile: {
-            show: false
-          }
-        });
-        console.log("Pio 酱加载尝试");
-      } else {
-        setTimeout(initPio, 100);
-      }
-    }
-
-    // 延迟一点执行，确保 autoload.js 已经加载
-    setTimeout(initPio, 500);
-  })();
-</script>
+L2Dwidget.init({
+  model: {
+    jsonPath: "https://cdn.jsdelivr.net/gh/PurgationDevil/PurgationDevil.github.io/live2d/model/pio/model.json",
+    scale: 1
+  },
+  display: {
+    position: "left",
+    width: 150,
+    height: 200,
+    hOffset: 0,
+    vOffset: -20
+  },
+  mobile: {
+    show: false
+  }
+});
