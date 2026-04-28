@@ -44,31 +44,8 @@
     font-size: 20px;
   }
 }
-</style>
 
-<div class="go-top" id="goTopBtn">↑</div>
-
-<script>
-(function() {
-  var btn = document.getElementById('goTopBtn');
-  if (!btn) return;
-  
-  window.addEventListener('scroll', function() {
-    if (window.scrollY > 300) {
-      btn.classList.add('show');
-    } else {
-      btn.classList.remove('show');
-    }
-  });
-  
-  btn.addEventListener('click', function() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-})();
-</script>
-
-<!-- 点击扩散波纹特效 -->
-<style>
+/* 点击波纹特效 */
 .ripple {
   position: fixed;
   width: 0;
@@ -93,35 +70,8 @@
     opacity: 0;
   }
 }
-</style>
 
-<script>
-(function() {
-  document.addEventListener('click', function(e) {
-    var ripple = document.createElement('div');
-    ripple.className = 'ripple';
-    ripple.style.left = e.clientX + 'px';
-    ripple.style.top = e.clientY + 'px';
-    document.body.appendChild(ripple);
-    
-    setTimeout(function() {
-      ripple.remove();
-    }, 600);
-  });
-})();
-</script>
-
-{% include head.html %}
-{% include nav.html %}
-{% include search.html %}
-
-{{ content }}
-
-{% include footer.html %}
-
-<style>
-
-<style>
+/* 搜索页面样式 */
 .search-page {
   position: fixed;
   top: 0;
@@ -164,10 +114,8 @@
 #search-results {
   margin-top: 30px;
 }
-</style>
 
-<style>
-/* 导航栏字体颜色 - 强制生效 */
+/* 导航栏样式 */
 .navbar-custom .nav li a,
 .navbar-custom .navbar-brand {
     color: #66ccff !important;
@@ -178,12 +126,10 @@
     color: #3399ff !important;
 }
 
-/* 导航栏背景半透明 */
 .navbar-custom {
     background-color: rgba(255, 255, 255, 0.85) !important;
 }
 
-/* 首页标题颜色 */
 .intro-header .site-heading h1,
 .intro-header .page-heading h1 {
     color: #ffffff !important;
@@ -194,7 +140,6 @@
     color: #ffffff !important;
 }
 
-/* 首页图片底部渐变 */
 .intro-header {
     position: relative;
 }
@@ -211,9 +156,40 @@
 }
 </style>
 
+<div class="go-top" id="goTopBtn">↑</div>
+
+<script>
+(function() {
+  var btn = document.getElementById('goTopBtn');
+  if (!btn) return;
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 300) {
+      btn.classList.add('show');
+    } else {
+      btn.classList.remove('show');
+    }
+  });
+  btn.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
+<script>
+(function() {
+  document.addEventListener('click', function(e) {
+    var ripple = document.createElement('div');
+    ripple.className = 'ripple';
+    ripple.style.left = e.clientX + 'px';
+    ripple.style.top = e.clientY + 'px';
+    document.body.appendChild(ripple);
+    setTimeout(function() { ripple.remove(); }, 600);
+  });
+})();
+</script>
+
 <!-- 粒子背景 -->
 <div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
-
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 <script>
   particlesJS("particles-js", {
@@ -234,42 +210,43 @@
       }
     }
   });
-</script> 
+</script>
 
-<!-- 鼠标点击爱心特效 -->
+<!-- 鼠标点击樱花特效 -->
 <script>
 (function() {
-    function createHeart(x, y) {
-        var heart = document.createElement('div');
-        heart.innerHTML = '🌸';
-        heart.style.position = 'fixed';
-        heart.style.left = x + 'px';
-        heart.style.top = y + 'px';
-        heart.style.fontSize = '20px';
-        heart.style.pointerEvents = 'none';
-        heart.style.zIndex = '9999';
-        heart.style.opacity = '1';
-        heart.style.transition = 'all 1s ease-out';
-        document.body.appendChild(heart);
-        
-        // 向上飘，逐渐变小变透明
+    function createFlower(x, y) {
+        var flower = document.createElement('div');
+        flower.innerHTML = '🌸';
+        flower.style.position = 'fixed';
+        flower.style.left = x + 'px';
+        flower.style.top = y + 'px';
+        flower.style.fontSize = '20px';
+        flower.style.pointerEvents = 'none';
+        flower.style.zIndex = '9999';
+        flower.style.opacity = '1';
+        flower.style.transition = 'all 1s ease-out';
+        document.body.appendChild(flower);
         setTimeout(function() {
-            heart.style.transform = 'translateY(-80px)';
-            heart.style.opacity = '0';
-            heart.style.fontSize = '12px';
+            flower.style.transform = 'translateY(-80px)';
+            flower.style.opacity = '0';
+            flower.style.fontSize = '12px';
         }, 10);
-        
-        // 1秒后移除
-        setTimeout(function() {
-            heart.remove();
-        }, 1000);
+        setTimeout(function() { flower.remove(); }, 1000);
     }
-    
     document.addEventListener('click', function(e) {
-        createHeart(e.clientX, e.clientY);
+        createFlower(e.clientX, e.clientY);
     });
 })();
 </script>
+
+{% include head.html %}
+{% include nav.html %}
+{% include search.html %}
+
+{{ content }}
+
+{% include footer.html %}
 
 <!-- Live2D 看板娘 -->
 <script src="https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
