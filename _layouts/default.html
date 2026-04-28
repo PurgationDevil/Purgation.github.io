@@ -248,20 +248,33 @@
 
 {% include footer.html %}
 
-<!-- Live2D 看板娘（强制 Pio 酱） -->
-L2Dwidget.init({
-  model: {
-    jsonPath: "https://cdn.jsdelivr.net/gh/PurgationDevil/PurgationDevil.github.io/live2d/model/pio/model.json",
-    scale: 1
-  },
-  display: {
-    position: "left",
-    width: 150,
-    height: 200,
-    hOffset: 0,
-    vOffset: -20
-  },
-  mobile: {
-    show: false
-  }
-});
+<!-- Live2D 看板娘 - Pio 酱 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+<script src="https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
+<script>
+  (function() {
+    // 等待 autoload.js 加载完成，然后覆盖默认模型
+    setTimeout(function() {
+      if (typeof L2Dwidget !== 'undefined') {
+        L2Dwidget.init({
+          model: {
+            // 如果 CDN 不行，换成 raw 链接：https://raw.githubusercontent.com/PurgationDevil/PurgationDevil.github.io/main/live2d/model/pio/model.json
+            jsonPath: "https://cdn.jsdelivr.net/gh/PurgationDevil/PurgationDevil.github.io/live2d/model/pio/model.json",
+            scale: 1
+          },
+          display: {
+            position: "left",
+            width: 150,
+            height: 200,
+            hOffset: 0,
+            vOffset: -20
+          },
+          mobile: {
+            show: false
+          }
+        });
+        console.log("Pio 酱模型尝试加载");
+      }
+    }, 500);
+  })();
+</script>
