@@ -87,5 +87,5 @@ page-mathjax: false
 # Friends
 friends:
   [
-  { title: "七月的博客", href: "http://qiyue.jiushi.gay/" }
+  { title: "七月的博客（网络安全的PWN方向）", href: "http://qiyue.jiushi.gay/" }
   ]
