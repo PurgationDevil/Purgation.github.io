@@ -91,14 +91,20 @@
     transform: scale(1.1);
 }
 
-/* 手机端适配 */
+/* 手机端适配 - 缩小显示 */
 @media (max-width: 768px) {
     .waifu {
-        display: none !important;
+        left: 5px !important;
+        transform: scale(0.6) translateY(20%);
+        transform-origin: left bottom;
     }
     
     .show-button {
-        display: none !important;
+        left: 15px !important;
+        bottom: 20px !important;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 16px !important;
     }
 }
 
