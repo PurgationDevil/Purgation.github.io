@@ -117,9 +117,14 @@
     transform: scale(1.1);
 }
 
-@media (max-width: 860px) {
-    .waifu  {
-        display: none;
+/* 手机端适配 - 屏幕宽度小于 768px 时隐藏看板娘 */
+@media (max-width: 768px) {
+    .waifu {
+        display: none !important;
+    }
+    
+    .show-button {
+        display: none !important;
     }
 }
 
