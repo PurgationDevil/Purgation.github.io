@@ -144,7 +144,6 @@ function hideMessage(timeout){
 }
 // 服装列表
 var dressList = [
-    "textures/ZCake-Costume.png",
     "textures/Dress-Costume.png",
     "textures/Halloween-Costume.png",
     "textures/Kids-Costume.png",
@@ -155,7 +154,8 @@ var dressList = [
     "textures/School-Costume.png",
     "textures/Succubus-Costume.png",
     "textures/Winter-Costume.png",
-    "textures/Winter2-Costume.png"
+    "textures/Winter2-Costume.png",
+    "textures/ZCake-Costume.png"
 ];
 
 // 从 localStorage 读取上次保存的服装索引
