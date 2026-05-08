@@ -90,7 +90,7 @@ initTips();
             text = 'Hello! 来自 谷歌搜索 的朋友<br>欢迎阅读<span style="color:#0099cc;">『' + document.title.split(' - ')[0] + '』</span>';
         }
     }else {
-        if (window.location.href == 'https://www.litblc.com/') { //如果是主页
+        if (window.location.href == 'https://www.litblc.com/') {
             var now = (new Date()).getHours();
             if (now > 23 || now <= 5) {
                 text = '你是夜猫子呀？这么晚还不睡觉，明天起的来嘛';
@@ -128,7 +128,6 @@ function showHitokoto() {
 function showMessage(text, timeout, flag){
     if(flag || sessionStorage.getItem('waifu-text') === '' || sessionStorage.getItem('waifu-text') === null){
         if(Array.isArray(text)) text = text[Math.floor(Math.random() * text.length + 1)-1];
-        //console.log(text);
         if(flag) sessionStorage.setItem('waifu-text', text);
         $('.waifu-tips').stop();
         $('.waifu-tips').html(text).fadeTo(200, 1);
@@ -144,6 +143,7 @@ function hideMessage(timeout){
 }
 // 服装列表
 var dressList = [
+    "textures/ZCake-Costume.png",
     "textures/Dress-Costume.png",
     "textures/Halloween-Costume.png",
     "textures/Kids-Costume.png",
@@ -154,8 +154,7 @@ var dressList = [
     "textures/School-Costume.png",
     "textures/Succubus-Costume.png",
     "textures/Winter-Costume.png",
-    "textures/Winter2-Costume.png",
-    "textures/ZCake-Costume.png"
+    "textures/Winter2-Costume.png"
 ];
 
 // 从 localStorage 读取上次保存的服装索引
@@ -238,33 +237,28 @@ function changeDressToIndex(index) {
     loadModelWithDress(currentDressIndex);
 }
 
+// 初始化看板娘
+var initAttempts = 0;
+var maxInitAttempts = 10;
+
 function initLive2d() {
+    initAttempts++;
+    
     var landlord = document.getElementById('landlord');
     var showWaifuBtn = document.getElementById('showWaifuBtn');
     var hideBtn = document.querySelector('.hide-button');
     var dressBtn = document.querySelector('.dress-button');
     
     if (!landlord || !showWaifuBtn || !hideBtn || !dressBtn) {
-        setTimeout(initLive2d, 100);
+        if (initAttempts < maxInitAttempts) {
+            setTimeout(initLive2d, 100);
+        }
         return;
     }
     
-    // 检查 localStorage 中的隐藏状态
-    var isHidden = false;
-    try {
-        isHidden = localStorage.getItem('waifu-hidden') === 'true';
-    } catch(e) {
-        console.log('localStorage 不可用');
-    }
-    
-    // 设置初始显示状态
-    if (isHidden) {
-        landlord.style.display = 'none';
-        showWaifuBtn.style.display = 'flex';
-    } else {
-        landlord.style.display = 'block';
-        showWaifuBtn.style.display = 'none';
-    }
+    // 强制显示看板娘，不读取隐藏状态
+    landlord.style.display = 'block';
+    showWaifuBtn.style.display = 'none';
     
     // 隐藏按钮事件
     hideBtn.style.display = 'none';
