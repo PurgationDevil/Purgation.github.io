@@ -1,55 +1,63 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if page.title %}{{ page.title }} - {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
-    
-    <!-- 引入必要的资源 -->
-    <link rel="stylesheet" href="{{ site.baseurl }}/css/style.css">
-    <link rel="stylesheet" href="{{ site.baseurl }}/css/font-awesome.min.css">
-    <script src="{{ site.baseurl }}/js/jquery.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+  <link rel="shortcut icon" href="{{ site.baseurl }}/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="{{ site.baseurl }}/favicon.ico" type="image/x-icon">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="{{ site.baseurl }}/css/main.css">
+  {% if site.google_fonts %}
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={{ site.google_fonts }}">
+  {% endif %}
+  
+  <!-- SEO & Analytics -->
+  {% seo %}
+  
+  <!-- MathJax -->
+  {% if page.mathjax or site.mathjax %}
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+  {% endif %}
 </head>
+
 <body>
-    <!-- 头部导航 -->
-    <header>
-        <div class="logo">
-            <a href="{{ site.baseurl }}/">{{ site.title }}</a>
-        </div>
-        <nav>
-            {% for item in site.navigation %}
-            <a href="{{ item.url }}">{{ item.name }}</a>
-            {% endfor %}
-        </nav>
-    </header>
-
-    <!-- 主要内容区域 -->
-    <main>
-        {{ content }}
-    </main>
-
-    <!-- 页脚 -->
-    <footer>
-        <p>&copy; {{ site.time | date: '%Y' }} {{ site.title }}. All rights reserved.</p>
-    </footer>
-
-    <!-- Live2D 看板娘 - Pio 酱 (本地资源) -->
-    <link rel="stylesheet" href="{{ site.baseurl }}/live2d/css/waifu.css">
-    <div class="waifu" id="landlord">
-        <div class="waifu-tips"></div>
-        <canvas id="live2d" width="300" height="300"></canvas>
-        <div class="hide-button">隐藏</div>
-        <div class="dress-button">换衣服</div>
+  {% include header.html %}
+  
+  <main class="page-content" aria-label="Content">
+    <div class="wrapper">
+      {{ content }}
     </div>
-    <div class="show-button" id="showWaifuBtn">🌸</div>
-    <script src="{{ site.baseurl }}/live2d/js/live2d.js"></script>
-    <script src="{{ site.baseurl }}/live2d/js/waifu.js"></script>
-    <script>
-      (function() {
-        // 直接加载原始模型配置
-        loadlive2d("live2d", "{{ site.baseurl }}/live2d/model/pio/model.json");
-        console.log("Pio 酱模型已从本地加载");
-      })();
-    </script>
+  </main>
+  
+  {% include footer.html %}
+  
+  <!-- Live2D 看板娘 - Pio 酱 (本地资源) -->
+  <link rel="stylesheet" href="{{ site.baseurl }}/live2d/css/waifu.css">
+  <div class="waifu" id="landlord">
+    <div class="waifu-tips"></div>
+    <canvas id="live2d" width="300" height="300"></canvas>
+    <div class="hide-button">隐藏</div>
+    <div class="dress-button">换衣服</div>
+  </div>
+  <div class="show-button" id="showWaifuBtn">🌸</div>
+  <script src="{{ site.baseurl }}/live2d/js/live2d.js"></script>
+  <script src="{{ site.baseurl }}/live2d/js/waifu.js"></script>
+  <script>
+    (function() {
+      loadlive2d("live2d", "{{ site.baseurl }}/live2d/model/pio/model.json");
+      console.log("Pio 酱模型已从本地加载");
+    })();
+  </script>
 </body>
 </html>
