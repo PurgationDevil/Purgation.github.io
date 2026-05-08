@@ -157,18 +157,29 @@ var dressList = [
     "textures/Winter-Costume.png",
     "textures/Winter2-Costume.png"
 ];
-var currentDressIndex = 0;
 
-// 切换服装 - 通过重新加载模型实现
-function changeDress() {
-    currentDressIndex = (currentDressIndex + 1) % dressList.length;
-    var dressName = dressList[currentDressIndex].replace('textures/', '').replace('-Costume.png', '');
+// 从 localStorage 读取上次保存的服装索引
+var currentDressIndex = 0;
+try {
+    var savedIndex = localStorage.getItem('waifu-dress-index');
+    if (savedIndex !== null) {
+        currentDressIndex = parseInt(savedIndex, 10);
+        if (isNaN(currentDressIndex) || currentDressIndex < 0 || currentDressIndex >= dressList.length) {
+            currentDressIndex = 0;
+        }
+    }
+} catch(e) {
+    console.log('localStorage 不可用，使用默认服装');
+}
+
+// 根据服装索引加载模型
+function loadModelWithDress(dressIndex) {
+    var dressName = dressList[dressIndex].replace('textures/', '').replace('-Costume.png', '');
     
-    // 构造只包含当前服装的模型配置
     var modelConfig = {
         "version": "1.0.0",
         "model": "/live2d/model/pio/model.moc",
-        "textures": ["/live2d/model/pio/" + dressList[currentDressIndex]],
+        "textures": ["/live2d/model/pio/" + dressList[dressIndex]],
         "layout": {
             "center_x": 0.0,
             "center_y": -0.05,
@@ -193,57 +204,90 @@ function changeDress() {
         }
     };
     
-    // 将配置转换为 Data URL
     var blob = new Blob([JSON.stringify(modelConfig)], {type: 'application/json'});
     var url = URL.createObjectURL(blob);
-    
-    // 重新加载模型
     loadlive2d("live2d", url);
+    
+    return dressName;
+}
+
+// 切换服装 - 通过重新加载模型实现
+function changeDress() {
+    currentDressIndex = (currentDressIndex + 1) % dressList.length;
+    
+    // 保存到 localStorage
+    try {
+        localStorage.setItem('waifu-dress-index', currentDressIndex.toString());
+    } catch(e) {}
+    
+    var dressName = loadModelWithDress(currentDressIndex);
     showMessage('换了一件' + dressName + '风格的衣服~', 3000, true);
 }
 
 function initLive2d() {
-    // 检查 localStorage 中的隐藏状态
-    var isHidden = localStorage.getItem('waifu-hidden') === 'true';
-    
-    if (isHidden) {
-        $('#landlord').hide();
-        $('#showWaifuBtn').show();
-    } else {
-        $('#landlord').show();
-        $('#showWaifuBtn').hide();
-    }
-    
-    // 隐藏按钮事件
-    $('.hide-button').fadeOut(0).on('click', () => {
-        $('#landlord').fadeOut(300);
-        setTimeout(() => {
-            $('#showWaifuBtn').fadeIn(300);
-        }, 300);
-        localStorage.setItem('waifu-hidden', 'true');
-    });
-    
-    // 显示按钮事件
-    $('#showWaifuBtn').on('click', () => {
-        $('#showWaifuBtn').fadeOut(300);
-        setTimeout(() => {
-            $('#landlord').fadeIn(300);
-        }, 300);
-        localStorage.removeItem('waifu-hidden');
-    });
-    
-    // 换衣服按钮事件
-    $('.dress-button').fadeOut(0).on('click', () => {
-        changeDress();
-    });
-    
-    // 鼠标悬停显示按钮
-    $('#landlord').hover(() => {
-        $('.hide-button').fadeIn(600);
-        $('.dress-button').fadeIn(600);
-    }, () => {
-        $('.hide-button').fadeOut(600);
-        $('.dress-button').fadeOut(600);
+    // 直接使用原生 JavaScript 而不依赖 jQuery 加载时机
+    document.addEventListener('DOMContentLoaded', function() {
+        var landlord = document.getElementById('landlord');
+        var showWaifuBtn = document.getElementById('showWaifuBtn');
+        var hideBtn = document.querySelector('.hide-button');
+        var dressBtn = document.querySelector('.dress-button');
+        
+        if (!landlord || !showWaifuBtn || !hideBtn || !dressBtn) {
+            console.log('找不到看板娘相关元素');
+            return;
+        }
+        
+        // 检查 localStorage 中的隐藏状态
+        var isHidden = false;
+        try {
+            isHidden = localStorage.getItem('waifu-hidden') === 'true';
+        } catch(e) {
+            console.log('localStorage 不可用');
+        }
+        
+        // 设置初始显示状态
+        if (isHidden) {
+            landlord.style.display = 'none';
+            showWaifuBtn.style.display = 'flex';
+        } else {
+            landlord.style.display = 'block';
+            showWaifuBtn.style.display = 'none';
+        }
+        
+        // 隐藏按钮事件
+        hideBtn.style.display = 'none';
+        hideBtn.onclick = function() {
+            landlord.style.display = 'none';
+            showWaifuBtn.style.display = 'flex';
+            try {
+                localStorage.setItem('waifu-hidden', 'true');
+            } catch(e) {}
+        };
+        
+        // 显示按钮事件
+        showWaifuBtn.onclick = function() {
+            showWaifuBtn.style.display = 'none';
+            landlord.style.display = 'block';
+            try {
+                localStorage.removeItem('waifu-hidden');
+            } catch(e) {}
+        };
+        
+        // 换衣服按钮事件
+        dressBtn.style.display = 'none';
+        dressBtn.onclick = function() {
+            changeDress();
+        };
+        
+        // 鼠标悬停显示按钮
+        landlord.onmouseenter = function() {
+            hideBtn.style.display = 'block';
+            dressBtn.style.display = 'block';
+        };
+        landlord.onmouseleave = function() {
+            hideBtn.style.display = 'none';
+            dressBtn.style.display = 'none';
+        };
     });
 }
 
