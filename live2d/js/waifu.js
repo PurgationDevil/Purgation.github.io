@@ -1,233 +1,161 @@
-var messages = {};
+String.prototype.render = function (context) {
+    var tokenReg = /(\\)?\{([^\{\}\\]+)(\\)?\}/g;
 
-// 加载消息配置文件
-function loadMessages(callback) {
-    var xhr = new XMLHttpRequest();
-    // 使用相对路径，waifu.js 在 live2d/js/ 目录下，message.json 在 live2d/ 目录下
-    xhr.open('GET', '../message.json', true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            messages = JSON.parse(xhr.responseText);
-            if (callback) callback();
-        } else if (xhr.readyState === 4) {
-            initDefaultMessages();
-            if (callback) callback();
+    return this.replace(tokenReg, function (word, slash1, token, slash2) {
+        if (slash1 || slash2) {
+            return word.replace('\\', '');
         }
-    };
-    xhr.send();
-}
 
-// 默认消息（备用）
-function initDefaultMessages() {
-    messages = {
-        "mouseover": [
-            {
-                "selector": ".waifu #live2d",
-                "text": ["干嘛呢你，快把手拿开", "鼠…鼠标放错地方了！"]
-            }
-        ],
-        "click": [
-            {
-                "selector": ".waifu #live2d",
-                "text": ["是…是不小心碰到了吧", "萝莉控是什么呀", "你看到我的小熊了吗", "再摸的话我可要报警了！⌇●﹏●⌇", "110吗，这里有个变态一直在摸我(ó﹏ò｡)"]
-            }
-        ],
-        "seasons": [],
-        "greetings": [
-            "你是夜猫子呀？这么晚还不睡觉，明天起的来嘛",
-            "早上好！一日之计在于晨，美好的一天就要开始了",
-            "上午好！工作顺利嘛，不要久坐，多起来走动走动哦！",
-            "中午了，工作了一个上午，现在是午餐时间！",
-            "午后很容易犯困呢，今天的运动目标完成了吗？",
-            "傍晚了！窗外夕阳的景色很美丽呢，最美不过夕阳红~",
-            "晚上好，今天过得怎么样？",
-            "已经这么晚了呀，早点休息吧，晚安~",
-            "嗨~ 快来逗我玩吧！"
-        ]
-    };
-}
+        var variables = token.replace(/\s/g, '').split('.');
+        var currentObject = context;
+        var i, length, variable;
 
-// 获取随机消息
-function getRandomMessage(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
-}
+        for (i = 0, length = variables.length; i < length; ++i) {
+            variable = variables[i];
+            currentObject = currentObject[variable];
+            if (currentObject === undefined || currentObject === null) return '';
+        }
+        return currentObject;
+    });
+};
 
-// 显示消息提示框
-function showMessage(text, timeout) {
-    var tips = document.querySelector('.waifu-tips');
-    if (!tips) return;
-    
-    tips.style.opacity = '1';
-    tips.innerHTML = text;
-    
-    if (timeout === undefined) timeout = 5000;
-    
-    setTimeout(function() {
-        tips.style.opacity = '0';
-    }, timeout);
-}
+var re = /x/;
+console.log(re);
+re.toString = function() {
+    showMessage('哈哈，你打开了控制台，是想要看看我的秘密吗？', 5000, true);
+    return '';
+};
 
-// 初始化欢迎消息
-function initWelcomeMessage() {
+$(document).on('copy', function (){
+    showMessage('你都复制了些什么呀，转载要记得加上出处哦', 5000, true);
+});
+
+function initTips() {
+    $.ajax({
+        cache: true,
+        url: "../message.json",
+        dataType: "json",
+        success: function (result) {
+            $.each(result.mouseover, function (index, tips) {
+                $(document).on("mouseover", tips.selector, function () {
+                    var text = tips.text;
+                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
+                    text = text.render({text: $(this).text()});
+                    showMessage(text, 3000);
+                });
+            });
+            $.each(result.click, function (index, tips) {
+                $(document).on("click", tips.selector, function () {
+                    var text = tips.text;
+                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
+                    text = text.render({text: $(this).text()});
+                    showMessage(text, 3000, true);
+                });
+            });
+            $.each(result.seasons, function (index, tips) {
+                var now = new Date();
+                var after = tips.date.split('-')[0];
+                var before = tips.date.split('-')[1] || after;
+
+                if ((after.split('/')[0] <= now.getMonth() + 1 && now.getMonth() + 1 <= before.split('/')[0]) &&
+                    (after.split('/')[1] <= now.getDate() && now.getDate() <= before.split('/')[1])) {
+                    var text = tips.text;
+                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
+                    text = text.render({year: now.getFullYear()});
+                    showMessage(text, 6000, true);
+                }
+            });
+        }
+    });
+}
+initTips();
+
+(function (){
     var text;
-    var now = (new Date()).getHours();
-    var greetings = messages.greetings || [
-        "你是夜猫子呀？这么晚还不睡觉，明天起的来嘛",
-        "早上好！一日之计在于晨，美好的一天就要开始了",
-        "上午好！工作顺利嘛，不要久坐，多起来走动走动哦！",
-        "中午了，工作了一个上午，现在是午餐时间！",
-        "午后很容易犯困呢，今天的运动目标完成了吗？",
-        "傍晚了！窗外夕阳的景色很美丽呢，最美不过夕阳红~",
-        "晚上好，今天过得怎么样？",
-        "已经这么晚了呀，早点休息吧，晚安~",
-        "嗨~ 快来逗我玩吧！"
-    ];
-    
-    if (now > 23 || now <= 5) {
-        text = greetings[0];
-    } else if (now > 5 && now <= 7) {
-        text = greetings[1];
-    } else if (now > 7 && now <= 11) {
-        text = greetings[2];
-    } else if (now > 11 && now <= 14) {
-        text = greetings[3];
-    } else if (now > 14 && now <= 17) {
-        text = greetings[4];
-    } else if (now > 17 && now <= 19) {
-        text = greetings[5];
-    } else if (now > 19 && now <= 21) {
-        text = greetings[6];
-    } else if (now > 21 && now <= 23) {
-        text = greetings[7];
-    } else {
-        text = greetings[8];
+    var referrer = document.createElement('a');
+    if(document.referrer !== ''){
+        referrer.href = document.referrer;
+    }
+
+    if(referrer.href !== '' && referrer.hostname != 'litblc.com'){
+        var referrer = document.createElement('a');
+        referrer.href = document.referrer;
+        text = 'Hello! 来自 <span style="color:#0099cc;">' + referrer.hostname + '</span> 的朋友';
+        var domain = referrer.hostname.split('.')[1];
+        if (domain == 'baidu') {
+            text = 'Hello! 来自 百度搜索 的朋友<br>你是搜索 <span style="color:#0099cc;">' + referrer.search.split('&wd=')[1].split('&')[0] + '</span> 找到的我吗？';
+        }else if (domain == 'so') {
+            text = 'Hello! 来自 360搜索 的朋友<br>你是搜索 <span style="color:#0099cc;">' + referrer.search.split('&q=')[1].split('&')[0] + '</span> 找到的我吗？';
+        }else if (domain == 'google') {
+            text = 'Hello! 来自 谷歌搜索 的朋友<br>欢迎阅读<span style="color:#0099cc;">『' + document.title.split(' - ')[0] + '』</span>';
+        }
+    }else {
+        if (window.location.href == 'https://www.litblc.com/') { //如果是主页
+            var now = (new Date()).getHours();
+            if (now > 23 || now <= 5) {
+                text = '你是夜猫子呀？这么晚还不睡觉，明天起的来嘛';
+            } else if (now > 5 && now <= 7) {
+                text = '早上好！一日之计在于晨，美好的一天就要开始了';
+            } else if (now > 7 && now <= 11) {
+                text = '上午好！工作顺利嘛，不要久坐，多起来走动走动哦！';
+            } else if (now > 11 && now <= 14) {
+                text = '中午了，工作了一个上午，现在是午餐时间！';
+            } else if (now > 14 && now <= 17) {
+                text = '午后很容易犯困呢，今天的运动目标完成了吗？';
+            } else if (now > 17 && now <= 19) {
+                text = '傍晚了！窗外夕阳的景色很美丽呢，最美不过夕阳红~';
+            } else if (now > 19 && now <= 21) {
+                text = '晚上好，今天过得怎么样？';
+            } else if (now > 21 && now <= 23) {
+                text = '已经这么晚了呀，早点休息吧，晚安~';
+            } else {
+                text = '嗨~ 快来逗我玩吧！';
+            }
+        }else {
+            text = '欢迎阅读<span style="color:#0099cc;">「 ' + document.title.split(' - ')[0] + ' 」</span>';
+        }
     }
     showMessage(text, 6000);
-}
+})();
 
-// 检查节日消息
-function checkSeasonMessage() {
-    if (!messages.seasons || messages.seasons.length === 0) return;
-    
-    var today = new Date();
-    var month = String(today.getMonth() + 1).padStart(2, '0');
-    var day = String(today.getDate()).padStart(2, '0');
-    var dateStr = month + '/' + day;
-    var year = today.getFullYear();
-    
-    for (var i = 0; i < messages.seasons.length; i++) {
-        var season = messages.seasons[i];
-        var dateRange = season.date;
-        
-        if (dateRange.includes('-')) {
-            var dates = dateRange.split('-');
-            var startDate = dates[0];
-            var endDate = dates[1];
-            
-            if ((dateStr >= startDate && dateStr <= endDate)) {
-                var text = season.text.replace(/{year}/g, year);
-                showMessage(text, 8000);
-                return;
-            }
-        } else {
-            if (dateStr === dateRange) {
-                var text = season.text.replace(/{year}/g, year);
-                showMessage(text, 8000);
-                return;
-            }
-        }
+window.hitokotoTimer = window.setInterval(showHitokoto,30000);
+
+function showHitokoto() {
+    $.getJSON("https://v1.hitokoto.cn/", function (result) {
+        showMessage(result.hitokoto, 5000);
+    });
+}
+function showMessage(text, timeout, flag){
+    if(flag || sessionStorage.getItem('waifu-text') === '' || sessionStorage.getItem('waifu-text') === null){
+        if(Array.isArray(text)) text = text[Math.floor(Math.random() * text.length + 1)-1];
+        //console.log(text);
+        if(flag) sessionStorage.setItem('waifu-text', text);
+        $('.waifu-tips').stop();
+        $('.waifu-tips').html(text).fadeTo(200, 1);
+        if (timeout === null) timeout = 5000;
+        hideMessage(timeout);
     }
 }
-
-// 初始化看板娘控制
+function hideMessage(timeout){
+    $('.waifu-tips').stop().css('opacity',1);
+    if (timeout === null) timeout = 5000;
+    window.setTimeout(function() {sessionStorage.removeItem('waifu-text')}, timeout);
+    $('.waifu-tips').delay(timeout).fadeTo(200, 0);
+}
 function initLive2d() {
-    var landlord = document.getElementById('landlord');
-    var showWaifuBtn = document.getElementById('showWaifuBtn');
-    var hideBtn = document.querySelector('.hide-button');
-    
-    if (!landlord || !showWaifuBtn || !hideBtn) {
-        setTimeout(initLive2d, 100);
-        return;
-    }
-    
-    landlord.style.display = 'block';
-    showWaifuBtn.style.display = 'none';
-    
-    // 隐藏按钮
-    hideBtn.style.display = 'none';
-    hideBtn.onclick = function(e) {
-        e.stopPropagation();
-        landlord.style.display = 'none';
-        showWaifuBtn.style.display = 'flex';
-    };
-    
-    // 显示按钮
-    showWaifuBtn.onclick = function() {
-        showWaifuBtn.style.display = 'none';
-        landlord.style.display = 'block';
-    };
-    
-    // 鼠标悬停显示隐藏按钮并触发消息
-    landlord.onmouseenter = function() {
-        hideBtn.style.display = 'block';
-        // 触发鼠标悬停消息
-        if (messages.mouseover) {
-            for (var i = 0; i < messages.mouseover.length; i++) {
-                var item = messages.mouseover[i];
-                if (document.querySelector(item.selector)) {
-                    showMessage(getRandomMessage(item.text), 3000);
-                    break;
-                }
-            }
-        }
-    };
-    landlord.onmouseleave = function() {
-        hideBtn.style.display = 'none';
-    };
-    
-    // 点击看板娘互动
-    landlord.addEventListener('click', function(e) {
-        if (e.target === hideBtn || e.target.classList.contains('hide-button')) {
-            return;
-        }
-        
-        if (messages.click) {
-            for (var i = 0; i < messages.click.length; i++) {
-                var item = messages.click[i];
-                if (document.querySelector(item.selector)) {
-                    showMessage(getRandomMessage(item.text), 3000);
-                    return;
-                }
-            }
-        }
-    });
+    $('.hide-button').fadeOut(0).on('click', () => {
+        $('#landlord').css('display', 'none')
+        $('.show-button').fadeIn(300)
+    })
+    $('#landlord').hover(() => {
+        $('.hide-button').fadeIn(600)
+    }, () => {
+        $('.hide-button').fadeOut(600)
+    })
+    $('.show-button').on('click', () => {
+        $('#landlord').css('display', 'block')
+        $('.show-button').fadeOut(300)
+    })
 }
 
-// 初始化页面元素的鼠标悬停事件
-function initMouseoverEvents() {
-    if (!messages.mouseover) return;
-    
-    messages.mouseover.forEach(function(item) {
-        var elements = document.querySelectorAll(item.selector);
-        elements.forEach(function(el) {
-            el.addEventListener('mouseover', function() {
-                var text = getRandomMessage(item.text);
-                if (text.includes('{text}')) {
-                    var linkText = el.textContent || el.innerText;
-                    text = text.replace(/{text}/g, linkText);
-                }
-                showMessage(text, 3000);
-            });
-        });
-    });
-}
-
-// 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', function() {
-    loadMessages(function() {
-        initWelcomeMessage();
-        checkSeasonMessage();
-        initLive2d();
-        initMouseoverEvents();
-    });
-});
+initLive2d();
