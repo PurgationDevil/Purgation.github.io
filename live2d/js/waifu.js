@@ -142,14 +142,79 @@ function hideMessage(timeout){
     window.setTimeout(function() {sessionStorage.removeItem('waifu-text')}, timeout);
     $('.waifu-tips').delay(timeout).fadeTo(200, 0);
 }
+// 服装列表
+var dressList = [
+    "textures/Cake-Costume.png",
+    "textures/Dress-Costume.png",
+    "textures/Halloween-Costume.png",
+    "textures/Kids-Costume.png",
+    "textures/Maid-Costume.png",
+    "textures/Pajamas-Costume.png",
+    "textures/Sailor-Costume.png",
+    "textures/Sakura-Costume.png",
+    "textures/School-Costume.png",
+    "textures/Succubus-Costume.png",
+    "textures/Winter-Costume.png",
+    "textures/Winter2-Costume.png"
+];
+var currentDressIndex = 0;
+
+// 切换服装 - 通过重新加载模型实现
+function changeDress() {
+    currentDressIndex = (currentDressIndex + 1) % dressList.length;
+    var dressName = dressList[currentDressIndex].replace('textures/', '').replace('-Costume.png', '');
+    
+    // 构造只包含当前服装的模型配置
+    var modelConfig = {
+        "version": "1.0.0",
+        "model": "/live2d/model/pio/model.moc",
+        "textures": ["/live2d/model/pio/" + dressList[currentDressIndex]],
+        "layout": {
+            "center_x": 0.0,
+            "center_y": -0.05,
+            "width": 2.0
+        },
+        "hit_areas_custom": {
+            "head_x": [-0.35, 0.6],
+            "head_y": [0.19, -0.2],
+            "body_x": [-0.3, -0.25],
+            "body_y": [0.3, -0.9]
+        },
+        "motions": {
+            "idle": [
+                { "file": "/live2d/model/pio/motions/WakeUp.mtn" },
+                { "file": "/live2d/model/pio/motions/Breath1.mtn" },
+                { "file": "/live2d/model/pio/motions/Breath2.mtn" }
+            ],
+            "tap_body": [
+                { "file": "/live2d/model/pio/motions/Touch1.mtn" },
+                { "file": "/live2d/model/pio/motions/Touch2.mtn" }
+            ]
+        }
+    };
+    
+    // 将配置转换为 Data URL
+    var blob = new Blob([JSON.stringify(modelConfig)], {type: 'application/json'});
+    var url = URL.createObjectURL(blob);
+    
+    // 重新加载模型
+    loadlive2d("live2d", url);
+    showMessage('换了一件' + dressName + '风格的衣服~', 3000, true);
+}
+
 function initLive2d() {
     $('.hide-button').fadeOut(0).on('click', () => {
         $('#landlord').css('display', 'none')
     })
+    $('.dress-button').fadeOut(0).on('click', () => {
+        changeDress();
+    })
     $('#landlord').hover(() => {
         $('.hide-button').fadeIn(600)
+        $('.dress-button').fadeIn(600)
     }, () => {
         $('.hide-button').fadeOut(600)
+        $('.dress-button').fadeOut(600)
     })
 }
 
