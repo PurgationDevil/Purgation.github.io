@@ -1,289 +1,55 @@
-<!-- 回到顶部按钮 -->
-<style>
-.go-top {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 48px;
-  height: 48px;
-  background: #0085a1;
-  color: #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 25px;
-  padding-left: 17px;
-  font-weight: bold;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-  z-index: 999;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-  text-decoration: none;
-  border: none;
-}
-
-.go-top:hover {
-  background: #006680;
-  transform: scale(1.08);
-}
-
-.go-top.show {
-  opacity: 1;
-  visibility: visible;
-}
-
-@media (max-width: 768px) {
-  .go-top {
-    bottom: 20px;
-    right: 20px;
-    width: 42px;
-    height: 42px;
-    font-size: 20px;
-  }
-}
-
-/* 点击波纹特效 */
-.ripple {
-  position: fixed;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,102,153,0.6), rgba(255,51,102,0.3));
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 9999;
-  animation: rippleAnim 0.6s ease-out forwards;
-}
-
-@keyframes rippleAnim {
-  0% {
-    width: 0;
-    height: 0;
-    opacity: 0.8;
-  }
-  100% {
-    width: 120px;
-    height: 120px;
-    opacity: 0;
-  }
-}
-
-/* 搜索页面样式 */
-.search-page {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #fff;
-  z-index: 2000;
-  transform: translateY(100%);
-  transition: transform 0.4s ease;
-  overflow-y: auto;
-}
-
-.search-page.search-active {
-  transform: translateY(0);
-}
-
-.search-icon-close-container {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  cursor: pointer;
-  font-size: 24px;
-  z-index: 2001;
-}
-
-.search-main {
-  padding-top: 80px;
-}
-
-#search-input {
-  width: 100%;
-  padding: 15px;
-  font-size: 24px;
-  border: none;
-  border-bottom: 2px solid #0085a1;
-  outline: none;
-}
-
-#search-results {
-  margin-top: 30px;
-}
-
-/* 导航栏样式 */
-.navbar-custom .nav li a,
-.navbar-custom .navbar-brand {
-    color: #66ccff !important;
-}
-
-.navbar-custom .nav li a:hover,
-.navbar-custom .navbar-brand:hover {
-    color: #3399ff !important;
-}
-
-.navbar-custom {
-    background-color: rgba(255, 255, 255, 0.85) !important;
-}
-
-.intro-header .site-heading h1,
-.intro-header .page-heading h1 {
-    color: #ffffff !important;
-    font-size: 60px !important;
-}
-
-.intro-header .site-heading .subheading {
-    color: #ffffff !important;
-}
-
-.intro-header {
-    position: relative;
-}
-
-.intro-header::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 120px;
-    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
-    pointer-events: none;
-}
-</style>
-
-<div class="go-top" id="goTopBtn">↑</div>
-
-<script>
-(function() {
-  var btn = document.getElementById('goTopBtn');
-  if (!btn) return;
-  window.addEventListener('scroll', function() {
-    if (window.scrollY > 300) {
-      btn.classList.add('show');
-    } else {
-      btn.classList.remove('show');
-    }
-  });
-  btn.addEventListener('click', function() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-})();
-</script>
-
-<script>
-(function() {
-  document.addEventListener('click', function(e) {
-    var ripple = document.createElement('div');
-    ripple.className = 'ripple';
-    ripple.style.left = e.clientX + 'px';
-    ripple.style.top = e.clientY + 'px';
-    document.body.appendChild(ripple);
-    setTimeout(function() { ripple.remove(); }, 600);
-  });
-})();
-</script>
-
-<!-- 粒子背景 -->
-<div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script>
-  particlesJS("particles-js", {
-    "particles": {
-      "number": { "value": 100 },
-      "color": { "value": "#00ffff" },
-      "shape": { "type": "circle" },
-      "opacity": { "value": 0.6, "random": true },
-      "size": { "value": 3, "random": true },
-      "line_linked": { "enable": false },
-      "move": { "enable": true, "speed": 2, "direction": "none", "random": true }
-    },
-    "interactivity": {
-      "detect_on": "canvas",
-      "events": {
-        "onhover": { "enable": false },
-        "onclick": { "enable": false }
-      }
-    }
-  });
-</script>
-
-<!-- 鼠标点击樱花特效 -->
-<script>
-(function() {
-    function createFlower(x, y) {
-        var flower = document.createElement('div');
-        flower.innerHTML = '🌸';
-        flower.style.position = 'fixed';
-        flower.style.left = x + 'px';
-        flower.style.top = y + 'px';
-        flower.style.fontSize = '20px';
-        flower.style.pointerEvents = 'none';
-        flower.style.zIndex = '9999';
-        flower.style.opacity = '1';
-        flower.style.transition = 'all 1s ease-out';
-        document.body.appendChild(flower);
-        setTimeout(function() {
-            flower.style.transform = 'translateY(-80px)';
-            flower.style.opacity = '0';
-            flower.style.fontSize = '12px';
-        }, 10);
-        setTimeout(function() { flower.remove(); }, 1000);
-    }
-    document.addEventListener('click', function(e) {
-        createFlower(e.clientX, e.clientY);
-    });
-})();
-</script>
-
-{% include head.html %}
-{% include nav.html %}
-{% include search.html %}
-
-{{ content }}
-
-{% include footer.html %}
-
-<!-- Live2D 看板娘 - Pio 酱 (本地资源) -->
-<link rel="stylesheet" href="{{ site.baseurl }}/live2d/css/waifu.css">
-<div class="waifu" id="landlord">
-    <div class="waifu-tips"></div>
-    <canvas id="live2d" width="300" height="300"></canvas>
-    <div class="hide-button">隐藏</div>
-    <div class="dress-button">换衣服</div>
-</div>
-<div class="show-button" id="showWaifuBtn">🌸</div>
-<script src="{{ site.baseurl }}/live2d/js/live2d.js"></script>
-<script src="{{ site.baseurl }}/live2d/js/waifu.js"></script>
-<script>
-  (function() {
-    // 检查是否有保存的服装状态
-    var dressIndex = 0;
-    try {
-        var savedIndex = localStorage.getItem('waifu-dress-index');
-        if (savedIndex !== null) {
-            dressIndex = parseInt(savedIndex, 10);
-            if (isNaN(dressIndex) || dressIndex < 0 || dressIndex >= 12) {
-                dressIndex = 0;
-            }
-        }
-    } catch(e) {}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if page.title %}{{ page.title }} - {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
     
-    // 加载原始模型配置，然后切换到对应服装
-    var modelUrl = "{{ site.baseurl }}/live2d/model/pio/model.json";
-    loadlive2d("live2d", modelUrl);
-    
-    // 模型加载后切换到保存的服装
-    setTimeout(function() {
-        if (dressIndex > 0) {
-            changeDressToIndex(dressIndex);
-        }
-    }, 1000);
-    
-    console.log("Pio 酱模型已从本地加载（服装索引: " + dressIndex + "）");
-  })();
-</script>
+    <!-- 引入必要的资源 -->
+    <link rel="stylesheet" href="{{ site.baseurl }}/css/style.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/css/font-awesome.min.css">
+    <script src="{{ site.baseurl }}/js/jquery.min.js"></script>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header>
+        <div class="logo">
+            <a href="{{ site.baseurl }}/">{{ site.title }}</a>
+        </div>
+        <nav>
+            {% for item in site.navigation %}
+            <a href="{{ item.url }}">{{ item.name }}</a>
+            {% endfor %}
+        </nav>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main>
+        {{ content }}
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <p>&copy; {{ site.time | date: '%Y' }} {{ site.title }}. All rights reserved.</p>
+    </footer>
+
+    <!-- Live2D 看板娘 - Pio 酱 (本地资源) -->
+    <link rel="stylesheet" href="{{ site.baseurl }}/live2d/css/waifu.css">
+    <div class="waifu" id="landlord">
+        <div class="waifu-tips"></div>
+        <canvas id="live2d" width="300" height="300"></canvas>
+        <div class="hide-button">隐藏</div>
+        <div class="dress-button">换衣服</div>
+    </div>
+    <div class="show-button" id="showWaifuBtn">🌸</div>
+    <script src="{{ site.baseurl }}/live2d/js/live2d.js"></script>
+    <script src="{{ site.baseurl }}/live2d/js/waifu.js"></script>
+    <script>
+      (function() {
+        // 直接加载原始模型配置
+        loadlive2d("live2d", "{{ site.baseurl }}/live2d/model/pio/model.json");
+        console.log("Pio 酱模型已从本地加载");
+      })();
+    </script>
+</body>
+</html>
