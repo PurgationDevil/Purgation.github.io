@@ -178,8 +178,8 @@ function loadModelWithDress(dressIndex) {
     
     var modelConfig = {
         "version": "1.0.0",
-        "model": "/live2d/model/pio/model.moc",
-        "textures": ["/live2d/model/pio/" + dressList[dressIndex]],
+        "model": "model.moc",
+        "textures": [dressList[dressIndex]],
         "layout": {
             "center_x": 0.0,
             "center_y": -0.05,
@@ -193,13 +193,13 @@ function loadModelWithDress(dressIndex) {
         },
         "motions": {
             "idle": [
-                { "file": "/live2d/model/pio/motions/WakeUp.mtn" },
-                { "file": "/live2d/model/pio/motions/Breath1.mtn" },
-                { "file": "/live2d/model/pio/motions/Breath2.mtn" }
+                { "file": "motions/WakeUp.mtn" },
+                { "file": "motions/Breath1.mtn" },
+                { "file": "motions/Breath2.mtn" }
             ],
             "tap_body": [
-                { "file": "/live2d/model/pio/motions/Touch1.mtn" },
-                { "file": "/live2d/model/pio/motions/Touch2.mtn" }
+                { "file": "motions/Touch1.mtn" },
+                { "file": "motions/Touch2.mtn" }
             ]
         }
     };
@@ -222,6 +222,20 @@ function changeDress() {
     
     var dressName = loadModelWithDress(currentDressIndex);
     showMessage('换了一件' + dressName + '风格的衣服~', 3000, true);
+}
+
+// 根据索引切换服装（用于恢复保存的状态）
+function changeDressToIndex(index) {
+    if (index < 0 || index >= dressList.length) return;
+    
+    currentDressIndex = index;
+    
+    // 保存到 localStorage
+    try {
+        localStorage.setItem('waifu-dress-index', currentDressIndex.toString());
+    } catch(e) {}
+    
+    loadModelWithDress(currentDressIndex);
 }
 
 function initLive2d() {
