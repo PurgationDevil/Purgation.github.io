@@ -4,7 +4,7 @@
   "textures": ["textures/Halloween-Costume.png"],
   "layout": {
     "center_x": 0.0,
-    "center_y": -0.1,
+    "center_y": -0.125,
     "width": 2.0
   },
   "hit_areas_custom": {
