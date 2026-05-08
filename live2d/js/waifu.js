@@ -144,7 +144,7 @@ function hideMessage(timeout){
 }
 // 服装列表
 var dressList = [
-    "textures/Cake-Costume.png",
+    "textures/ZCake-Costume.png",
     "textures/Dress-Costume.png",
     "textures/Halloween-Costume.png",
     "textures/Kids-Costume.png",
@@ -174,7 +174,7 @@ try {
 
 // 根据服装索引加载模型
 function loadModelWithDress(dressIndex) {
-    var dressName = dressList[dressIndex].replace('textures/', '').replace('-Costume.png', '');
+    var dressName = dressList[dressIndex].replace('textures/', '').replace('-Costume.png', '').replace('Z', '');
     
     var modelConfig = {
         "version": "1.0.0",
@@ -225,70 +225,67 @@ function changeDress() {
 }
 
 function initLive2d() {
-    // 直接使用原生 JavaScript 而不依赖 jQuery 加载时机
-    document.addEventListener('DOMContentLoaded', function() {
-        var landlord = document.getElementById('landlord');
-        var showWaifuBtn = document.getElementById('showWaifuBtn');
-        var hideBtn = document.querySelector('.hide-button');
-        var dressBtn = document.querySelector('.dress-button');
-        
-        if (!landlord || !showWaifuBtn || !hideBtn || !dressBtn) {
-            console.log('找不到看板娘相关元素');
-            return;
-        }
-        
-        // 检查 localStorage 中的隐藏状态
-        var isHidden = false;
+    var landlord = document.getElementById('landlord');
+    var showWaifuBtn = document.getElementById('showWaifuBtn');
+    var hideBtn = document.querySelector('.hide-button');
+    var dressBtn = document.querySelector('.dress-button');
+    
+    if (!landlord || !showWaifuBtn || !hideBtn || !dressBtn) {
+        setTimeout(initLive2d, 100);
+        return;
+    }
+    
+    // 检查 localStorage 中的隐藏状态
+    var isHidden = false;
+    try {
+        isHidden = localStorage.getItem('waifu-hidden') === 'true';
+    } catch(e) {
+        console.log('localStorage 不可用');
+    }
+    
+    // 设置初始显示状态
+    if (isHidden) {
+        landlord.style.display = 'none';
+        showWaifuBtn.style.display = 'flex';
+    } else {
+        landlord.style.display = 'block';
+        showWaifuBtn.style.display = 'none';
+    }
+    
+    // 隐藏按钮事件
+    hideBtn.style.display = 'none';
+    hideBtn.onclick = function() {
+        landlord.style.display = 'none';
+        showWaifuBtn.style.display = 'flex';
         try {
-            isHidden = localStorage.getItem('waifu-hidden') === 'true';
-        } catch(e) {
-            console.log('localStorage 不可用');
-        }
-        
-        // 设置初始显示状态
-        if (isHidden) {
-            landlord.style.display = 'none';
-            showWaifuBtn.style.display = 'flex';
-        } else {
-            landlord.style.display = 'block';
-            showWaifuBtn.style.display = 'none';
-        }
-        
-        // 隐藏按钮事件
+            localStorage.setItem('waifu-hidden', 'true');
+        } catch(e) {}
+    };
+    
+    // 显示按钮事件
+    showWaifuBtn.onclick = function() {
+        showWaifuBtn.style.display = 'none';
+        landlord.style.display = 'block';
+        try {
+            localStorage.removeItem('waifu-hidden');
+        } catch(e) {}
+    };
+    
+    // 换衣服按钮事件
+    dressBtn.style.display = 'none';
+    dressBtn.onclick = function() {
+        changeDress();
+    };
+    
+    // 鼠标悬停显示按钮
+    landlord.onmouseenter = function() {
+        hideBtn.style.display = 'block';
+        dressBtn.style.display = 'block';
+    };
+    landlord.onmouseleave = function() {
         hideBtn.style.display = 'none';
-        hideBtn.onclick = function() {
-            landlord.style.display = 'none';
-            showWaifuBtn.style.display = 'flex';
-            try {
-                localStorage.setItem('waifu-hidden', 'true');
-            } catch(e) {}
-        };
-        
-        // 显示按钮事件
-        showWaifuBtn.onclick = function() {
-            showWaifuBtn.style.display = 'none';
-            landlord.style.display = 'block';
-            try {
-                localStorage.removeItem('waifu-hidden');
-            } catch(e) {}
-        };
-        
-        // 换衣服按钮事件
         dressBtn.style.display = 'none';
-        dressBtn.onclick = function() {
-            changeDress();
-        };
-        
-        // 鼠标悬停显示按钮
-        landlord.onmouseenter = function() {
-            hideBtn.style.display = 'block';
-            dressBtn.style.display = 'block';
-        };
-        landlord.onmouseleave = function() {
-            hideBtn.style.display = 'none';
-            dressBtn.style.display = 'none';
-        };
-    });
+    };
 }
 
 initLive2d();
