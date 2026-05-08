@@ -2,7 +2,6 @@
   "version": "1.0.0",
   "model": "model.moc",
   "textures": [
-    "textures/Cake-Costume.png",
     "textures/Dress-Costume.png",
     "textures/Halloween-Costume.png",
     "textures/Kids-Costume.png",
@@ -13,7 +12,8 @@
     "textures/School-Costume.png",
     "textures/Succubus-Costume.png",
     "textures/Winter-Costume.png",
-    "textures/Winter2-Costume.png"
+    "textures/Winter2-Costume.png",
+    "textures/ZCake-Costume.png"
   ],
   "layout": {
     "center_x": 0.0,
