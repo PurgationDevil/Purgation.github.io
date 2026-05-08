@@ -261,8 +261,65 @@
 <script src="{{ site.baseurl }}/live2d/js/waifu.js"></script>
 <script>
   (function() {
-    // 使用本地模型
-    loadlive2d("live2d", "{{ site.baseurl }}/live2d/model/pio/model.json");
-    console.log("Pio 酱模型已从本地加载");
+    // 检查是否有保存的服装状态
+    var dressIndex = 0;
+    try {
+        var savedIndex = localStorage.getItem('waifu-dress-index');
+        if (savedIndex !== null) {
+            dressIndex = parseInt(savedIndex, 10);
+            if (isNaN(dressIndex) || dressIndex < 0 || dressIndex >= 12) {
+                dressIndex = 0;
+            }
+        }
+    } catch(e) {}
+    
+    // 根据保存的服装状态加载模型
+    var dressList = [
+        "textures/ZCake-Costume.png",
+        "textures/Dress-Costume.png",
+        "textures/Halloween-Costume.png",
+        "textures/Kids-Costume.png",
+        "textures/Maid-Costume.png",
+        "textures/Pajamas-Costume.png",
+        "textures/Sailor-Costume.png",
+        "textures/Sakura-Costume.png",
+        "textures/School-Costume.png",
+        "textures/Succubus-Costume.png",
+        "textures/Winter-Costume.png",
+        "textures/Winter2-Costume.png"
+    ];
+    
+    var modelConfig = {
+        "version": "1.0.0",
+        "model": "{{ site.baseurl }}/live2d/model/pio/model.moc",
+        "textures": ["{{ site.baseurl }}/live2d/model/pio/" + dressList[dressIndex]],
+        "layout": {
+            "center_x": 0.0,
+            "center_y": -0.05,
+            "width": 2.0
+        },
+        "hit_areas_custom": {
+            "head_x": [-0.35, 0.6],
+            "head_y": [0.19, -0.2],
+            "body_x": [-0.3, -0.25],
+            "body_y": [0.3, -0.9]
+        },
+        "motions": {
+            "idle": [
+                { "file": "{{ site.baseurl }}/live2d/model/pio/motions/WakeUp.mtn" },
+                { "file": "{{ site.baseurl }}/live2d/model/pio/motions/Breath1.mtn" },
+                { "file": "{{ site.baseurl }}/live2d/model/pio/motions/Breath2.mtn" }
+            ],
+            "tap_body": [
+                { "file": "{{ site.baseurl }}/live2d/model/pio/motions/Touch1.mtn" },
+                { "file": "{{ site.baseurl }}/live2d/model/pio/motions/Touch2.mtn" }
+            ]
+        }
+    };
+    
+    var blob = new Blob([JSON.stringify(modelConfig)], {type: 'application/json'});
+    var url = URL.createObjectURL(blob);
+    loadlive2d("live2d", url);
+    console.log("Pio 酱模型已从本地加载（服装索引: " + dressIndex + "）");
   })();
 </script>
