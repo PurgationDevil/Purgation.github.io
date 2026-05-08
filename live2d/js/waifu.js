@@ -10,7 +10,6 @@ function loadMessages(callback) {
             messages = JSON.parse(xhr.responseText);
             if (callback) callback();
         } else if (xhr.readyState === 4) {
-            // 如果加载失败，使用默认消息
             initDefaultMessages();
             if (callback) callback();
         }
@@ -33,7 +32,18 @@ function initDefaultMessages() {
                 "text": ["是…是不小心碰到了吧", "萝莉控是什么呀", "你看到我的小熊了吗", "再摸的话我可要报警了！⌇●﹏●⌇", "110吗，这里有个变态一直在摸我(ó﹏ò｡)"]
             }
         ],
-        "seasons": []
+        "seasons": [],
+        "greetings": [
+            "你是夜猫子呀？这么晚还不睡觉，明天起的来嘛",
+            "早上好！一日之计在于晨，美好的一天就要开始了",
+            "上午好！工作顺利嘛，不要久坐，多起来走动走动哦！",
+            "中午了，工作了一个上午，现在是午餐时间！",
+            "午后很容易犯困呢，今天的运动目标完成了吗？",
+            "傍晚了！窗外夕阳的景色很美丽呢，最美不过夕阳红~",
+            "晚上好，今天过得怎么样？",
+            "已经这么晚了呀，早点休息吧，晚安~",
+            "嗨~ 快来逗我玩吧！"
+        ]
     };
 }
 
@@ -61,24 +71,36 @@ function showMessage(text, timeout) {
 function initWelcomeMessage() {
     var text;
     var now = (new Date()).getHours();
+    var greetings = messages.greetings || [
+        "你是夜猫子呀？这么晚还不睡觉，明天起的来嘛",
+        "早上好！一日之计在于晨，美好的一天就要开始了",
+        "上午好！工作顺利嘛，不要久坐，多起来走动走动哦！",
+        "中午了，工作了一个上午，现在是午餐时间！",
+        "午后很容易犯困呢，今天的运动目标完成了吗？",
+        "傍晚了！窗外夕阳的景色很美丽呢，最美不过夕阳红~",
+        "晚上好，今天过得怎么样？",
+        "已经这么晚了呀，早点休息吧，晚安~",
+        "嗨~ 快来逗我玩吧！"
+    ];
+    
     if (now > 23 || now <= 5) {
-        text = '你是夜猫子呀？这么晚还不睡觉，明天起的来嘛';
+        text = greetings[0];
     } else if (now > 5 && now <= 7) {
-        text = '早上好！一日之计在于晨，美好的一天就要开始了';
+        text = greetings[1];
     } else if (now > 7 && now <= 11) {
-        text = '上午好！工作顺利嘛，不要久坐，多起来走动走动哦！';
+        text = greetings[2];
     } else if (now > 11 && now <= 14) {
-        text = '中午了，工作了一个上午，现在是午餐时间！';
+        text = greetings[3];
     } else if (now > 14 && now <= 17) {
-        text = '午后很容易犯困呢，今天的运动目标完成了吗？';
+        text = greetings[4];
     } else if (now > 17 && now <= 19) {
-        text = '傍晚了！窗外夕阳的景色很美丽呢，最美不过夕阳红~';
+        text = greetings[5];
     } else if (now > 19 && now <= 21) {
-        text = '晚上好，今天过得怎么样？';
+        text = greetings[6];
     } else if (now > 21 && now <= 23) {
-        text = '已经这么晚了呀，早点休息吧，晚安~';
+        text = greetings[7];
     } else {
-        text = '嗨~ 快来逗我玩吧！';
+        text = greetings[8];
     }
     showMessage(text, 6000);
 }
@@ -128,7 +150,6 @@ function initLive2d() {
         return;
     }
     
-    // 确保看板娘始终显示
     landlord.style.display = 'block';
     showWaifuBtn.style.display = 'none';
     
@@ -146,7 +167,7 @@ function initLive2d() {
         landlord.style.display = 'block';
     };
     
-    // 鼠标悬停显示隐藏按钮
+    // 鼠标悬停显示隐藏按钮并触发消息
     landlord.onmouseenter = function() {
         hideBtn.style.display = 'block';
         // 触发鼠标悬停消息
@@ -170,7 +191,6 @@ function initLive2d() {
             return;
         }
         
-        // 查找点击消息
         if (messages.click) {
             for (var i = 0; i < messages.click.length; i++) {
                 var item = messages.click[i];
@@ -192,7 +212,6 @@ function initMouseoverEvents() {
         elements.forEach(function(el) {
             el.addEventListener('mouseover', function() {
                 var text = getRandomMessage(item.text);
-                // 如果是带链接的消息，替换{text}为链接文本
                 if (text.includes('{text}')) {
                     var linkText = el.textContent || el.innerText;
                     text = text.replace(/{text}/g, linkText);
