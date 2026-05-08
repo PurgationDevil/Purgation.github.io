@@ -95,8 +95,13 @@
 @media (max-width: 768px) {
     .waifu {
         left: 5px !important;
-        transform: scale(0.6) translateY(20%);
+        bottom: 0 !important;
+        transform: scale(0.5);
         transform-origin: left bottom;
+    }
+    
+    .waifu:hover {
+        transform: scale(0.5) !important;
     }
     
     .show-button {
