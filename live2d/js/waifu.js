@@ -20,115 +20,19 @@ String.prototype.render = function (context) {
 };
 
 var re = /x/;
-console.log(re);
 re.toString = function() {
     showMessage('哈哈，你打开了控制台，是想要看看我的秘密吗？', 5000, true);
     return '';
 };
 
-$(document).on('copy', function (){
-    showMessage('你都复制了些什么呀，转载要记得加上出处哦', 5000, true);
-});
-
-function initTips() {
-    $.ajax({
-        cache: true,
-        url: "../message.json",
-        dataType: "json",
-        success: function (result) {
-            $.each(result.mouseover, function (index, tips) {
-                $(document).on("mouseover", tips.selector, function () {
-                    var text = tips.text;
-                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
-                    text = text.render({text: $(this).text()});
-                    showMessage(text, 3000);
-                });
-            });
-            $.each(result.click, function (index, tips) {
-                $(document).on("click", tips.selector, function () {
-                    var text = tips.text;
-                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
-                    text = text.render({text: $(this).text()});
-                    showMessage(text, 3000, true);
-                });
-            });
-            $.each(result.seasons, function (index, tips) {
-                var now = new Date();
-                var after = tips.date.split('-')[0];
-                var before = tips.date.split('-')[1] || after;
-
-                if ((after.split('/')[0] <= now.getMonth() + 1 && now.getMonth() + 1 <= before.split('/')[0]) &&
-                    (after.split('/')[1] <= now.getDate() && now.getDate() <= before.split('/')[1])) {
-                    var text = tips.text;
-                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
-                    text = text.render({year: now.getFullYear()});
-                    showMessage(text, 6000, true);
-                }
-            });
-        }
-    });
+function getRandomText(arr) {
+    if (!arr || !Array.isArray(arr)) return '';
+    return arr[Math.floor(Math.random() * arr.length)];
 }
-initTips();
 
-(function (){
-    var text;
-    var referrer = document.createElement('a');
-    if(document.referrer !== ''){
-        referrer.href = document.referrer;
-    }
-
-    if(referrer.href !== '' && referrer.hostname != 'litblc.com'){
-        var referrer = document.createElement('a');
-        referrer.href = document.referrer;
-        text = 'Hello! 来自 <span style="color:#0099cc;">' + referrer.hostname + '</span> 的朋友';
-        var domain = referrer.hostname.split('.')[1];
-        if (domain == 'baidu') {
-            text = 'Hello! 来自 百度搜索 的朋友<br>你是搜索 <span style="color:#0099cc;">' + referrer.search.split('&wd=')[1].split('&')[0] + '</span> 找到的我吗？';
-        }else if (domain == 'so') {
-            text = 'Hello! 来自 360搜索 的朋友<br>你是搜索 <span style="color:#0099cc;">' + referrer.search.split('&q=')[1].split('&')[0] + '</span> 找到的我吗？';
-        }else if (domain == 'google') {
-            text = 'Hello! 来自 谷歌搜索 的朋友<br>欢迎阅读<span style="color:#0099cc;">『' + document.title.split(' - ')[0] + '』</span>';
-        }
-    }else {
-        if (window.location.href == 'https://www.litblc.com/') { //如果是主页
-            var now = (new Date()).getHours();
-            if (now > 23 || now <= 5) {
-                text = '你是夜猫子呀？这么晚还不睡觉，明天起的来嘛';
-            } else if (now > 5 && now <= 7) {
-                text = '早上好！一日之计在于晨，美好的一天就要开始了';
-            } else if (now > 7 && now <= 11) {
-                text = '上午好！工作顺利嘛，不要久坐，多起来走动走动哦！';
-            } else if (now > 11 && now <= 14) {
-                text = '中午了，工作了一个上午，现在是午餐时间！';
-            } else if (now > 14 && now <= 17) {
-                text = '午后很容易犯困呢，今天的运动目标完成了吗？';
-            } else if (now > 17 && now <= 19) {
-                text = '傍晚了！窗外夕阳的景色很美丽呢，最美不过夕阳红~';
-            } else if (now > 19 && now <= 21) {
-                text = '晚上好，今天过得怎么样？';
-            } else if (now > 21 && now <= 23) {
-                text = '已经这么晚了呀，早点休息吧，晚安~';
-            } else {
-                text = '嗨~ 快来逗我玩吧！';
-            }
-        }else {
-            text = '欢迎阅读<span style="color:#0099cc;">「 ' + document.title.split(' - ')[0] + ' 」</span>';
-        }
-    }
-    showMessage(text, 6000);
-})();
-
-window.hitokotoTimer = window.setInterval(showHitokoto,30000);
-
-function showHitokoto() {
-    $.getJSON("https://v1.hitokoto.cn/", function (result) {
-        showMessage(result.hitokoto, 5000);
-    });
-}
 function showMessage(text, timeout, flag){
     if(flag || sessionStorage.getItem('waifu-text') === '' || sessionStorage.getItem('waifu-text') === null){
-        if(Array.isArray(text)) text = text[Math.floor(Math.random() * text.length + 1)-1];
-        //console.log(text);
+        if(Array.isArray(text)) text = getRandomText(text);
         if(flag) sessionStorage.setItem('waifu-text', text);
         $('.waifu-tips').stop();
         $('.waifu-tips').html(text).fadeTo(200, 1);
@@ -136,12 +40,121 @@ function showMessage(text, timeout, flag){
         hideMessage(timeout);
     }
 }
+
 function hideMessage(timeout){
     $('.waifu-tips').stop().css('opacity',1);
     if (timeout === null) timeout = 5000;
     window.setTimeout(function() {sessionStorage.removeItem('waifu-text')}, timeout);
     $('.waifu-tips').delay(timeout).fadeTo(200, 0);
 }
+
+function initTips(messages) {
+    // 鼠标悬停事件
+    $.each(messages.mouseover, function (index, tips) {
+        $(document).on("mouseover", tips.selector, function () {
+            var text = getRandomText(tips.text);
+            text = text.render({text: $(this).text()});
+            showMessage(text, 3000);
+        });
+    });
+
+    // 点击事件
+    $.each(messages.click, function (index, tips) {
+        $(document).on("click", tips.selector, function () {
+            var text = getRandomText(tips.text);
+            text = text.render({text: $(this).text()});
+            showMessage(text, 3000, true);
+        });
+    });
+
+    // 节日消息
+    $.each(messages.seasons, function (index, tips) {
+        var now = new Date();
+        var after = tips.date.split('-')[0];
+        var before = tips.date.split('-')[1] || after;
+
+        if ((after.split('/')[0] <= now.getMonth() + 1 && now.getMonth() + 1 <= before.split('/')[0]) &&
+            (after.split('/')[1] <= now.getDate() && now.getDate() <= before.split('/')[1])) {
+            var text = tips.text;
+            if (Array.isArray(tips.text)) text = getRandomText(tips.text);
+            text = text.render({year: now.getFullYear()});
+            showMessage(text, 6000, true);
+        }
+    });
+}
+
+function initWelcomeMessage(messages) {
+    var text;
+    var isFirstVisit = !document.cookie.includes('visited=true');
+    
+    if (isFirstVisit) {
+        // 首次访问
+        document.cookie = 'visited=true; expires=Fri, 31 Dec 9999 23:59:59 GMT';
+        
+        var referrer = document.createElement('a');
+        if(document.referrer !== ''){
+            referrer.href = document.referrer;
+        }
+
+        if(referrer.href !== '' && referrer.hostname != 'litblc.com'){
+            var domain = referrer.hostname.split('.')[1];
+            if (domain == 'baidu') {
+                text = getRandomText(messages.welcome).render({
+                    keyword: referrer.search.split('&wd=')[1].split('&')[0],
+                    referrer: referrer.hostname
+                });
+            } else if (domain == 'so') {
+                text = getRandomText(messages.welcome).render({
+                    keyword: referrer.search.split('&q=')[1].split('&')[0],
+                    referrer: referrer.hostname
+                });
+            } else if (domain == 'google') {
+                text = getRandomText(messages.welcome).render({
+                    title: document.title.split(' - ')[0],
+                    referrer: referrer.hostname
+                });
+            } else {
+                text = getRandomText(messages.welcome).render({
+                    referrer: referrer.hostname
+                });
+            }
+        } else {
+            text = getRandomText(messages.greetings.default);
+        }
+    } else {
+        // 非首次访问
+        if (window.location.href == 'https://www.litblc.com/') {
+            // 主页 - 根据时间显示问候语
+            var now = (new Date()).getHours();
+            if (now > 23 || now <= 5) {
+                text = getRandomText(messages.greetings.lateNight);
+            } else if (now > 5 && now <= 7) {
+                text = getRandomText(messages.greetings.morning);
+            } else if (now > 7 && now <= 11) {
+                text = getRandomText(messages.greetings.forenoon);
+            } else if (now > 11 && now <= 14) {
+                text = getRandomText(messages.greetings.noon);
+            } else if (now > 14 && now <= 17) {
+                text = getRandomText(messages.greetings.afternoon);
+            } else if (now > 17 && now <= 19) {
+                text = getRandomText(messages.greetings.evening);
+            } else if (now > 19 && now <= 21) {
+                text = getRandomText(messages.greetings.night);
+            } else if (now > 21 && now <= 23) {
+                text = getRandomText(messages.greetings.midnight);
+            } else {
+                text = getRandomText(messages.greetings.default);
+            }
+        } else {
+            // 文章页
+            text = getRandomText(messages.welcome).render({
+                title: document.title.split(' - ')[0]
+            });
+        }
+    }
+    showMessage(text, 6000);
+}
+
 function initLive2d() {
     $('.hide-button').fadeOut(0).on('click', () => {
         $('#landlord').css('display', 'none')
@@ -158,4 +171,37 @@ function initLive2d() {
     })
 }
 
-initLive2d();
+// 主初始化函数
+$(document).ready(function() {
+    $.ajax({
+        cache: true,
+        url: "../message.json",
+        dataType: "json",
+        success: function (messages) {
+            // 初始化悬停和点击事件
+            initTips(messages);
+            
+            // 初始化欢迎消息（带cookie判断逻辑）
+            initWelcomeMessage(messages);
+
+            // 复制事件
+            $(document).on('copy', function (){
+                showMessage(getRandomText(messages.copy), 5000, true);
+            });
+
+            // 30秒随机句子（保持原有功能）
+            window.hitokotoTimer = window.setInterval(function() {
+                $.getJSON("https://v1.hitokoto.cn/", function (result) {
+                    showMessage(result.hitokoto, 5000);
+                });
+            }, 30000);
+        },
+        error: function() {
+            // 如果加载失败，使用默认消息
+            console.log('无法加载 message.json，使用默认配置');
+        }
+    });
+
+    // 初始化看板娘显示/隐藏
+    initLive2d();
+});
