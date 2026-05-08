@@ -203,19 +203,48 @@ function changeDress() {
 }
 
 function initLive2d() {
+    // 检查 localStorage 中的隐藏状态
+    var isHidden = localStorage.getItem('waifu-hidden') === 'true';
+    
+    if (isHidden) {
+        $('#landlord').hide();
+        $('#showWaifuBtn').show();
+    } else {
+        $('#landlord').show();
+        $('#showWaifuBtn').hide();
+    }
+    
+    // 隐藏按钮事件
     $('.hide-button').fadeOut(0).on('click', () => {
-        $('#landlord').css('display', 'none')
-    })
+        $('#landlord').fadeOut(300);
+        setTimeout(() => {
+            $('#showWaifuBtn').fadeIn(300);
+        }, 300);
+        localStorage.setItem('waifu-hidden', 'true');
+    });
+    
+    // 显示按钮事件
+    $('#showWaifuBtn').on('click', () => {
+        $('#showWaifuBtn').fadeOut(300);
+        setTimeout(() => {
+            $('#landlord').fadeIn(300);
+        }, 300);
+        localStorage.removeItem('waifu-hidden');
+    });
+    
+    // 换衣服按钮事件
     $('.dress-button').fadeOut(0).on('click', () => {
         changeDress();
-    })
+    });
+    
+    // 鼠标悬停显示按钮
     $('#landlord').hover(() => {
-        $('.hide-button').fadeIn(600)
-        $('.dress-button').fadeIn(600)
+        $('.hide-button').fadeIn(600);
+        $('.dress-button').fadeIn(600);
     }, () => {
-        $('.hide-button').fadeOut(600)
-        $('.dress-button').fadeOut(600)
-    })
+        $('.hide-button').fadeOut(600);
+        $('.dress-button').fadeOut(600);
+    });
 }
 
 initLive2d();
