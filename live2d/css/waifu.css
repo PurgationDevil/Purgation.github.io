@@ -1,18 +1,20 @@
-.waifu  {
+.waifu {
     user-select: none;
     position: fixed;
     left: 30px;
     bottom: 0;
     z-index: 10;
     font-size: 0;
-    transition: all .3s ease-in-out;
+    transition: all 0.3s ease-in-out;
     -webkit-transform: translateY(3px);
     transform: translateY(3px);
 }
+
 .waifu:hover {
     -webkit-transform: translateY(0);
     transform: translateY(0);
 }
+
 .waifu #live2d {
     position: relative;
 }
@@ -51,13 +53,15 @@
     overflow: hidden;
     width: 60px;
     height: 20px;
-    border: 1px solid rgba(255,137,255,.4);
+    border: 1px solid rgba(255, 137, 255, 0.4);
     border-radius: 12px;
-    background: rgba(255,137,255,.2);
-    box-shadow: 0 3px 15px 2px rgba(255,137,255,.4);
+    background: rgba(255, 137, 255, 0.2);
+    box-shadow: 0 3px 15px 2px rgba(255, 137, 255, 0.4);
     text-align: center;
     font-size: 12px;
     cursor: pointer;
+    color: #606975;
+    line-height: 20px;
 }
 
 .hide-button:hover {
@@ -73,22 +77,21 @@
     height: 50px;
     border-radius: 50%;
     background: rgba(255, 187, 255, 0.8);
-    box-shadow: 0 3px 15px 2px rgba(255,137,255,.4);
+    box-shadow: 0 3px 15px 2px rgba(255, 137, 255, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24px;
     cursor: pointer;
     z-index: 10;
-    border: 1px solid rgba(255,137,255,.4);
+    border: 1px solid rgba(255, 137, 255, 0.4);
 }
 
 .show-button:hover {
-    background: rgba(255,137,255,0.9);
+    background: rgba(255, 137, 255, 0.9);
     transform: scale(1.05);
 }
 
-/* 手机端适配 - 缩小显示 */
 @media (max-width: 768px) {
     .waifu {
         left: 5px !important;
@@ -96,11 +99,11 @@
         transform: scale(0.5);
         transform-origin: left bottom;
     }
-    
+
     .waifu:hover {
         transform: scale(0.5) !important;
     }
-    
+
     .show-button {
         left: 15px !important;
         bottom: 15px !important;
