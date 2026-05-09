@@ -102,7 +102,7 @@ initTips();
 
 (function (){
     var text;
-    if (window.location.href == 'https://www.litblc.com/') {
+    if (window.location.href == 'https://purgationdevil.github.io/' || window.location.href == 'https://www.purgationdevil.github.io/') {
         var now = (new Date()).getHours();
         if (now > 23 || now <= 5) {
             text = '你是夜猫子呀？这么晚还不睡觉，明天起的来嘛';
