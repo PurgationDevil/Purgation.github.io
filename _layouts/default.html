@@ -1,3 +1,11 @@
+{% include head.html %}
+{% include nav.html %}
+{% include search.html %}
+
+{{ content }}
+
+{% include footer.html %}
+
 <!-- 回到顶部按钮 -->
 <style>
 .go-top {
@@ -67,14 +75,7 @@
 })();
 </script>
 
-{% include head.html %}
-{% include nav.html %}
-{% include search.html %}
-
-{{ content }}
-
-{% include footer.html %}
-
+<!-- 搜索页面样式 -->
 <style>
 .search-page {
   position: fixed;
@@ -120,8 +121,8 @@
 }
 </style>
 
+<!-- 导航栏样式 -->
 <style>
-/* 导航栏字体颜色 - 强制生效 */
 .navbar-custom .nav li a,
 .navbar-custom .navbar-brand {
     color: #66ccff !important;
@@ -132,12 +133,10 @@
     color: #3399ff !important;
 }
 
-/* 导航栏背景半透明 */
 .navbar-custom {
     background-color: rgba(255, 255, 255, 0.85) !important;
 }
 
-/* 首页标题颜色 */
 .intro-header .site-heading h1,
 .intro-header .page-heading h1 {
     color: #ffffff !important;
@@ -148,7 +147,6 @@
     color: #ffffff !important;
 }
 
-/* 首页图片底部渐变 */
 .intro-header {
     position: relative;
 }
@@ -188,7 +186,7 @@
       }
     }
   });
-</script> 
+</script>
 
 <!-- 鼠标点击爱心特效 -->
 <script>
@@ -206,14 +204,12 @@
         heart.style.transition = 'all 1s ease-out';
         document.body.appendChild(heart);
         
-        // 向上飘，逐渐变小变透明
         setTimeout(function() {
             heart.style.transform = 'translateY(-80px)';
             heart.style.opacity = '0';
             heart.style.fontSize = '12px';
         }, 10);
         
-        // 1秒后移除
         setTimeout(function() {
             heart.remove();
         }, 1000);
@@ -225,7 +221,7 @@
 })();
 </script>
 
-<!-- 加载 Font Awesome 图标库（小人需要） -->
+<!-- 加载 Font Awesome 图标库 -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
 
 <!-- Live2D 看板娘 - 本地资源 -->
