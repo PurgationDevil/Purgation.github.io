@@ -38,14 +38,14 @@ function initTips() {
         {selector: "#comment-form #misubmit", text: ["要提交了吗，首次评论需要审核，请耐心等待~"]},
         {selector: ".page-navigator .prev", text: ["去上一页看看吧"]},
         {selector: ".page-navigator .next", text: ["去下一页看看吧"]},
-        {selector: ".navbar-menu a[href^='https://github.com/PurgationDevil']", text: ["这里有一些关于我家主人的秘密哦，要不要看看呢"]},
+        {selector: ".navbar-menu a[href^='https://github.com/PurgationDevil']", text: ["这里有一些关于我家主人的秘密哦，要不要看看呢？"]},
         {selector: "#rewardButton", text: ["主人最近在吃土呢，很辛苦的样子。"]},
         {selector: ".github-corner", text: ["这里是我家主人的GitHub，去看看嘛~"]},
-        {selector: ".waifu #live2d", text: ["干嘛呢你，快把手拿开", "鼠…鼠标放错地方了！"]}
+        {selector: ".waifu #live2d", text: ["干嘛呢你，快把手拿开~~", "鼠…鼠标放错地方了！", "怕怕", "非礼呀！救命！( ⓛ ω ⓛ *)", "喵喵喵？", "你要干嘛呀？"]}
     ];
 
     var clickTips = [
-        {selector: ".waifu #live2d", text: ["是…是不小心碰到了吧", "萝莉控是什么呀", "你看到我的小熊了吗", "再摸的话我可要报警了！⌇●﹏●⌇", "110吗，这里有个变态一直在摸我(ó﹏ò｡)"]}
+        {selector: ".waifu #live2d", text: ["是…是不小心碰到的吧！(´・ω・`)", "萝莉控是什么呀？", "干嘛动我啊，小心我咬你！(〃｀ 3′〃)", "不要再摸我啦，我告诉你老婆来打你的！", "真…真是不知羞耻！", "我要生气了哦", "再摸的话我可要报警了！⌇●﹏●⌇", "110吗，这里有个变态一直在摸我(ó﹏ò｡)"]}
     ];
 
     var seasonsTips = [
