@@ -241,36 +241,95 @@ body {
   });
 </script>
 
-<!-- 鼠标点击爱心特效 -->
+<!-- 鼠标点击特效 -->
+<style>
+.click-particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  animation: particleExplode 0.6s ease-out forwards;
+}
+
+.click-ripple {
+  position: fixed;
+  border: 3px solid #ff69b4;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  animation: rippleExpand 0.8s ease-out forwards;
+}
+
+@keyframes particleExplode {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty));
+  }
+}
+
+@keyframes rippleExpand {
+  0% {
+    opacity: 1;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3);
+  }
+}
+</style>
+
 <script>
 (function() {
-    function createHeart(x, y) {
-        var heart = document.createElement('div');
-        heart.innerHTML = '🌸';
-        heart.style.position = 'fixed';
-        heart.style.left = x + 'px';
-        heart.style.top = y + 'px';
-        heart.style.fontSize = '20px';
-        heart.style.pointerEvents = 'none';
-        heart.style.zIndex = '9999';
-        heart.style.opacity = '1';
-        heart.style.transition = 'all 1s ease-out';
-        document.body.appendChild(heart);
-        
-        setTimeout(function() {
-            heart.style.transform = 'translateY(-80px)';
-            heart.style.opacity = '0';
-            heart.style.fontSize = '12px';
-        }, 10);
-        
-        setTimeout(function() {
-            heart.remove();
-        }, 1000);
+  var colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff6600', '#0066ff', '#ff3366'];
+  
+  document.addEventListener('click', function(e) {
+    var centerX = e.clientX;
+    var centerY = e.clientY;
+    
+    var count = 6;
+    for (var i = 0; i < count; i++) {
+      var angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+      var distance = 80 + Math.random() * 60;
+      var size = 10 + Math.random() * 16;
+      var particle = document.createElement('div');
+      particle.className = 'click-particle';
+      
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      particle.style.left = centerX - size/2 + 'px';
+      particle.style.top = centerY - size/2 + 'px';
+      particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      particle.style.boxShadow = '0 0 ' + (size/2 + 8) + 'px ' + particle.style.backgroundColor + ', 0 0 ' + (size + 15) + 'px ' + particle.style.backgroundColor;
+      
+      var tx = Math.cos(angle) * distance;
+      var ty = Math.sin(angle) * distance;
+      particle.style.setProperty('--tx', tx + 'px');
+      particle.style.setProperty('--ty', ty + 'px');
+      
+      document.body.appendChild(particle);
+      
+      setTimeout(function(p) {
+        p.remove();
+      }, 600, particle);
     }
     
-    document.addEventListener('click', function(e) {
-        createHeart(e.clientX, e.clientY);
-    });
+    var ripple = document.createElement('div');
+    ripple.className = 'click-ripple';
+    ripple.style.width = '40px';
+    ripple.style.height = '40px';
+    ripple.style.left = centerX - 20 + 'px';
+    ripple.style.top = centerY - 20 + 'px';
+    document.body.appendChild(ripple);
+    
+    setTimeout(function(r) {
+      r.remove();
+    }, 800, ripple);
+  });
 })();
 </script>
 
