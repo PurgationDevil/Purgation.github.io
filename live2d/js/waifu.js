@@ -137,21 +137,34 @@ function showHitokoto() {
     });
 }
 
+var waifuMessageTimer = null;
+var waifuMessageTimeout = null;
+
 function showMessage(text, timeout, flag){
-    if(flag || sessionStorage.getItem('waifu-text') === '' || sessionStorage.getItem('waifu-text') === null){
-        if(Array.isArray(text)) text = text[Math.floor(Math.random() * text.length + 1)-1];
-        if(flag) sessionStorage.setItem('waifu-text', text);
-        $('.waifu-tips').stop();
-        $('.waifu-tips').html(text).fadeTo(200, 1);
-        if (timeout === null) timeout = 5000;
-        hideMessage(timeout);
+    if(Array.isArray(text)) text = text[Math.floor(Math.random() * text.length + 1)-1];
+
+    if (waifuMessageTimer) {
+        clearTimeout(waifuMessageTimer);
+        waifuMessageTimer = null;
     }
+    if (waifuMessageTimeout) {
+        clearTimeout(waifuMessageTimeout);
+        waifuMessageTimeout = null;
+    }
+
+    $('.waifu-tips').stop();
+    $('.waifu-tips').html(text).fadeTo(200, 1);
+    if (timeout === null) timeout = 5000;
+
+    waifuMessageTimeout = setTimeout(function() {
+        $('.waifu-tips').fadeTo(200, 0);
+        waifuMessageTimeout = null;
+    }, timeout);
 }
 
 function hideMessage(timeout){
     $('.waifu-tips').stop().css('opacity', 1);
     if (timeout === null) timeout = 5000;
-    window.setTimeout(function() { sessionStorage.removeItem('waifu-text'); }, timeout);
     $('.waifu-tips').delay(timeout).fadeTo(200, 0);
 }
 
