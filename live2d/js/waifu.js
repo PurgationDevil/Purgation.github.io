@@ -22,22 +22,25 @@ String.prototype.render = function (context) {
 var re = /x/;
 console.log(re);
 re.toString = function() {
-    showMessage('哈哈，你打开了控制台，是想要看看我的秘密吗？', 5000, true);
+    showMessage('哈哈，你打开了控制台，是想要看看我的秘密吗？', 5000);
     return '';
 };
 
 $(document).on('copy', function (){
-    showMessage('你都复制了些什么呀，转载要记得加上出处哦', 5000, true);
+    showMessage('你都复制了些什么呀，转载要记得加上出处哦', 5000);
 });
 
 function initTips() {
     var mouseoverTips = [
         {selector: ".post-list-item-container .item-title a[href^='http']", text: ["要看看 <span style=\"color:#0099cc;\">{text}</span> 么？"]},
-        {selector: ".navbar-container .navbar-logo", text: ["回到最开始的地方吧"]},
+        {selector: ".navbar-brand", text: ["欢迎回来！", "主人的博客首页哦~", "回到首页看看吧"]},
+        {selector: ".navbar-nav li a[href*='about']", text: ["想了解主人吗？", "关于主人的故事~", "主人是个有趣的人哦"]},
+        {selector: ".navbar-nav li a[href*='archive']", text: ["有很多文章呢~", "看看历史文章吧", "好多技术文章哦"]},
+        {selector: ".navbar-nav li a[href*='friends']", text: ["主人的朋友们~", "友情链接", "去看看其他博客吧"]},
+        {selector: ".page-navigator .prev, .pagination .prev", text: ["去上一页看看吧", "上一篇文章", "还有更多内容哦"]},
+        {selector: ".page-navigator .next, .pagination .next", text: ["去下一页看看吧", "下一篇文章", "继续探索吧"]},
         {selector: "#comment-form #textarea", text: ["认真填写哦，垃圾评论是禁止事项"]},
         {selector: "#comment-form #misubmit", text: ["要提交了吗，首次评论需要审核，请耐心等待~"]},
-        {selector: ".page-navigator .prev", text: ["去上一页看看吧"]},
-        {selector: ".page-navigator .next", text: ["去下一页看看吧"]},
         {selector: ".navbar-menu a[href^='https://github.com/PurgationDevil']", text: ["这里有一些关于我家主人的秘密哦，要不要看看呢？"]},
         {selector: "#rewardButton", text: ["主人最近在吃土呢，很辛苦的样子。"]},
         {selector: ".github-corner", text: ["这里是我家主人的GitHub，去看看嘛~"]},
@@ -68,7 +71,7 @@ function initTips() {
     $.each(mouseoverTips, function (index, tips) {
         $(document).on("mouseover", tips.selector, function () {
             var text = tips.text;
-            if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
+            if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length)];
             text = text.render({text: $(this).text()});
             showMessage(text, 3000);
         });
@@ -77,9 +80,9 @@ function initTips() {
     $.each(clickTips, function (index, tips) {
         $(document).on("click", tips.selector, function () {
             var text = tips.text;
-            if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
+            if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length)];
             text = text.render({text: $(this).text()});
-            showMessage(text, 3000, true);
+            showMessage(text, 3000);
         });
     });
 
@@ -91,9 +94,9 @@ function initTips() {
         if ((after.split('/')[0] <= now.getMonth() + 1 && now.getMonth() + 1 <= before.split('/')[0]) &&
             (after.split('/')[1] <= now.getDate() && now.getDate() <= before.split('/')[1])) {
             var text = tips.text;
-            if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
+            if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length)];
             text = text.render({year: now.getFullYear()});
-            showMessage(text, 6000, true);
+            showMessage(text, 6000);
         }
     });
 }
@@ -137,35 +140,25 @@ function showHitokoto() {
     });
 }
 
-var waifuMessageTimer = null;
-var waifuMessageTimeout = null;
+var messageTimeout = null;
 
-function showMessage(text, timeout, flag){
-    if(Array.isArray(text)) text = text[Math.floor(Math.random() * text.length + 1)-1];
+function showMessage(text, timeout) {
+    if (Array.isArray(text)) text = text[Math.floor(Math.random() * text.length)];
 
-    if (waifuMessageTimer) {
-        clearTimeout(waifuMessageTimer);
-        waifuMessageTimer = null;
-    }
-    if (waifuMessageTimeout) {
-        clearTimeout(waifuMessageTimeout);
-        waifuMessageTimeout = null;
+    if (messageTimeout) {
+        clearTimeout(messageTimeout);
+        messageTimeout = null;
     }
 
-    $('.waifu-tips').stop();
+    $('.waifu-tips').stop(true, true);
     $('.waifu-tips').html(text).fadeTo(200, 1);
-    if (timeout === null) timeout = 5000;
-
-    waifuMessageTimeout = setTimeout(function() {
+    
+    if (timeout === undefined || timeout === null) timeout = 5000;
+    
+    messageTimeout = setTimeout(function() {
         $('.waifu-tips').fadeTo(200, 0);
-        waifuMessageTimeout = null;
+        messageTimeout = null;
     }, timeout);
-}
-
-function hideMessage(timeout){
-    $('.waifu-tips').stop().css('opacity', 1);
-    if (timeout === null) timeout = 5000;
-    $('.waifu-tips').delay(timeout).fadeTo(200, 0);
 }
 
 function initLive2d() {
