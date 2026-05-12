@@ -57,6 +57,10 @@
   height: 100%;
   padding-bottom: 40px;
   width: 195px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  border: 1px solid #e7e7e7;
+  padding: 10px;
 }
 .side-catalog.fixed {
   position: fixed;
@@ -134,6 +138,25 @@
 @media (max-width: 1200px) {
   .side-catalog {
     display: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .side-catalog {
+    background-color: rgba(10, 20, 30, 0.95);
+    border: 1px solid #2a3f5f;
+  }
+  
+  .side-catalog .catalog-body li a {
+    color: #d4d4d4;
+  }
+  
+  .side-catalog .catalog-body .active {
+    background-color: rgba(0, 212, 255, 0.15);
+  }
+  
+  .side-catalog .catalog-body .active a {
+    color: #00d4ff !important;
   }
 }
 /*
