@@ -353,8 +353,9 @@ body {
 </script>
 
 <style>
-* {
-  cursor: none !important;
+.animecursor-disabled,
+.animecursor-disabled * {
+  cursor: auto !important;
 }
 
 input, textarea, [contenteditable] {
@@ -364,25 +365,33 @@ input, textarea, [contenteditable] {
 
 <script src="{{ site.baseurl }}/js/anime-cursor/dist/anime-cursor.umd.min.js"></script>
 <script>
-new AnimeCursor({
-    fallbackCursor: 'none',
-    excludeSelectors: 'input, textarea, [contenteditable]',
-    cursors: {
-        default: {
-            image: '{{ site.baseurl }}/img/mouse/default_001.png',
-            default: true,
-            offset: [8, 8]
-        },
-        pointer: {
-            tags: ['a', 'button'],
-            image: '{{ site.baseurl }}/img/mouse/default_001.png',
-            offset: [8, 8]
-        },
-        landlord: {
-            tags: ['.waifu', '#landlord', '#live2d'],
-            image: '{{ site.baseurl }}/img/mouse/landlord_001.png',
-            offset: [10, 10]
-        }
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        new AnimeCursor({
+            fallbackCursor: 'auto',
+            excludeSelectors: 'input, textarea, [contenteditable]',
+            cursors: {
+                default: {
+                    image: '{{ site.baseurl }}/img/mouse/default_001.png',
+                    default: true,
+                    offset: [8, 8]
+                },
+                pointer: {
+                    tags: ['a', 'button'],
+                    image: '{{ site.baseurl }}/img/mouse/default_001.png',
+                    offset: [8, 8]
+                },
+                landlord: {
+                    tags: ['.waifu', '#landlord', '#live2d'],
+                    image: '{{ site.baseurl }}/img/mouse/landlord_001.png',
+                    offset: [10, 10]
+                }
+            }
+        });
+        console.log('AnimeCursor initialized successfully');
+    } catch (error) {
+        console.error('AnimeCursor initialization failed:', error);
+        document.body.classList.add('animecursor-disabled');
     }
 });
 </script>
