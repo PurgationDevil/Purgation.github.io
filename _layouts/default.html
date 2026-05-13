@@ -235,6 +235,68 @@ body {
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--gradient-end));
     pointer-events: none;
 }
+
+@media (prefers-color-scheme: dark) {
+  .post-preview > a {
+    color: #e6e6e6 !important;
+  }
+  .post-preview > a:hover,
+  .post-preview > a:focus {
+    color: #00d4ff !important;
+  }
+  .post-preview > a > .post-title {
+    color: #ffffff !important;
+  }
+  .post-preview > a > .post-subtitle {
+    color: #d4d4d4 !important;
+  }
+  .post-preview > .post-meta {
+    color: #b3b3b3 !important;
+  }
+  .post-preview > .post-meta > a {
+    color: #e6e6e6 !important;
+  }
+  
+  .archive-container .item-title a,
+  .archive-container .item-title {
+    color: #ffffff !important;
+  }
+  .archive-container .item-meta,
+  .archive-container .item-excerpt {
+    color: #d4d4d4 !important;
+  }
+  .archive-container .tag-button {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #e6e6e6 !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+  }
+  .archive-container .tag-button.focus {
+    background-color: #0085a1 !important;
+    color: #ffffff !important;
+  }
+  
+  .waifu-tips {
+    background-color: rgba(30, 40, 60, 0.9) !important;
+    border-color: rgba(0, 212, 255, 0.5) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.2) !important;
+    color: #ffffff !important;
+  }
+  .hide-button {
+    background: rgba(0, 212, 255, 0.2) !important;
+    border-color: rgba(0, 212, 255, 0.4) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
+    color: #ffffff !important;
+  }
+  .hide-button:hover {
+    background: rgba(0, 212, 255, 0.3) !important;
+    border-color: #00d4ff !important;
+  }
+  .show-button {
+    background: rgba(0, 212, 255, 0.8) !important;
+    border-color: rgba(0, 212, 255, 0.6) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
+  }
+}
 </style>
 
 <!-- 粒子背景 -->
