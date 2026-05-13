@@ -1,4 +1,15 @@
 {% include head.html %}
+
+<div id="loader-wrapper">
+    <div class="loader">
+        <div class="loader-circle"></div>
+        <div class="loader-circle"></div>
+        <div class="loader-circle"></div>
+        <div class="loader-center"></div>
+        <div class="loader-text">LOADING...</div>
+    </div>
+</div>
+
 {% include nav.html %}
 {% include search.html %}
 
@@ -393,5 +404,14 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('AnimeCursor initialization failed:', error);
         document.body.classList.add('animecursor-disabled');
     }
+});
+
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        var loader = document.getElementById('loader-wrapper');
+        if (loader) {
+            loader.classList.add('loaded');
+        }
+    }, 500);
 });
 </script>
