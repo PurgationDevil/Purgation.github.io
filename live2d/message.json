@@ -9,16 +9,20 @@
       "text": ["欢迎回来！", "主人的博客首页哦~", "回到首页看看吧"]
     },
     {
-      "selector": ".nav.navbar-nav.navbar-right li a[href*='about']",
+      "selector": ".nav.navbar-nav.navbar-right li a:contains('关于')",
       "text": ["想了解主人吗？", "关于主人的故事~", "主人是个有趣的人哦"]
     },
     {
-      "selector": ".nav.navbar-nav.navbar-right li a[href*='archive']",
+      "selector": ".nav.navbar-nav.navbar-right li a:contains('归档')",
       "text": ["有很多文章呢~", "看看历史文章吧", "好多技术文章哦"]
     },
     {
-      "selector": ".nav.navbar-nav.navbar-right li a[href='https://purgationdevil.github.io/']",
+      "selector": ".nav.navbar-nav.navbar-right li a:contains('首页')",
       "text": ["欢迎回到首页！", "首页有很多精彩内容哦", "去首页逛逛吧"]
+    },
+    {
+      "selector": ".search-icon a",
+      "text": ["想搜索什么呢？", "有什么想找的吗？", "来搜索一下吧~"]
     },
     {
       "selector": "#comment-form #textarea",
