@@ -21,7 +21,9 @@
 {% include nav.html %}
 {% include search.html %}
 
-{{ content }}
+<div id="main-content" class="content-hidden">
+    {{ content }}
+</div>
 
 {% include footer.html %}
 
@@ -419,9 +421,17 @@ document.addEventListener('DOMContentLoaded', function() {
         var loader = document.getElementById('loader-wrapper');
         if (loader) {
             loader.classList.add('loaded');
+            
             setTimeout(function() {
-                loader.remove();
-            }, 1000);
+                var mainContent = document.getElementById('main-content');
+                if (mainContent) {
+                    mainContent.classList.add('content-fade-in');
+                }
+                
+                setTimeout(function() {
+                    loader.remove();
+                }, 1000);
+            }, 300);
         }
     }, 800);
 });
