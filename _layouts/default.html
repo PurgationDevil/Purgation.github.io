@@ -414,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         var loader = document.getElementById('loader-wrapper');
         if (loader) {
@@ -423,7 +423,7 @@ window.addEventListener('load', function() {
                 loader.remove();
             }, 1000);
         }
-    }, 500);
+    }, 800);
 });
 
 var loadPercent = 0;
@@ -433,7 +433,7 @@ var percentInterval = setInterval(function() {
     document.getElementById('loader-percent').textContent = Math.round(loadPercent) + '%';
 }, 200);
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
     clearInterval(percentInterval);
     document.getElementById('loader-percent').textContent = '100%';
 });
