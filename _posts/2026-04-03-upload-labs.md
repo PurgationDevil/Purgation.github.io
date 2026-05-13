@@ -10,7 +10,7 @@ tags: [web]
 # upload-lebs
 
 推荐用phpstudy2016版搭建靶场，可以复原所有环境。
-工具：*burpsuite*、*中国蚁剑（或哥斯拉）*
+工具：*burpsuite（或Yakit）*、*中国蚁剑（或哥斯拉、冰蝎系列）*
 
 ## Pass-1(JS限制)
 
