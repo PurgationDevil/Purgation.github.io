@@ -5,8 +5,20 @@
       "text": ["要看看 <span style=\"color:#0099cc;\">{text}</span> 么？"]
     },
     {
-      "selector": ".navbar-container .navbar-logo",
-      "text": ["回到最开始的地方吧"]
+      "selector": ".navbar-brand",
+      "text": ["欢迎回来！", "主人的博客首页哦~", "回到首页看看吧"]
+    },
+    {
+      "selector": ".nav.navbar-nav.navbar-right li a[href*='about']",
+      "text": ["想了解主人吗？", "关于主人的故事~", "主人是个有趣的人哦"]
+    },
+    {
+      "selector": ".nav.navbar-nav.navbar-right li a[href*='archive']",
+      "text": ["有很多文章呢~", "看看历史文章吧", "好多技术文章哦"]
+    },
+    {
+      "selector": ".nav.navbar-nav.navbar-right li a[href='https://purgationdevil.github.io/']",
+      "text": ["欢迎回到首页！", "首页有很多精彩内容哦", "去首页逛逛吧"]
     },
     {
       "selector": "#comment-form #textarea",
