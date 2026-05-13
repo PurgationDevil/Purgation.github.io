@@ -34,9 +34,10 @@ function initTips() {
     var mouseoverTips = [
         {selector: ".post-list-item-container .item-title a[href^='http']", text: ["要看看 <span style=\"color:#0099cc;\">{text}</span> 么？"]},
         {selector: ".navbar-brand", text: ["欢迎回来！", "主人的博客首页哦~", "回到首页看看吧"]},
-        {selector: ".nav.navbar-nav.navbar-right li a[href*='about']", text: ["想了解主人吗？", "关于主人的故事~", "主人是个有趣的人哦"]},
-        {selector: ".nav.navbar-nav.navbar-right li a[href*='archive']", text: ["有很多文章呢~", "看看历史文章吧", "好多技术文章哦"]},
-        {selector: ".nav.navbar-nav.navbar-right li a[href*='/']", text: ["欢迎回到首页！", "首页有很多精彩内容哦", "去首页逛逛吧"]},
+        {selector: ".nav.navbar-nav.navbar-right li a:contains('关于')", text: ["想了解主人吗？", "关于主人的故事~", "主人是个有趣的人哦"]},
+        {selector: ".nav.navbar-nav.navbar-right li a:contains('归档')", text: ["有很多文章呢~", "看看历史文章吧", "好多技术文章哦"]},
+        {selector: ".nav.navbar-nav.navbar-right li a:contains('首页')", text: ["欢迎回到首页！", "首页有很多精彩内容哦", "去首页逛逛吧"]},
+        {selector: ".search-icon a", text: ["想搜索什么呢？", "有什么想找的吗？", "来搜索一下吧~"]},
         {selector: ".pager .previous a", text: ["去上一页看看吧", "上一篇文章", "还有更多内容哦"]},
         {selector: ".pager .next a", text: ["去下一页看看吧", "下一篇文章", "继续探索吧"]},
         {selector: ".list-inline li a", text: ["主人的朋友们~", "友情链接", "去看看其他博客吧"]},
