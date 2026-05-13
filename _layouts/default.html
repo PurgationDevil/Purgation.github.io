@@ -237,41 +237,60 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-  .post-preview > a {
-    color: #e6e6e6 !important;
+  /* 首页文章卡片 */
+  .post-card {
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
   }
-  .post-preview > a:hover,
-  .post-preview > a:focus {
+  .post-card-title a {
+    color: #ffffff !important;
+  }
+  .post-card-title a:hover {
     color: #00d4ff !important;
   }
-  .post-preview > a > .post-title {
-    color: #ffffff !important;
-  }
-  .post-preview > a > .post-subtitle {
-    color: #d4d4d4 !important;
-  }
-  .post-preview > .post-meta {
+  .post-card-date,
+  .post-card-meta {
     color: #b3b3b3 !important;
   }
-  .post-preview > .post-meta > a {
-    color: #e6e6e6 !important;
-  }
-  
-  .archive-container .item-title a,
-  .archive-container .item-title {
-    color: #ffffff !important;
-  }
-  .archive-container .item-meta,
-  .archive-container .item-excerpt {
+  .post-card-excerpt {
     color: #d4d4d4 !important;
   }
-  .archive-container .tag-button {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    color: #e6e6e6 !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
+  
+  /* 归档页面 */
+  .archive-year {
+    color: #ffffff !important;
+    border-left-color: #00d4ff !important;
   }
-  .archive-container .tag-button.focus {
-    background-color: #0085a1 !important;
+  .archive-date {
+    color: #b3b3b3 !important;
+  }
+  .archive-item a {
+    color: #e6e6e6 !important;
+  }
+  .archive-item a:hover {
+    color: #00d4ff !important;
+  }
+  
+  /* 归档标签按钮 */
+  #tag_cloud a,
+  #tag_cloud .tag-button--all {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e6e6e6 !important;
+  }
+  #tag_cloud a.active,
+  #tag_cloud .tag-button--all.active {
+    background: #0085a1 !important;
+    color: #ffffff !important;
+  }
+  #tag_cloud a:hover,
+  #tag_cloud .tag-button--all:hover {
+    background: rgba(0, 212, 255, 0.3) !important;
+    color: #ffffff !important;
+  }
+  #tag_cloud sup {
+    color: #999 !important;
+  }
+  #tag_cloud a.active sup,
+  #tag_cloud .tag-button--all.active sup {
     color: #ffffff !important;
   }
   
