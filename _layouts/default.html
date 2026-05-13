@@ -1,12 +1,20 @@
 {% include head.html %}
 
 <div id="loader-wrapper">
-    <div class="loader">
-        <div class="loader-circle"></div>
-        <div class="loader-circle"></div>
-        <div class="loader-circle"></div>
-        <div class="loader-center"></div>
+    <div class="loader-left"></div>
+    <div class="loader-right"></div>
+    <div class="loader-content">
+        <div class="loader">
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+            <div class="loader-center"></div>
+        </div>
         <div class="loader-text">LOADING...</div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+        <div class="loader-percent" id="loader-percent">0%</div>
     </div>
 </div>
 
@@ -413,8 +421,20 @@ window.addEventListener('load', function() {
             loader.classList.add('loaded');
             setTimeout(function() {
                 loader.remove();
-            }, 600);
+            }, 1000);
         }
     }, 500);
+});
+
+var loadPercent = 0;
+var percentInterval = setInterval(function() {
+    loadPercent += Math.random() * 15;
+    if (loadPercent > 95) loadPercent = 95;
+    document.getElementById('loader-percent').textContent = Math.round(loadPercent) + '%';
+}, 200);
+
+window.addEventListener('load', function() {
+    clearInterval(percentInterval);
+    document.getElementById('loader-percent').textContent = '100%';
 });
 </script>
