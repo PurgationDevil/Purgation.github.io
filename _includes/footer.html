@@ -29,7 +29,7 @@
         searchInput: document.getElementById('search-input'),
         resultsContainer: document.getElementById('search-results'),
         json: '/search.json',
-        searchResultTemplate: '<div class="post-preview"><a href="{url}"><h2 class="post-title">{title}</h2><h3 class="post-subtitle">{subtitle}</h3><div class="post-meta">Tags: {tags} | Date: {date}</div></a></div>',
+        searchResultTemplate: '<div class="post-preview"><a href="{url}"><h2 class="post-title">{title}</h2><div class="post-meta">标签: {tags} | {date}</div></a></div>',
         noResultsText: '<div class="alert alert-warning">没有找到相关文章</div>'
     });
     
