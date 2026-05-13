@@ -34,10 +34,6 @@ function initTips() {
     var mouseoverTips = [
         {selector: ".post-list-item-container .item-title a[href^='http']", text: ["要看看 <span style=\"color:#0099cc;\">{text}</span> 么？"]},
         {selector: ".navbar-brand", text: ["欢迎回来！", "主人的博客首页哦~", "回到首页看看吧"]},
-        {selector: ".nav.navbar-nav.navbar-right li a:contains('关于')", text: ["想了解主人吗？", "关于主人的故事~", "主人是个有趣的人哦"]},
-        {selector: ".nav.navbar-nav.navbar-right li a:contains('归档')", text: ["有很多文章呢~", "看看历史文章吧", "好多技术文章哦"]},
-        {selector: ".nav.navbar-nav.navbar-right li a:contains('首页')", text: ["欢迎回到首页！", "首页有很多精彩内容哦", "去首页逛逛吧"]},
-        {selector: ".search-icon a", text: ["想搜索什么呢？", "有什么想找的吗？", "来搜索一下吧~"]},
         {selector: ".pager .previous a", text: ["去上一页看看吧", "上一篇文章", "还有更多内容哦"]},
         {selector: ".pager .next a", text: ["去下一页看看吧", "下一篇文章", "继续探索吧"]},
         {selector: ".list-inline li a", text: ["主人的朋友们~", "友情链接", "去看看其他博客吧"]},
@@ -48,6 +44,24 @@ function initTips() {
         {selector: ".github-corner", text: ["这里是我家主人的GitHub，去看看嘛~"]},
         {selector: ".waifu #live2d", text: ["干嘛呢你，快把手拿开~~", "鼠…鼠标放错地方了！", "怕怕", "非礼呀！救命！( ⓛ ω ⓛ *)", "喵喵喵？", "你要干嘛呀？"]}
     ];
+    
+    $(document).on("mouseover", ".nav.navbar-nav.navbar-right li a", function() {
+        var text = $(this).text();
+        var messages = [];
+        if (text.indexOf('关于') !== -1) {
+            messages = ["想了解主人吗？", "关于主人的故事~", "主人是个有趣的人哦"];
+        } else if (text.indexOf('归档') !== -1) {
+            messages = ["有很多文章呢~", "看看历史文章吧", "好多技术文章哦"];
+        } else if (text.indexOf('首页') !== -1) {
+            messages = ["欢迎回到首页！", "首页有很多精彩内容哦", "去首页逛逛吧"];
+        } else if (text.indexOf('搜索') !== -1 || $(this).find('.fa-search').length > 0) {
+            messages = ["想搜索什么呢？", "有什么想找的吗？", "来搜索一下吧~"];
+        }
+        if (messages.length > 0) {
+            var msg = messages[Math.floor(Math.random() * messages.length)];
+            showMessage(msg, 3000);
+        }
+    });
 
     var clickTips = [
         {selector: ".waifu #live2d", text: ["是…是不小心碰到的吧！(´・ω・`)", "萝莉控是什么呀？", "干嘛动我啊，小心我咬你！(〃｀ 3′〃)", "不要再摸我啦，我告诉你老婆来打你的！", "真…真是不知羞耻！", "我要生气了哦", "再摸的话我可要报警了！⌇●﹏●⌇", "110吗，这里有个变态一直在摸我(ó﹏ò｡)"]}
