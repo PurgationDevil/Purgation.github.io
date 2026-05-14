@@ -73,9 +73,146 @@
     font-size: 20px;
   }
 }
+
+/* 手机端浮动目录按钮 */
+.toc-mobile-btn {
+  position: fixed;
+  right: 15px;
+  bottom: 100px;
+  width: 45px;
+  height: 45px;
+  background: #0085a1;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 1000;
+  display: none;
+}
+
+.toc-mobile-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 2000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.toc-mobile-panel.active {
+  transform: translateX(0);
+}
+
+.toc-mobile-content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 85%;
+  max-width: 320px;
+  height: 100%;
+  background: #fff;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.toc-mobile-content h4 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #0085a1;
+}
+
+.toc-mobile-content ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-mobile-content li {
+  margin: 10px 0;
+}
+
+.toc-mobile-content a {
+  color: #555;
+  text-decoration: none;
+  font-size: 14px;
+  display: block;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.toc-mobile-content a:hover,
+.toc-mobile-content a.active {
+  background: #f0f0f0;
+  color: #0085a1;
+}
+
+.toc-mobile-close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+}
+
+/* 手机端显示目录按钮 */
+@media (max-width: 992px) {
+  .toc-mobile-btn {
+    display: flex;
+  }
+}
+
+/* 深色模式手机端目录 */
+@media (prefers-color-scheme: dark) {
+  .toc-mobile-content {
+    background: #0a141e;
+  }
+  
+  .toc-mobile-content h4 {
+    color: #fff;
+    border-bottom-color: #00d4ff;
+  }
+  
+  .toc-mobile-content a {
+    color: #d4d4d4;
+  }
+  
+  .toc-mobile-content a:hover,
+  .toc-mobile-content a.active {
+    background: rgba(0, 212, 255, 0.15);
+    color: #00d4ff;
+  }
+  
+  .toc-mobile-close {
+    color: #666;
+  }
+}
 </style>
 
 <div class="go-top" id="goTopBtn">↑</div>
+
+<!-- 手机端目录按钮 -->
+<div class="toc-mobile-btn" id="tocMobileBtn">☰</div>
+
+<!-- 手机端目录面板 -->
+<div class="toc-mobile-panel" id="tocMobilePanel">
+  <div class="toc-mobile-content">
+    <div class="toc-mobile-close" id="tocMobileClose">×</div>
+    <h4>📖 目录</h4>
+    <ul id="tocMobileList"></ul>
+  </div>
+</div>
 
 <script>
 (function() {
@@ -93,6 +230,95 @@
   btn.addEventListener('click', function() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
+})();
+</script>
+
+<!-- 目录功能 JavaScript -->
+<script>
+(function() {
+  function initToc() {
+    var article = document.querySelector('.post-container');
+    if (!article) return;
+    
+    var headers = article.querySelectorAll('h2, h3');
+    if (headers.length === 0) return;
+    
+    // 创建手机端目录列表
+    var mobileTocList = document.getElementById('tocMobileList');
+    if (!mobileTocList) return;
+    mobileTocList.innerHTML = '';
+    
+    headers.forEach(function(header, index) {
+      var id = 'toc-' + index;
+      header.id = id;
+      
+      // 手机端目录项
+      var mobileLi = document.createElement('li');
+      var mobileA = document.createElement('a');
+      mobileA.href = '#' + id;
+      mobileA.textContent = header.textContent;
+      mobileA.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('tocMobilePanel').classList.remove('active');
+      });
+      mobileLi.appendChild(mobileA);
+      mobileTocList.appendChild(mobileLi);
+    });
+    
+    // 高亮当前章节
+    var tocLinks = document.querySelectorAll('.toc-mobile-content a');
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + 100;
+      var currentId = null;
+      
+      headers.forEach(function(header) {
+        var offsetTop = header.offsetTop;
+        if (offsetTop <= scrollPos) {
+          currentId = header.id;
+        }
+      });
+      
+      tocLinks.forEach(function(link) {
+        link.classList.remove('active');
+        var href = link.getAttribute('href').substring(1);
+        if (href === currentId) {
+          link.classList.add('active');
+        }
+      });
+    });
+  }
+  
+  // 手机端目录按钮事件
+  var mobileBtn = document.getElementById('tocMobileBtn');
+  var mobilePanel = document.getElementById('tocMobilePanel');
+  var mobileClose = document.getElementById('tocMobileClose');
+  
+  if (mobileBtn && mobilePanel) {
+    mobileBtn.addEventListener('click', function() {
+      mobilePanel.classList.add('active');
+    });
+  }
+  
+  if (mobileClose && mobilePanel) {
+    mobileClose.addEventListener('click', function() {
+      mobilePanel.classList.remove('active');
+    });
+  }
+  
+  if (mobilePanel) {
+    mobilePanel.addEventListener('click', function(e) {
+      if (e.target === mobilePanel) {
+        mobilePanel.classList.remove('active');
+      }
+    });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToc);
+  } else {
+    initToc();
+  }
 })();
 </script>
 
