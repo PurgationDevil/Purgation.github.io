@@ -1,0 +1,30 @@
+{
+    "name": "anime-cursor",
+    "version": "2.1.3",
+    "description": "A lightweight JavaScript library for animated custom cursors",
+    "main": "dist/anime-cursor.umd.js",
+    "module": "dist/anime-cursor.esm.js",
+    "files": [
+        "dist"
+    ],
+    "keywords": [
+        "cursor",
+        "animation",
+        "ui",
+        "javascript"
+    ],
+    "scripts": {
+        "build": "rollup -c"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/shuninyu/anime-cursor.git"
+    },
+    "author": "ShuninYu",
+    "license": "MIT",
+    "homepage": "https://animecursor.js.org",
+    "devDependencies": {
+        "@rollup/plugin-terser": "^0.4.4",
+        "rollup": "^4.56.0"
+    }
+}

