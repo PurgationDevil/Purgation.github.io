@@ -90,7 +90,7 @@ layout: default
 .toc-mobile-btn {
   position: fixed;
   right: 15px;
-  bottom: 120px;
+  bottom: 100px;
   width: 45px;
   height: 45px;
   background: #0085a1;
@@ -102,7 +102,8 @@ layout: default
   font-size: 18px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.2);
   cursor: pointer;
-  z-index: 9999;
+  z-index: 1000;
+  display: none;
 }
 
 .toc-mobile-panel {
@@ -351,13 +352,9 @@ layout: default
   var mobileBtn = document.getElementById('tocMobileBtn');
   var mobilePanel = document.getElementById('tocMobilePanel');
   var mobileClose = document.getElementById('tocMobileClose');
-  var mobileContent = document.querySelector('.toc-mobile-content');
   
   mobileBtn.addEventListener('click', function() {
     mobilePanel.classList.add('active');
-    if (mobileContent) {
-      mobileContent.scrollTop = 0;
-    }
   });
   
   mobileClose.addEventListener('click', function() {
