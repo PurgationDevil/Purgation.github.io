@@ -74,7 +74,7 @@
   }
 }
 
-/* 手机端浮动目录按钮 */
+/* 手机端浮动目录按钮 - 默认隐藏 */
 .toc-mobile-btn {
   position: fixed;
   right: 15px;
@@ -84,14 +84,13 @@
   background: #0085a1;
   color: #fff;
   border-radius: 50%;
-  display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.2);
   cursor: pointer;
   z-index: 1000;
-  display: none;
+  display: none !important;
 }
 
 .toc-mobile-panel {
@@ -168,8 +167,10 @@
 
 /* 手机端显示目录按钮 */
 @media (max-width: 992px) {
-  .toc-mobile-btn {
-    display: flex;
+  .toc-mobile-btn.show {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 }
 
@@ -242,6 +243,12 @@
     
     var headers = article.querySelectorAll('h2, h3');
     if (headers.length === 0) return;
+    
+    // 显示目录按钮（只有文章页面才显示）
+    var mobileBtn = document.getElementById('tocMobileBtn');
+    if (mobileBtn) {
+      mobileBtn.classList.add('show');
+    }
     
     // 创建手机端目录列表
     var mobileTocList = document.getElementById('tocMobileList');
