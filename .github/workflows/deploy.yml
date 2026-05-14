@@ -16,10 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -38,14 +35,9 @@ jobs:
         env:
           JEKYLL_ENV: production
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          name: github-pages
-          path: ./_site
-
-      - name: Deploy to Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-        with:
-          artifact_name: github-pages
+          folder: ./_site
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
