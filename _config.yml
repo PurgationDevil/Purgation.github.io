@@ -13,7 +13,7 @@ future: true
 # SNS settings
 RSS: false
 github_username: PurgationDevil
-#facebook_username:  PurgationDevil
+facebook_username:  PurgationDevil
 #linkedin_username:  firstname-lastname-idxxxx
 
 # Build settings
