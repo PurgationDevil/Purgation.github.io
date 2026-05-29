@@ -65,6 +65,17 @@
 
     <!-- Loading Animation -->
     <style>
+    /* 修改首页封面字体大小 - 手机端 */
+    .intro-header .site-heading h1,
+    .intro-header .page-heading h1 {
+        font-size: 32px !important;
+    }
+    @media only screen and (min-width: 768px) {
+        .intro-header .site-heading h1,
+        .intro-header .page-heading h1 {
+            font-size: 80px !important;
+        }
+    }
     #loader-wrapper {
         position: fixed;
         top: 0;
