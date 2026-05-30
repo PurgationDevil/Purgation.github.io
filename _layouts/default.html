@@ -1,24 +1,3 @@
-{% include head.html %}
-
-<div id="loader-wrapper" style="display: none;">
-    <div class="loader-left"></div>
-    <div class="loader-right"></div>
-    <div class="loader-content">
-        <div class="loader">
-            <div class="loader-center"></div>
-        </div>
-    </div>
-</div>
-
-{% include nav.html %}
-{% include search.html %}
-
-<div id="main-content">
-    {{ content }}
-</div>
-
-{% include footer.html %}
-
 <!-- 回到顶部按钮 -->
 <style>
 .go-top {
@@ -35,7 +14,7 @@
   justify-content: center;
   cursor: pointer;
   font-size: 25px;
-  padding-left: 19px;
+  padding-left: 17px;
   font-weight: bold;
   opacity: 0;
   visibility: hidden;
@@ -66,343 +45,33 @@
   }
 }
 
-/* 手机端浮动目录按钮 - 默认隐藏 */
-.toc-mobile-btn {
+/* 点击波纹特效 */
+.ripple {
   position: fixed;
-  right: 15px;
-  bottom: 100px;
-  width: 45px;
-  height: 45px;
-  background: #0085a1;
-  color: #fff;
+  width: 0;
+  height: 0;
   border-radius: 50%;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 1000;
-  display: none !important;
+  background: radial-gradient(circle, rgba(255,102,153,0.6), rgba(255,51,102,0.3));
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9999;
+  animation: rippleAnim 0.6s ease-out forwards;
 }
 
-.toc-mobile-panel {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.8);
-  z-index: 2000;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-}
-
-.toc-mobile-panel.active {
-  transform: translateX(0);
-}
-
-.toc-mobile-content {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 85%;
-  max-width: 320px;
-  height: 100%;
-  background: #fff;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.toc-mobile-content h4 {
-  margin: 0 0 15px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #0085a1;
-}
-
-.toc-mobile-content ul {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
-
-.toc-mobile-content li {
-  margin: 10px 0;
-}
-
-.toc-mobile-content a {
-  color: #555;
-  text-decoration: none;
-  font-size: 14px;
-  display: block;
-  padding: 8px;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-.toc-mobile-content a:hover,
-.toc-mobile-content a.active {
-  background: #f0f0f0;
-  color: #0085a1;
-}
-
-.toc-mobile-close {
-  position: absolute;
-  right: 15px;
-  top: 15px;
-  font-size: 24px;
-  color: #999;
-  cursor: pointer;
-}
-
-/* 手机端显示目录按钮 */
-@media (max-width: 992px) {
-  .toc-mobile-btn.show {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+@keyframes rippleAnim {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.8;
+  }
+  100% {
+    width: 120px;
+    height: 120px;
+    opacity: 0;
   }
 }
 
-/* 深色模式手机端目录 */
-@media (prefers-color-scheme: dark) {
-  .toc-mobile-content {
-    background: #0a141e;
-  }
-  
-  .toc-mobile-content h4 {
-    color: #fff;
-    border-bottom-color: #00d4ff;
-  }
-  
-  .toc-mobile-content a {
-    color: #d4d4d4;
-  }
-  
-  .toc-mobile-content a:hover,
-  .toc-mobile-content a.active {
-    background: rgba(0, 212, 255, 0.15);
-    color: #00d4ff;
-  }
-  
-  .toc-mobile-close {
-    color: #666;
-  }
-}
-</style>
-
-<div class="go-top" id="goTopBtn">↑</div>
-
-<!-- 手机端目录按钮 -->
-<div class="toc-mobile-btn" id="tocMobileBtn">☰</div>
-
-<!-- 手机端目录面板 -->
-<div class="toc-mobile-panel" id="tocMobilePanel">
-  <div class="toc-mobile-content">
-    <div class="toc-mobile-close" id="tocMobileClose">×</div>
-    <h4>📖 目录</h4>
-    <ul id="tocMobileList"></ul>
-  </div>
-</div>
-
-<script>
-(function() {
-  var btn = document.getElementById('goTopBtn');
-  if (!btn) return;
-  
-  window.addEventListener('scroll', function() {
-    if (window.scrollY > 300) {
-      btn.classList.add('show');
-    } else {
-      btn.classList.remove('show');
-    }
-  });
-  
-  btn.addEventListener('click', function() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-})();
-</script>
-
-<!-- 目录功能 JavaScript -->
-<script>
-(function() {
-  function initToc() {
-    var article = document.querySelector('.post-container');
-    if (!article) return;
-    
-    var headers = article.querySelectorAll('h2, h3');
-    if (headers.length === 0) return;
-    
-    // 显示目录按钮（只有文章页面才显示）
-    var mobileBtn = document.getElementById('tocMobileBtn');
-    if (mobileBtn) {
-      mobileBtn.classList.add('show');
-    }
-    
-    // 创建手机端目录列表
-    var mobileTocList = document.getElementById('tocMobileList');
-    if (!mobileTocList) return;
-    mobileTocList.innerHTML = '';
-    
-    headers.forEach(function(header, index) {
-      var id = 'toc-' + index;
-      header.id = id;
-      
-      // 手机端目录项
-      var mobileLi = document.createElement('li');
-      var mobileA = document.createElement('a');
-      mobileA.href = '#' + id;
-      mobileA.textContent = header.textContent;
-      mobileA.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
-        document.getElementById('tocMobilePanel').classList.remove('active');
-      });
-      mobileLi.appendChild(mobileA);
-      mobileTocList.appendChild(mobileLi);
-    });
-    
-    // 高亮当前章节
-    var tocLinks = document.querySelectorAll('.toc-mobile-content a');
-    window.addEventListener('scroll', function() {
-      var scrollPos = window.scrollY + 100;
-      var currentId = null;
-      
-      headers.forEach(function(header) {
-        var offsetTop = header.offsetTop;
-        if (offsetTop <= scrollPos) {
-          currentId = header.id;
-        }
-      });
-      
-      tocLinks.forEach(function(link) {
-        link.classList.remove('active');
-        var href = link.getAttribute('href').substring(1);
-        if (href === currentId) {
-          link.classList.add('active');
-        }
-      });
-    });
-  }
-  
-  // 手机端目录按钮事件
-  var mobileBtn = document.getElementById('tocMobileBtn');
-  var mobilePanel = document.getElementById('tocMobilePanel');
-  var mobileClose = document.getElementById('tocMobileClose');
-  
-  if (mobileBtn && mobilePanel) {
-    mobileBtn.addEventListener('click', function() {
-      mobilePanel.classList.add('active');
-    });
-  }
-  
-  if (mobileClose && mobilePanel) {
-    mobileClose.addEventListener('click', function() {
-      mobilePanel.classList.remove('active');
-    });
-  }
-  
-  if (mobilePanel) {
-    mobilePanel.addEventListener('click', function(e) {
-      if (e.target === mobilePanel) {
-        mobilePanel.classList.remove('active');
-      }
-    });
-  }
-  
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initToc);
-  } else {
-    initToc();
-  }
-})();
-</script>
-
-<!-- 代码块深色主题（统一风格） -->
-<style>
-.highlight,
-pre.highlight {
-    background: #282c34 !important;
-    color: #abb2bf !important;
-    border-radius: 8px;
-    padding: 12px;
-    overflow-x: auto;
-}
-
-/* 代码块内文字颜色 */
-.highlight .c  { color: #5c6370 !important; font-style: italic; } /* 注释 */
-.highlight .k  { color: #c678dd !important; } /* 关键字 */
-.highlight .s  { color: #98c379 !important; } /* 字符串 */
-.highlight .n  { color: #abb2bf !important; } /* 变量名 */
-.highlight .p  { color: #abb2bf !important; } /* 括号 */
-.highlight .cm { color: #5c6370 !important; } /* 多行注释 */
-.highlight .nt { color: #e06c75 !important; } /* 标签 */
-
-/* 补充更多代码高亮样式 */
-.highlight .err { color: #960050 !important; background-color: #1e0010 !important; }
-.highlight .l { color: #98c379 !important; }
-.highlight .o { color: #abb2bf !important; }
-.highlight .cp { color: #5c6370 !important; font-style: italic; }
-.highlight .c1 { color: #5c6370 !important; font-style: italic; }
-.highlight .cs { color: #5c6370 !important; font-style: italic; }
-.highlight .kc { color: #c678dd !important; }
-.highlight .kd { color: #c678dd !important; }
-.highlight .kn { color: #c678dd !important; }
-.highlight .kp { color: #c678dd !important; }
-.highlight .kr { color: #c678dd !important; }
-.highlight .kt { color: #c678dd !important; }
-.highlight .ld { color: #98c379 !important; }
-.highlight .m { color: #d19a66 !important; }
-.highlight .na { color: #d19a66 !important; }
-.highlight .nb { color: #e5c07b !important; }
-.highlight .nc { color: #e5c07b !important; }
-.highlight .no { color: #e5c07b !important; }
-.highlight .nd { color: #e5c07b !important; }
-.highlight .ni { color: #e5c07b !important; }
-.highlight .ne { color: #e5c07b !important; }
-.highlight .nf { color: #abb2bf !important; }
-.highlight .nl { color: #e5c07b !important; }
-.highlight .nn { color: #abb2bf !important; }
-.highlight .nx { color: #abb2bf !important; }
-.highlight .py { color: #e5c07b !important; }
-.highlight .nv { color: #e5c07b !important; }
-.highlight .ow { font-weight: 700; }
-.highlight .w { color: #f8f8f2 !important; }
-.highlight .mf { color: #d19a66 !important; }
-.highlight .mh { color: #d19a66 !important; }
-.highlight .mi { color: #d19a66 !important; }
-.highlight .mo { color: #d19a66 !important; }
-.highlight .sb { color: #98c379 !important; }
-.highlight .sc { color: #98c379 !important; }
-.highlight .sd { color: #98c379 !important; }
-.highlight .s2 { color: #98c379 !important; }
-.highlight .se { color: #98c379 !important; }
-.highlight .sh { color: #98c379 !important; }
-.highlight .si { color: #98c379 !important; }
-.highlight .sx { color: #98c379 !important; }
-.highlight .sr { color: #56b6c2 !important; }
-.highlight .s1 { color: #98c379 !important; }
-.highlight .ss { color: #56b6c2 !important; }
-.highlight .bp { color: #e5c07b !important; }
-.highlight .vc { color: #e5c07b !important; }
-.highlight .vg { color: #e5c07b !important; }
-.highlight .vi { color: #e06c75 !important; }
-.highlight .il { color: #d19a66 !important; }
-
-/* 行号样式 */
-.highlight .lineno {
-    color: #5c6370 !important;
-    padding-right: 12px;
-    border-right: 1px solid #3e4451;
-    margin-right: 12px;
-}
-</style>
-
-<!-- 搜索页面样式 -->
-<style>
+/* 搜索页面样式 */
 .search-page {
   position: fixed;
   top: 0;
@@ -445,66 +114,11 @@ pre.highlight {
 #search-results {
   margin-top: 30px;
 }
-</style>
 
-<!-- 页面背景和文字颜色样式 - 跟随系统主题 -->
-<style>
-:root {
-  --bg-color: #ffffff;
-  --text-color: #333333;
-  --text-light: #666666;
-  --heading-color: #000000;
-  --link-color: #0085a1;
-  --navbar-bg: rgba(255, 255, 255, 0.85);
-  --navbar-text: #66ccff;
-  --gradient-end: rgba(255, 255, 255, 1);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-color: #0a141e;
-    --text-color: #e6e6e6;
-    --text-light: #d4d4d4;
-    --heading-color: #ffffff;
-    --link-color: #00d4ff;
-    --navbar-bg: rgba(10, 20, 30, 0.85);
-    --navbar-text: #66ccff;
-    --gradient-end: rgba(10, 20, 30, 1);
-  }
-}
-
-body {
-  background-color: var(--bg-color) !important;
-  color: var(--text-color) !important;
-}
-
-.post-container,
-.article-container {
-  color: var(--text-color) !important;
-}
-
-.post-container p,
-.post-container li,
-.post-container span {
-  color: var(--text-light) !important;
-}
-
-.post-container h1,
-.post-container h2,
-.post-container h3,
-.post-container h4,
-.post-container h5,
-.post-container h6 {
-  color: var(--heading-color) !important;
-}
-
-.post-container a {
-  color: var(--link-color) !important;
-}
-
+/* 导航栏样式 */
 .navbar-custom .nav li a,
 .navbar-custom .navbar-brand {
-    color: var(--navbar-text) !important;
+    color: #66ccff !important;
 }
 
 .navbar-custom .nav li a:hover,
@@ -513,7 +127,7 @@ body {
 }
 
 .navbar-custom {
-    background-color: var(--navbar-bg) !important;
+    background-color: rgba(255, 255, 255, 0.85) !important;
 }
 
 .intro-header .site-heading h1,
@@ -537,112 +151,70 @@ body {
     left: 0;
     width: 100%;
     height: 120px;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--gradient-end));
+    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
     pointer-events: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  /* 首页文章卡片 */
-  .post-card {
-    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
-  }
-  .post-card-title a {
-    color: #ffffff !important;
-  }
-  .post-card-title a:hover {
-    color: #00d4ff !important;
-  }
-  .post-card-date,
-  .post-card-meta {
-    color: #b3b3b3 !important;
-  }
-  .post-card-excerpt {
-    color: #d4d4d4 !important;
-  }
-  
-  /* 归档页面 */
-  .archive-year {
-    color: #ffffff !important;
-    border-left-color: #00d4ff !important;
-  }
-  .archive-date {
-    color: #b3b3b3 !important;
-  }
-  .archive-item a {
-    color: #e6e6e6 !important;
-  }
-  .archive-item a:hover {
-    color: #00d4ff !important;
-  }
-  
-  /* 归档标签按钮 */
-  #tag_cloud a,
-  #tag_cloud .tag-button--all {
-    background: rgba(255, 255, 255, 0.1) !important;
-    color: #e6e6e6 !important;
-  }
-  #tag_cloud a.active,
-  #tag_cloud .tag-button--all.active {
-    background: #0085a1 !important;
-    color: #ffffff !important;
-  }
-  #tag_cloud a:hover,
-  #tag_cloud .tag-button--all:hover {
-    background: rgba(0, 212, 255, 0.3) !important;
-    color: #ffffff !important;
-  }
-  #tag_cloud sup {
-    color: #999 !important;
-  }
-  #tag_cloud a.active sup,
-  #tag_cloud .tag-button--all.active sup {
-    color: #ffffff !important;
-  }
-  
-  .waifu-tips {
-    background-color: rgba(30, 40, 60, 0.9) !important;
-    border-color: rgba(0, 212, 255, 0.5) !important;
-    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.2) !important;
-    color: #ffffff !important;
-  }
-  .hide-button {
-    background: rgba(0, 212, 255, 0.2) !important;
-    border-color: rgba(0, 212, 255, 0.4) !important;
-    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
-    color: #ffffff !important;
-  }
-  .hide-button:hover {
-    background: rgba(0, 212, 255, 0.3) !important;
-    border-color: #00d4ff !important;
-  }
-  .show-button {
-    background: rgba(0, 212, 255, 0.8) !important;
-    border-color: rgba(0, 212, 255, 0.6) !important;
-    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
-  }
 }
 </style>
 
-<!-- 粒子背景 - 延迟加载 -->
-<div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
+<div class="go-top" id="goTopBtn">↑</div>
+
 <script>
-// 延迟加载粒子特效 - 等页面加载完再加载
+(function() {
+  var btn = document.getElementById('goTopBtn');
+  if (!btn) return;
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 300) {
+      btn.classList.add('show');
+    } else {
+      btn.classList.remove('show');
+    }
+  });
+  btn.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
+<!-- 特效延迟加载 -->
+<script>
+// 等页面加载完2秒后再加载特效，避免阻塞首屏
 window.addEventListener('load', function() {
     setTimeout(function() {
-        var particlesScript = document.createElement('script');
-        particlesScript.src = 'https://cdn.bootcdn.net/ajax/libs/particles.js/2.0.0/particles.min.js';
-        document.body.appendChild(particlesScript);
+        // 1. 点击波纹特效（使用requestAnimationFrame优化）
+        (function() {
+            var lastClickTime = 0;
+            document.addEventListener('click', function(e) {
+                var now = Date.now();
+                if (now - lastClickTime < 50) return; // 节流，防止频繁点击
+                lastClickTime = now;
+                
+                var ripple = document.createElement('div');
+                ripple.className = 'ripple';
+                ripple.style.left = e.clientX + 'px';
+                ripple.style.top = e.clientY + 'px';
+                document.body.appendChild(ripple);
+                setTimeout(function() { ripple.remove(); }, 600);
+            });
+        })();
+
+        // 2. 粒子背景（延迟加载+减少粒子）
+        var particlesDiv = document.createElement('div');
+        particlesDiv.id = 'particles-js';
+        particlesDiv.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;';
+        document.body.appendChild(particlesDiv);
         
+        var particlesScript = document.createElement('script');
+        particlesScript.src = 'https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js';
         particlesScript.onload = function() {
             particlesJS("particles-js", {
                 "particles": {
-                    "number": { "value": 60 },
+                    "number": { "value": 40 }, // 减少粒子数量
                     "color": { "value": "#00ffff" },
                     "shape": { "type": "circle" },
-                    "opacity": { "value": 0.5, "random": true },
-                    "size": { "value": 2, "random": true },
+                    "opacity": { "value": 0.6, "random": true },
+                    "size": { "value": 3, "random": true },
                     "line_linked": { "enable": false },
-                    "move": { "enable": true, "speed": 1.5, "direction": "none", "random": true }
+                    "move": { "enable": true, "speed": 2, "direction": "none", "random": true }
                 },
                 "interactivity": {
                     "detect_on": "canvas",
@@ -652,185 +224,88 @@ window.addEventListener('load', function() {
                     }
                 }
             });
-            console.log("粒子特效加载完成");
         };
-    }, 1000);
+        document.body.appendChild(particlesScript);
+
+        // 3. 鼠标点击樱花特效（节流优化）
+        (function() {
+            var lastFlowerTime = 0;
+            function createFlower(x, y) {
+                var flower = document.createElement('div');
+                flower.innerHTML = '🌸';
+                flower.style.position = 'fixed';
+                flower.style.left = x + 'px';
+                flower.style.top = y + 'px';
+                flower.style.fontSize = '20px';
+                flower.style.pointerEvents = 'none';
+                flower.style.zIndex = '9999';
+                flower.style.opacity = '1';
+                flower.style.transition = 'all 1s ease-out';
+                document.body.appendChild(flower);
+                setTimeout(function() {
+                    flower.style.transform = 'translateY(-80px)';
+                    flower.style.opacity = '0';
+                    flower.style.fontSize = '12px';
+                }, 10);
+                setTimeout(function() { flower.remove(); }, 1000);
+            }
+            document.addEventListener('click', function(e) {
+                var now = Date.now();
+                if (now - lastFlowerTime < 80) return; // 节流，防止频繁创建
+                lastFlowerTime = now;
+                createFlower(e.clientX, e.clientY);
+            });
+        })();
+    }, 2000); // 延迟2秒加载
 });
 </script>
 
-<!-- 鼠标点击特效 - Canvas优化 -->
-<canvas id="clickCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;"></canvas>
-<script>
-// Canvas点击特效 - 性能优化
-(function() {
-    var canvas = document.getElementById('clickCanvas');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    var particles = [];
-    var colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff6600', '#0066ff', '#ff3366'];
-    
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-    
-    function Particle(x, y, color) {
-        this.x = x;
-        this.y = y;
-        this.color = color;
-        this.size = 5 + Math.random() * 10;
-        var angle = Math.random() * Math.PI * 2;
-        var speed = 2 + Math.random() * 3;
-        this.vx = Math.cos(angle) * speed;
-        this.vy = Math.sin(angle) * speed;
-        this.alpha = 1;
-        this.decay = 0.02 + Math.random() * 0.02;
-    }
-    
-    Particle.prototype.update = function() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.alpha -= this.decay;
-        this.size *= 0.98;
-    };
-    
-    Particle.prototype.draw = function() {
-        ctx.save();
-        ctx.globalAlpha = this.alpha;
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-    };
-    
-    document.addEventListener('click', function(e) {
-        var color = colors[Math.floor(Math.random() * colors.length)];
-        for (var i = 0; i < 5; i++) {
-            particles.push(new Particle(e.clientX, e.clientY, color));
-        }
-    });
-    
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (var i = particles.length - 1; i >= 0; i--) {
-            particles[i].update();
-            particles[i].draw();
-            if (particles[i].alpha <= 0) {
-                particles.splice(i, 1);
-            }
-        }
-        requestAnimationFrame(animate);
-    }
-    animate();
-})();
-</script>
+{% include head.html %}
+{% include nav.html %}
+{% include search.html %}
 
-<!-- 加载 Font Awesome 图标库 - 预连接优化 -->
-<link rel="preconnect" href="https://cdn.bootcdn.net">
-<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+{{ content }}
 
-<!-- Live2D 看板娘 - 延迟加载 -->
-<div class="waifu" id="landlord" style="display: none;">
-    <div class="waifu-tips"></div>
-    <canvas id="live2d" width="300" height="300"></canvas>
-    <div class="hide-button">隐藏</div>
-</div>
-<div class="show-button" id="showWaifuBtn" style="display: none;">🌸</div>
+{% include footer.html %}
+
+<!-- Live2D 看板娘 - Pio 酱（延迟加载） -->
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" as="style">
 <script>
-// 延迟加载看板娘 - 等页面完全加载后再加载
+// 延迟加载看板娘，等页面加载完3秒后再加载
 window.addEventListener('load', function() {
-    // 延迟3秒后加载看板娘，不阻塞首屏
     setTimeout(function() {
-        // 加载看板娘CSS
-        var waifuCss = document.createElement('link');
-        waifuCss.rel = 'stylesheet';
-        waifuCss.href = '{{ site.baseurl }}/live2d/css/waifu.css';
-        document.head.appendChild(waifuCss);
+        // 加载Font Awesome
+        var faLink = document.createElement('link');
+        faLink.rel = 'stylesheet';
+        faLink.href = 'https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css';
+        document.head.appendChild(faLink);
         
-        // 显示看板娘
-        var waifu = document.getElementById('landlord');
-        if (waifu) {
-            waifu.style.display = 'block';
-        }
-        
-        // 加载Live2D脚本
-        var live2dScript = document.createElement('script');
-        live2dScript.src = '{{ site.baseurl }}/live2d/js/live2d.js';
-        document.body.appendChild(live2dScript);
-        
-        live2dScript.onload = function() {
-            // 加载waifu.js
-            var waifuScript = document.createElement('script');
-            waifuScript.src = '{{ site.baseurl }}/live2d/js/waifu.js';
-            document.body.appendChild(waifuScript);
-            
-            waifuScript.onload = function() {
-                // 加载模型
-                loadlive2d("live2d", "{{ site.baseurl }}/live2d/model/pio/model.json");
-                console.log("Pio 酱模型加载完成");
-            };
-        };
-    }, 3000); // 3秒后加载
-});
-</script>
-
-<style>
-.animecursor-disabled,
-.animecursor-disabled * {
-  cursor: auto !important;
-}
-
-input, textarea, [contenteditable] {
-  cursor: text !important;
-}
-</style>
-
-<script src="{{ site.baseurl }}/js/anime-cursor/dist/anime-cursor.umd.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    try {
-        new AnimeCursor({
-            fallbackCursor: 'auto',
-            excludeSelectors: 'input, textarea, [contenteditable]',
-            cursors: {
-                default: {
-                    image: '{{ site.baseurl }}/img/mouse/default_001.png',
-                    default: true,
-                    offset: [0, 0]
-                },
-                pointer: {
-                    tags: ['a', 'button'],
-                    image: '{{ site.baseurl }}/img/mouse/default_001.png',
-                    offset: [0, 0]
-                },
-                landlord: {
-                    tags: ['.waifu', '#landlord', '#live2d'],
-                    image: '{{ site.baseurl }}/img/mouse/landlord_001.png',
-                    offset: [0, 0]
-                }
-            }
-        });
-        console.log('AnimeCursor initialized successfully');
-    } catch (error) {
-        console.error('AnimeCursor initialization failed:', error);
-        document.body.classList.add('animecursor-disabled');
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    var loader = document.getElementById('loader-wrapper');
-    if (loader) {
-        loader.style.display = 'flex';
-        setTimeout(function() {
-            loader.classList.add('loaded');
+        // 加载看板娘
+        var l2dScript = document.createElement('script');
+        l2dScript.src = 'https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js';
+        l2dScript.onload = function() {
             setTimeout(function() {
-                loader.remove();
-            }, 300);
-        }, 200);
-    }
+                if (typeof L2Dwidget !== 'undefined') {
+                    L2Dwidget.init({
+                        model: {
+                            jsonPath: "https://cdn.jsdelivr.net/gh/PurgationDevil/PurgationDevil.github.io/live2d/model/pio/model.json",
+                            scale: 1
+                        },
+                        display: {
+                            position: "left",
+                            width: 150,
+                            height: 200,
+                            hOffset: 0,
+                            vOffset: -20
+                        },
+                        mobile: {
+                            show: false
+                        }
+                    });
+                }
+            }, 500);
+        };
+        document.body.appendChild(l2dScript);
+    }, 3000); // 延迟3秒加载
 });
 </script>
