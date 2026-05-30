@@ -636,7 +636,7 @@ window.addEventListener('load', function() {
         particlesScript.onload = function() {
             particlesJS("particles-js", {
                 "particles": {
-                    "number": { "value": 60 },
+                    "number": { "value": 30 },
                     "color": { "value": "#00ffff" },
                     "shape": { "type": "circle" },
                     "opacity": { "value": 0.5, "random": true },
@@ -722,7 +722,10 @@ window.addEventListener('load', function() {
                 particles.splice(i, 1);
             }
         }
-        requestAnimationFrame(animate);
+        // 只有当还有粒子时才继续动画，否则停止
+        if (particles.length > 0) {
+            requestAnimationFrame(animate);
+        }
     }
     animate();
 })();
@@ -789,7 +792,10 @@ input, textarea, [contenteditable] {
 }
 </style>
 
-<script src="{{ site.baseurl }}/js/anime-cursor/dist/anime-cursor.umd.min.js"></script>
+{% unless page.layout == "post" %}
+<script defer src="{{ site.baseurl }}/js/anime-cursor/dist/anime-cursor.umd.min.js"></script>
+{% endunless %}
+{% unless page.layout == "post" %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     try {
@@ -820,6 +826,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.classList.add('animecursor-disabled');
     }
 });
+</script>
+{% endunless %}
 
 document.addEventListener('DOMContentLoaded', function() {
     var loader = document.getElementById('loader-wrapper');
