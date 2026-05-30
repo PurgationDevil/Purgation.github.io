@@ -10,14 +10,6 @@ description: "「代码即利刃，逆向即真相」"
   padding: 30px 0 !important;
   border-bottom: 1px solid #eaeaea !important;
   align-items: center !important;
-  opacity: 0 !important;
-  transform: translateY(40px) !important;
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out !important;
-}
-
-.post-card.visible {
-  opacity: 1 !important;
-  transform: translateY(0) !important;
 }
 
 .post-card-image {
@@ -142,7 +134,7 @@ description: "「代码即利刃，逆向即真相」"
   {% elsif cycle_index == 5 %}
   <div class="post-card post-card-left">
     <div class="post-card-image">
-      <img src="/img/posts/5.jpg" alt="{{ post.title }}" loading="lazy">
+      <img src="/img/posts/5.jpg" alt="{{ post.title }}">
     </div>
     <div class="post-card-content">
       <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
@@ -162,7 +154,7 @@ description: "「代码即利刃，逆向即真相」"
       <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
     </div>
     <div class="post-card-image">
-      <img src="/img/posts/6.jpg" alt="{{ post.title }}" loading="lazy">
+      <img src="/img/posts/6.jpg" alt="{{ post.title }}">
     </div>
   </div>
   {% endif %}
@@ -184,48 +176,3 @@ description: "「代码即利刃，逆向即真相」"
     {% endif %}
 </ul>
 {% endif %}
-
-<!-- 文章卡片滚动动画 - 优化版 -->
-<script>
-(function() {
-  var ticking = false;
-  
-  function isInViewport(element, offset = 100) {
-    var rect = element.getBoundingClientRect();
-    var windowHeight = window.innerHeight || document.documentElement.clientHeight;
-    return (
-      rect.top <= windowHeight - offset &&
-      rect.bottom >= 0
-    );
-  }
-
-  function animateCards() {
-    var cards = document.querySelectorAll('.post-card:not(.visible)');
-    cards.forEach(function(card, index) {
-      if (isInViewport(card, 80)) {
-        setTimeout(function() {
-          card.classList.add('visible');
-        }, index * 100);
-      }
-    });
-    ticking = false;
-  }
-
-  function onScroll() {
-    if (!ticking) {
-      requestAnimationFrame(animateCards);
-      ticking = true;
-    }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(animateCards, 300);
-    });
-  } else {
-    setTimeout(animateCards, 300);
-  }
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-})();
-</script>
