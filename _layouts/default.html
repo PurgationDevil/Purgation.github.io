@@ -271,36 +271,52 @@ window.addEventListener('load', function() {
 <!-- Live2D 看板娘 - 本地加载 -->
 <link rel="stylesheet" href="{{ "/live2d/css/waifu.css" | prepend: site.baseurl }}">
 <script>
+// 延迟加载看板娘，确保jQuery已加载
 window.addEventListener('load', function() {
     setTimeout(function() {
-        var l2dScript = document.createElement('script');
-        l2dScript.src = '{{ "/live2d/js/live2d.js" | prepend: site.baseurl }}';
-        l2dScript.onload = function() {
-            var waifuScript = document.createElement('script');
-            waifuScript.src = '{{ "/live2d/js/waifu.js" | prepend: site.baseurl }}';
-            waifuScript.onload = function() {
-                if (typeof L2Dwidget !== 'undefined') {
-                    L2Dwidget.init({
-                        model: {
-                            jsonPath: "{{ "/live2d/model/pio/model.json" | prepend: site.baseurl }}",
-                            scale: 1
-                        },
-                        display: {
-                            position: "left",
-                            width: 150,
-                            height: 200,
-                            hOffset: 0,
-                            vOffset: -20
-                        },
-                        mobile: {
-                            show: false
-                        }
-                    });
+        // 检查jQuery是否已加载
+        if (typeof $ !== 'undefined' || typeof jQuery !== 'undefined') {
+            loadLive2D();
+        } else {
+            // 如果jQuery还没加载，等待一下
+            var checkJQuery = setInterval(function() {
+                if (typeof $ !== 'undefined' || typeof jQuery !== 'undefined') {
+                    clearInterval(checkJQuery);
+                    loadLive2D();
                 }
+            }, 100);
+        }
+        
+        function loadLive2D() {
+            var l2dScript = document.createElement('script');
+            l2dScript.src = '{{ "/live2d/js/live2d.js" | prepend: site.baseurl }}';
+            l2dScript.onload = function() {
+                var waifuScript = document.createElement('script');
+                waifuScript.src = '{{ "/live2d/js/waifu.js" | prepend: site.baseurl }}';
+                waifuScript.onload = function() {
+                    if (typeof L2Dwidget !== 'undefined') {
+                        L2Dwidget.init({
+                            model: {
+                                jsonPath: "{{ "/live2d/model/pio/model.json" | prepend: site.baseurl }}",
+                                scale: 1
+                            },
+                            display: {
+                                position: "left",
+                                width: 150,
+                                height: 200,
+                                hOffset: 0,
+                                vOffset: -20
+                            },
+                            mobile: {
+                                show: false
+                            }
+                        });
+                    }
+                };
+                document.body.appendChild(waifuScript);
             };
-            document.body.appendChild(waifuScript);
-        };
-        document.body.appendChild(l2dScript);
+            document.body.appendChild(l2dScript);
+        }
     }, 3000);
 });
 </script>
