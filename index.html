@@ -86,7 +86,7 @@ description: "「代码即利刃，逆向即真相」"
   {% if cycle_index == 1 %}
   <div class="post-card post-card-left">
     <div class="post-card-image">
-      <img src="/img/posts/1.jpg" alt="{{ post.title }}">
+      <img src="/img/posts/1.jpg" alt="{{ post.title }}" loading="lazy">
     </div>
     <div class="post-card-content">
       <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
@@ -106,7 +106,7 @@ description: "「代码即利刃，逆向即真相」"
       <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
     </div>
     <div class="post-card-image">
-      <img src="/img/posts/2.jpg" alt="{{ post.title }}">
+      <img src="/img/posts/2.jpg" alt="{{ post.title }}" loading="lazy">
     </div>
   </div>
   
@@ -114,7 +114,7 @@ description: "「代码即利刃，逆向即真相」"
   {% elsif cycle_index == 3 %}
   <div class="post-card post-card-left">
     <div class="post-card-image">
-      <img src="/img/posts/3.jpg" alt="{{ post.title }}">
+      <img src="/img/posts/3.jpg" alt="{{ post.title }}" loading="lazy">
     </div>
     <div class="post-card-content">
       <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
@@ -134,7 +134,7 @@ description: "「代码即利刃，逆向即真相」"
       <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
     </div>
     <div class="post-card-image">
-      <img src="/img/posts/4.jpg" alt="{{ post.title }}">
+      <img src="/img/posts/4.jpg" alt="{{ post.title }}" loading="lazy">
     </div>
   </div>
 
@@ -142,7 +142,7 @@ description: "「代码即利刃，逆向即真相」"
   {% elsif cycle_index == 5 %}
   <div class="post-card post-card-left">
     <div class="post-card-image">
-      <img src="/img/posts/5.jpg" alt="{{ post.title }}">
+      <img src="/img/posts/5.jpg" alt="{{ post.title }}" loading="lazy">
     </div>
     <div class="post-card-content">
       <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
@@ -162,7 +162,7 @@ description: "「代码即利刃，逆向即真相」"
       <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
     </div>
     <div class="post-card-image">
-      <img src="/img/posts/6.jpg" alt="{{ post.title }}">
+      <img src="/img/posts/6.jpg" alt="{{ post.title }}" loading="lazy">
     </div>
   </div>
   {% endif %}
@@ -185,9 +185,11 @@ description: "「代码即利刃，逆向即真相」"
 </ul>
 {% endif %}
 
-<!-- 文章卡片滚动动画 -->
+<!-- 文章卡片滚动动画 - 优化版 -->
 <script>
 (function() {
+  var ticking = false;
+  
   function isInViewport(element, offset = 100) {
     var rect = element.getBoundingClientRect();
     var windowHeight = window.innerHeight || document.documentElement.clientHeight;
@@ -198,7 +200,7 @@ description: "「代码即利刃，逆向即真相」"
   }
 
   function animateCards() {
-    var cards = document.querySelectorAll('.post-card');
+    var cards = document.querySelectorAll('.post-card:not(.visible)');
     cards.forEach(function(card, index) {
       if (isInViewport(card, 80)) {
         setTimeout(function() {
@@ -206,6 +208,14 @@ description: "「代码即利刃，逆向即真相」"
         }, index * 100);
       }
     });
+    ticking = false;
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      requestAnimationFrame(animateCards);
+      ticking = true;
+    }
   }
 
   if (document.readyState === 'loading') {
@@ -216,6 +226,6 @@ description: "「代码即利刃，逆向即真相」"
     setTimeout(animateCards, 300);
   }
 
-  window.addEventListener('scroll', animateCards, { passive: true });
+  window.addEventListener('scroll', onScroll, { passive: true });
 })();
 </script>
