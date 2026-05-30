@@ -268,27 +268,21 @@ window.addEventListener('load', function() {
 
 {% include footer.html %}
 
-<!-- Live2D 看板娘 - Pio 酱（延迟加载） -->
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" as="style">
+<!-- Live2D 看板娘 - 本地加载 -->
+<link rel="stylesheet" href="{{ "/live2d/css/waifu.css" | prepend: site.baseurl }}">
 <script>
-// 延迟加载看板娘，等页面加载完3秒后再加载
 window.addEventListener('load', function() {
     setTimeout(function() {
-        // 加载Font Awesome
-        var faLink = document.createElement('link');
-        faLink.rel = 'stylesheet';
-        faLink.href = 'https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css';
-        document.head.appendChild(faLink);
-        
-        // 加载看板娘
         var l2dScript = document.createElement('script');
-        l2dScript.src = 'https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js';
+        l2dScript.src = '{{ "/live2d/js/live2d.js" | prepend: site.baseurl }}';
         l2dScript.onload = function() {
-            setTimeout(function() {
+            var waifuScript = document.createElement('script');
+            waifuScript.src = '{{ "/live2d/js/waifu.js" | prepend: site.baseurl }}';
+            waifuScript.onload = function() {
                 if (typeof L2Dwidget !== 'undefined') {
                     L2Dwidget.init({
                         model: {
-                            jsonPath: "https://cdn.jsdelivr.net/gh/PurgationDevil/PurgationDevil.github.io/live2d/model/pio/model.json",
+                            jsonPath: "{{ "/live2d/model/pio/model.json" | prepend: site.baseurl }}",
                             scale: 1
                         },
                         display: {
@@ -303,9 +297,10 @@ window.addEventListener('load', function() {
                         }
                     });
                 }
-            }, 500);
+            };
+            document.body.appendChild(waifuScript);
         };
         document.body.appendChild(l2dScript);
-    }, 3000); // 延迟3秒加载
+    }, 3000);
 });
 </script>
