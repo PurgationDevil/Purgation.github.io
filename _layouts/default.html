@@ -1,15 +1,5 @@
 {% include head.html %}
 
-<div id="loader-wrapper" style="display: none;">
-    <div class="loader-left"></div>
-    <div class="loader-right"></div>
-    <div class="loader-content">
-        <div class="loader">
-            <div class="loader-center"></div>
-        </div>
-    </div>
-</div>
-
 {% include nav.html %}
 {% include search.html %}
 
@@ -828,17 +818,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endunless %}
-
-document.addEventListener('DOMContentLoaded', function() {
-    var loader = document.getElementById('loader-wrapper');
-    if (loader) {
-        loader.style.display = 'flex';
-        setTimeout(function() {
-            loader.classList.add('loaded');
-            setTimeout(function() {
-                loader.remove();
-            }, 300);
-        }, 200);
-    }
-});
 </script>
