@@ -13,110 +13,8 @@ layout: default
   });
 </script>
 
-<!-- 深色模式支持 -->
+<!-- 固定目录（跟随滚动） - PC端 -->
 <style>
-/* 文章内容深色模式 */
-@media (prefers-color-scheme: dark) {
-  .post-container {
-    color: #e0e0e0;
-  }
-  
-  .post-container h1,
-  .post-container h2,
-  .post-container h3,
-  .post-container h4,
-  .post-container h5,
-  .post-container h6 {
-    color: #ffffff;
-  }
-  
-  .post-container p,
-  .post-container li,
-  .post-container td {
-    color: #d0d0d0;
-  }
-  
-  .post-container a {
-    color: #66ccff;
-  }
-  
-  .post-container blockquote {
-    background: rgba(30, 30, 30, 0.8);
-    border-left-color: #0085a1;
-    color: #c0c0c0;
-  }
-  
-  .post-container code {
-    background: rgba(50, 50, 50, 0.9);
-    color: #ff9;
-  }
-  
-  .post-container pre {
-    background: rgba(30, 30, 30, 0.9);
-    border: 1px solid #444;
-  }
-  
-  .post-container pre code {
-    background: transparent;
-  }
-  
-  .post-container table {
-    border-color: #444;
-  }
-  
-  .post-container table th,
-  .post-container table td {
-    border-color: #444;
-    background: rgba(40, 40, 40, 0.5);
-  }
-  
-  .post-container table th {
-    background: rgba(50, 50, 50, 0.8);
-  }
-  
-  .post-container hr {
-    border-top-color: #444;
-  }
-  
-  .post-container .pager li a {
-    background: rgba(40, 40, 40, 0.9);
-    color: #e0e0e0;
-    border-color: #555;
-  }
-  
-  .post-container .pager li a:hover {
-    background: rgba(60, 60, 60, 0.9);
-  }
-  
-  .sidebar-container {
-    background: transparent;
-  }
-  
-  .sidebar-container h5 {
-    color: #e0e0e0;
-  }
-  
-  .featured-tags a {
-    background: rgba(40, 40, 40, 0.9);
-    color: #b0b0b0;
-    border-color: #555;
-  }
-  
-  .featured-tags a:hover {
-    background: rgba(0, 133, 161, 0.3);
-    color: #66ccff;
-  }
-  
-  .friends-section {
-    background: rgba(30, 30, 30, 0.5);
-  }
-  
-  .friends-section h5 {
-    color: #e0e0e0;
-  }
-}
-
-/* 固定目录（跟随滚动） */
 .toc-fixed {
   position: fixed;
   right: 20px;
@@ -188,44 +86,43 @@ layout: default
   border-radius: 4px;
 }
 
-/* 手机端隐藏 */
+/* 手机端隐藏PC目录 */
 @media (max-width: 992px) {
   .toc-fixed {
     display: none;
   }
 }
 
-/* 深色模式 - 目录 */
 @media (prefers-color-scheme: dark) {
   .toc-fixed {
-    background: rgba(30, 30, 30, 0.95);
-    border-color: #444;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    background: rgba(10, 20, 30, 0.95);
+    border: 1px solid #2a3f5f;
   }
   
   .toc-fixed h4 {
-    color: #e0e0e0;
-    border-bottom-color: #0085a1;
+    color: #ffffff;
+    border-bottom-color: #00d4ff;
   }
   
   .toc-fixed a {
-    color: #b0b0b0;
+    color: #d4d4d4;
   }
   
   .toc-fixed a:hover {
-    color: #0085a1;
+    color: #00d4ff;
   }
   
   .toc-fixed a.active {
-    color: #0085a1;
+    color: #00d4ff;
+    border-left-color: #00d4ff;
   }
   
   .toc-fixed::-webkit-scrollbar-track {
-    background: #2a2a2a;
+    background: #1a2735;
   }
   
   .toc-fixed::-webkit-scrollbar-thumb {
-    background: #555;
+    background: #3a5065;
   }
 }
 </style>
@@ -239,7 +136,7 @@ layout: default
     var headers = article.querySelectorAll('h2, h3');
     if (headers.length === 0) return;
     
-    // 创建目录
+    // 创建PC端目录
     var tocDiv = document.createElement('div');
     tocDiv.className = 'toc-fixed';
     tocDiv.innerHTML = '<h4>📖 目录</h4><ul></ul>';
@@ -249,6 +146,7 @@ layout: default
       var id = 'toc-' + index;
       header.id = id;
       
+      // PC端目录项
       var li = document.createElement('li');
       var a = document.createElement('a');
       a.href = '#' + id;
@@ -340,19 +238,51 @@ layout: default
                 </ul>
                 <hr style="visibility: hidden;">
 
-                {% if site.disqus_username %}
-                <!-- disqus 评论框 start -->
-                <div class="comment">
-                    <div id="disqus_thread" class="disqus-thread"></div>
+                <!-- giscus 评论系统 - 延迟加载 -->
+                <div class="comment" id="comment-section">
+                    <h4>💬 评论</h4>
+                    <div id="comment-placeholder" style="color: #999; font-size: 14px;">评论加载中...</div>
                 </div>
-                <!-- disqus 评论框 end -->
-                {% endif %}
-
-                {% if site.netease_comment %}
-                <!-- 网易云跟帖 评论框 start -->
-                <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
-                <!-- 网易云跟帖 评论框 end -->
-                {% endif %}
+                <script>
+                (function() {
+                    function loadComments() {
+                        var placeholder = document.getElementById('comment-placeholder');
+                        if (!placeholder) return;
+                        
+                        var script = document.createElement('script');
+                        script.src = 'https://giscus.app/client.js';
+                        script.setAttribute('data-repo', 'PurgationDevil/PurgationDevil.github.io');
+                        script.setAttribute('data-repo-id', 'R_kgDOR4wBWA');
+                        script.setAttribute('data-category', 'General');
+                        script.setAttribute('data-category-id', 'DIC_kwDOR4wBWM4C83Ny');
+                        script.setAttribute('data-mapping', 'pathname');
+                        script.setAttribute('data-strict', '0');
+                        script.setAttribute('data-reactions-enabled', '1');
+                        script.setAttribute('data-emit-metadata', '0');
+                        script.setAttribute('data-input-position', 'bottom');
+                        script.setAttribute('data-theme', 'preferred_color_scheme');
+                        script.setAttribute('data-lang', 'zh-CN');
+                        script.setAttribute('crossorigin', 'anonymous');
+                        script.async = true;
+                        
+                        placeholder.innerHTML = '';
+                        placeholder.appendChild(script);
+                    }
+                    
+                    // 监听滚动，等评论区域进入视口时加载
+                    var observer = new IntersectionObserver(function(entries) {
+                        if (entries[0].isIntersecting) {
+                            loadComments();
+                            observer.disconnect();
+                        }
+                    }, { rootMargin: '200px' });
+                    
+                    var commentSection = document.getElementById('comment-section');
+                    if (commentSection) {
+                        observer.observe(commentSection);
+                    }
+                })();
+                </script>
             </div>  
 
     <!-- Side Catalog Container -->
@@ -407,24 +337,6 @@ layout: default
   Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
 </script>
 <!-- 网易云跟帖JS代码 end -->
-{% endif %}
-
-
-{% if site.disqus_username %}
-<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = "{{site.disqus_username}}";
-    var disqus_identifier = "{{page.id}}";
-    var disqus_url = "{{site.url}}{{page.url}}";
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<!-- disqus 公共JS代码 end -->
 {% endif %}
 
 
