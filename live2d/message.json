@@ -29,7 +29,7 @@
       "text": [ "这里有一些关于我家主人的秘密哦，要不要看看呢" ]
     },
     {
-      "selector": ".navbar-menu a[href*='csdn.net']",
+      "selector": ".list-inline a[href*='csdn.net'], .navbar-menu a[href*='csdn.net']",
       "text": ["主人的 CSDN 博客，快来阅读吧~", "这里有主人的技术文章哦"]
     },
     {
