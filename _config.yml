@@ -14,8 +14,8 @@ future: false
 RSS: false
 github_username: PurgationDevil
 facebook_username: PurgationDevil
-youtube_channel: PurgationDevil
 gitee_username: PurgationDevil
+csdn_username: PurgationDevil
 
 # Build settings
 # from 2016, 'pygments' is unsupported on GitHub Pages. Use 'rouge' for highlighting instead.
