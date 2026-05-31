@@ -794,12 +794,10 @@ input, textarea, [contenteditable] {
 }
 </style>
 
-{% unless page.layout == "post" %}
 <script defer src="{{ site.baseurl }}/js/anime-cursor/dist/anime-cursor.umd.min.js"></script>
-{% endunless %}
-{% unless page.layout == "post" %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+// 光标效果 - 文章页延迟加载，避免影响性能
+function initAnimeCursor() {
     try {
         new AnimeCursor({
             fallbackCursor: 'auto',
@@ -827,7 +825,16 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('AnimeCursor initialization failed:', error);
         document.body.classList.add('animecursor-disabled');
     }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    {% if page.layout == "post" %}
+        // 文章页延迟2秒后加载，不影响文章加载
+        setTimeout(initAnimeCursor, 2000);
+    {% else %}
+        // 首页直接加载
+        initAnimeCursor();
+    {% endif %}
 });
 </script>
-{% endunless %}
 </script>
