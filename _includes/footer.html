@@ -13,62 +13,56 @@
 </footer>
 
 <!-- jQuery -->
-<script defer src="{{ "/js/jquery.min.js " | prepend: site.baseurl }}"></script>
+<script src="{{ "/js/jquery.min.js " | prepend: site.baseurl }}"></script>
 
 <!-- Bootstrap Core JavaScript -->
-<script defer src="{{ "/js/bootstrap.min.js " | prepend: site.baseurl }}"></script>
+<script src="{{ "/js/bootstrap.min.js " | prepend: site.baseurl }}"></script>
 
 <!-- Custom Theme JavaScript -->
-<script defer src="{{ "/js/hux-blog.min.js " | prepend: site.baseurl }}"></script>
+<script src="{{ "/js/hux-blog.min.js " | prepend: site.baseurl }}"></script>
 
 <!-- Simple Jekyll Search -->
-<script defer src="{{ "/js/simple-jekyll-search.min.js" | prepend: site.baseurl }}"></script>
-
-<!-- Search Optimization - Lazy Load & Debounce -->
-<script defer>
-let searchLoaded = false;
-let searchInstance = null;
-
-function debounce(fn, delay) {
-    let timer;
-    return function() {
-        clearTimeout(timer);
-        const args = arguments;
-        timer = setTimeout(() => {
-            fn.apply(this, args);
-        }, delay);
-    };
-}
-
-function initSearch() {
-    if (searchLoaded) return;
-    searchLoaded = true;
-
-    searchInstance = SimpleJekyllSearch({
+<script src="{{ "/js/simple-jekyll-search.min.js" | prepend: site.baseurl }}"></script>
+<script>
+(function() {
+    SimpleJekyllSearch({
         searchInput: document.getElementById('search-input'),
         resultsContainer: document.getElementById('search-results'),
-        json: '{{ site.baseurl }}/search.json',
-        searchResultTemplate: '<li><a href="{url}">{title}</a></li>',
-        limit: 10,
-        noResultsText: '没有找到结果'
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview"><a href="{url}"><h2 class="post-title">{title}</h2><div class="post-meta">标签: {tags} | {date}</div></a></div>',
+        noResultsText: '<div class="alert alert-warning">没有找到相关文章</div>'
     });
-
-    // 搜索输入防抖
-    const originalSearch = searchInstance.search;
-    searchInstance.search = debounce(originalSearch, 300);
-}
-
-// 用户打开搜索时才加载
-document.addEventListener('DOMContentLoaded', function() {
-    const searchPage = document.querySelector('.search-page');
-    if (searchPage) {
-        searchPage.addEventListener('click', initSearch, { once: true });
+    
+    var searchPage = document.querySelector('.search-page');
+    var searchIcon = document.querySelector('.search-icon a');
+    var searchClose = document.querySelector('.search-icon-close');
+    var searchInput = document.getElementById('search-input');
+    
+    if (searchIcon) {
+        searchIcon.addEventListener('click', function() {
+            searchPage.classList.add('search-active');
+            setTimeout(function() {
+                searchInput.focus();
+            }, 400);
+        });
     }
-});
+    
+    if (searchClose) {
+        searchClose.addEventListener('click', function() {
+            searchPage.classList.remove('search-active');
+        });
+    }
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && searchPage.classList.contains('search-active')) {
+            searchPage.classList.remove('search-active');
+        }
+    });
+})();
 </script>
 
 <!-- Service Worker -->
 {% if site.service-worker %}
-<script defer src="{{ "/js/snackbar.js " | prepend: site.baseurl }}"></script>
-<script defer src="{{ "/js/sw-registration.js " | prepend: site.baseurl }}"></script>
+<script src="{{ "/js/snackbar.js " | prepend: site.baseurl }}"></script>
+<script src="{{ "/js/sw-registration.js " | prepend: site.baseurl }}"></script>
 {% endif %}
