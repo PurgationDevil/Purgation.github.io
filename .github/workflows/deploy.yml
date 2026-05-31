@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Build and Deploy to GitHub Pages
 
 on:
   push:
@@ -7,8 +7,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -30,10 +35,18 @@ jobs:
         env:
           JEKYLL_ENV: production
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          branch: gh-pages
-          folder: _site
-          clean: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./_site
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
