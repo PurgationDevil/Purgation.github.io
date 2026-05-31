@@ -696,10 +696,17 @@ window.addEventListener('load', function() {
         ctx.restore();
     };
     
+    let animating = false;
+    
     document.addEventListener('click', function(e) {
         var color = colors[Math.floor(Math.random() * colors.length)];
         for (var i = 0; i < 5; i++) {
             particles.push(new Particle(e.clientX, e.clientY, color));
+        }
+        // 如果没在动画，启动动画循环
+        if (!animating) {
+            animating = true;
+            animate();
         }
     });
     
@@ -715,9 +722,10 @@ window.addEventListener('load', function() {
         // 只有当还有粒子时才继续动画，否则停止
         if (particles.length > 0) {
             requestAnimationFrame(animate);
+        } else {
+            animating = false;
         }
     }
-    animate();
 })();
 </script>
 
