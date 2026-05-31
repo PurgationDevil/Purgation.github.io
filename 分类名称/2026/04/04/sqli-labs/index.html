@@ -9,7 +9,7 @@
 
     <!-- Open Graph -->
     <meta property="og:title"
-        content="sqli-lebs - PurgationDevil Blog">
+        content="sqli-lebs - we1c0me t0 PurgationDevil 810g">
     
     <meta property="og:type" content="article">
     <meta property="og:description" content="SQL-labs
@@ -51,9 +51,9 @@ Less-1(基础注入)
     
     <meta property="og:image" content="https://PurgationDevil.github.iohttps://github.com/PurgationDevil.png">
     <meta property="og:url" content="https://PurgationDevil.github.io/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/04/sqli-labs/">
-    <meta property="og:site_name" content="PurgationDevil Blog">
+    <meta property="og:site_name" content="we1c0me t0 PurgationDevil 810g">
 
-    <title>sqli-lebs - PurgationDevil Blog</title>
+    <title>sqli-lebs - we1c0me t0 PurgationDevil 810g</title>
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="/pwa/manifest.json">
@@ -71,10 +71,6 @@ Less-1(基础注入)
     <link rel="stylesheet" href=" /css/hux-blog.min.css">
 
     <!-- Custom Fonts -->
-    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
-    <!-- Hux change font-awesome CDN to qiniu -->
-    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet"
-        type="text/css">
 
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -84,237 +80,10 @@ Less-1(基础注入)
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <!-- Loading Animation -->
-    <style>
-    #loader-wrapper {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 99999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        transition: opacity 0.3s ease 0.5s;
-    }
-
-    #loader-wrapper::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(10, 15, 30, 0.9);
-        z-index: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    #loader-wrapper.loaded::before {
-        opacity: 0;
-    }
-
-    #loader-wrapper.loaded {
-        pointer-events: none;
-    }
-
-    #loader-wrapper.loaded .loader-left,
-    #loader-wrapper.loaded .loader-right {
-        transform: translateX(0);
-        opacity: 0;
-    }
-
-    #loader-wrapper.loaded .loader-content {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-
-    .loader-left,
-    .loader-right {
-        position: absolute;
-        top: 0;
-        width: 50%;
-        height: 100%;
-        transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
-    }
-
-    .loader-left {
-        left: 0;
-        transform: translateX(0);
-        background: linear-gradient(135deg, rgba(255, 107, 157, 0.3) 0%, rgba(196, 69, 105, 0.2) 100%);
-    }
-
-    .loader-right {
-        right: 0;
-        transform: translateX(0);
-        background: linear-gradient(315deg, rgba(196, 69, 105, 0.2) 0%, rgba(255, 107, 157, 0.3) 100%);
-    }
-
-    #loader-wrapper.loaded .loader-left {
-        transform: translateX(-100%);
-    }
-
-    #loader-wrapper.loaded .loader-right {
-        transform: translateX(100%);
-    }
-
-    .loader-content {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        transition: all 0.5s ease;
-    }
-
-    .loader {
-        position: relative;
-        width: 60px;
-        height: 60px;
-    }
-
-    .loader-circle {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        border: 2px solid transparent;
-        animation: spin 2s linear infinite;
-    }
-
-    .loader-circle:nth-child(1) {
-        border-top-color: rgba(255, 107, 157, 0.8);
-        animation-duration: 1.5s;
-    }
-
-    .loader-circle:nth-child(2) {
-        border-right-color: rgba(196, 69, 105, 0.8);
-        animation-duration: 1.8s;
-        animation-direction: reverse;
-    }
-
-    .loader-circle:nth-child(3) {
-        border-bottom-color: rgba(248, 181, 0, 0.8);
-        animation-duration: 2s;
-    }
-
-    .loader-center {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 15px;
-        height: 15px;
-        background: rgba(255, 107, 157, 0.9);
-        border-radius: 50%;
-        box-shadow: 0 0 15px rgba(255, 107, 157, 0.8), 0 0 30px rgba(255, 107, 157, 0.5);
-        animation: pulse 1s ease-in-out infinite;
-    }
-
-    .loader-text {
-        margin-top: 30px;
-        color: rgba(255, 107, 157, 0.9);
-        font-size: 12px;
-        font-family: 'Montserrat', sans-serif;
-        letter-spacing: 3px;
-        animation: fadeInOut 2s ease-in-out infinite;
-    }
-
-    .loader-progress {
-        margin-top: 20px;
-        width: 120px;
-        height: 3px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 2px;
-        overflow: hidden;
-    }
-
-    .loader-progress-bar {
-        height: 100%;
-        background: linear-gradient(90deg, #ff6b9d, #c44569);
-        border-radius: 2px;
-        animation: progress 2s ease-in-out infinite;
-        width: 0;
-    }
-
-    .loader-percent {
-        margin-top: 10px;
-        color: rgba(255, 107, 157, 0.7);
-        font-size: 10px;
-        font-family: 'Montserrat', sans-serif;
-        letter-spacing: 1px;
-    }
-
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
-    @keyframes pulse {
-        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; }
-    }
-
-    @keyframes fadeInOut {
-        0%, 100% { opacity: 0.5; }
-        50% { opacity: 0.9; }
-    }
-
-    @keyframes progress {
-        0% { width: 0%; }
-        50% { width: 70%; }
-        100% { width: 100%; }
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .content-fade-in {
-        animation: fadeInUp 0.6s ease-out forwards;
-        opacity: 0;
-    }
-
-    .content-hidden {
-        opacity: 0;
-    }
-    </style>
-
     <!-- ga & ba script hoook -->
     <script></script>
-
-    <!-- Google AdSense -->
-    <script data-ad-client="ca-pub-6487568398225121" async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
 
-
-<div id="loader-wrapper">
-    <div class="loader-left"></div>
-    <div class="loader-right"></div>
-    <div class="loader-content">
-        <div class="loader">
-            <div class="loader-circle"></div>
-            <div class="loader-circle"></div>
-            <div class="loader-circle"></div>
-            <div class="loader-center"></div>
-        </div>
-        <div class="loader-text">LOADING...</div>
-        <div class="loader-progress">
-            <div class="loader-progress-bar"></div>
-        </div>
-        <div class="loader-percent" id="loader-percent">0%</div>
-    </div>
-</div>
 
 <!-- Navigation -->
 
@@ -341,7 +110,7 @@ Less-1(基础注入)
                         <li><a href="/archive">归档</a></li>
                         <li class="search-icon">
                             <a href="javascript:void(0)">
-                                <i class="fa fa-search"></i>
+                                <i class="fa-solid fa-search"></i>
                             </a>
                         </li>
                     </ul>
@@ -409,7 +178,7 @@ Less-1(基础注入)
 <div class="search-page">
   <div class="search-icon-close-container">
     <span class="search-icon-close">
-      <i class="fa fa-chevron-down"></i>
+      <i class="fa-solid fa-chevron-down"></i>
     </span>
   </div>
   <div class="search-main container">
@@ -424,7 +193,7 @@ Less-1(基础注入)
   </div>
 </div>
 
-<div id="main-content" class="content-hidden">
+<div id="main-content">
     <!-- Mermaid 支持 -->
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script>
@@ -2167,34 +1936,60 @@ Password: 123
                     
                     
                     <li class="next">
-                        <a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/17/reverse%E5%AE%9E%E7%94%A8%E6%8A%80%E5%B7%A7/" data-toggle="tooltip" data-placement="top" title="reverse实用技巧(持续完善)">
+                        <a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/04/25/C++-%E9%80%9F%E6%9F%A5%E5%8F%82%E8%80%83/" data-toggle="tooltip" data-placement="top" title="C++ 速查参考">
                         下一篇<br>
-                        <span>reverse实用技巧(持续完善)</span>
+                        <span>C++ 速查参考</span>
                         </a>
                     </li>
                     
                 </ul>
                 <hr style="visibility: hidden;">
 
-                <!-- giscus 评论系统 -->
-                <div class="comment">
+                <!-- giscus 评论系统 - 延迟加载 -->
+                <div class="comment" id="comment-section">
                     <h4>💬 评论</h4>
-                    <script src="https://giscus.app/client.js"
-                            data-repo="PurgationDevil/PurgationDevil.github.io"
-                            data-repo-id="R_kgDOR4wBWA"
-                            data-category="General"
-                            data-category-id="DIC_kwDOR4wBWM4C83Ny"
-                            data-mapping="pathname"
-                            data-strict="0"
-                            data-reactions-enabled="1"
-                            data-emit-metadata="0"
-                            data-input-position="bottom"
-                            data-theme="preferred_color_scheme"
-                            data-lang="zh-CN"
-                            crossorigin="anonymous"
-                            async>
-                    </script>
+                    <div id="comment-placeholder" style="color: #999; font-size: 14px;">评论加载中...</div>
                 </div>
+                <script>
+                (function() {
+                    function loadComments() {
+                        var placeholder = document.getElementById('comment-placeholder');
+                        if (!placeholder) return;
+                        
+                        var script = document.createElement('script');
+                        script.src = 'https://giscus.app/client.js';
+                        script.setAttribute('data-repo', 'PurgationDevil/PurgationDevil.github.io');
+                        script.setAttribute('data-repo-id', 'R_kgDOR4wBWA');
+                        script.setAttribute('data-category', 'General');
+                        script.setAttribute('data-category-id', 'DIC_kwDOR4wBWM4C83Ny');
+                        script.setAttribute('data-mapping', 'pathname');
+                        script.setAttribute('data-strict', '0');
+                        script.setAttribute('data-reactions-enabled', '1');
+                        script.setAttribute('data-emit-metadata', '0');
+                        script.setAttribute('data-input-position', 'bottom');
+                        script.setAttribute('data-theme', 'preferred_color_scheme');
+                        script.setAttribute('data-lang', 'zh-CN');
+                        script.setAttribute('crossorigin', 'anonymous');
+                        script.async = true;
+                        
+                        placeholder.innerHTML = '';
+                        placeholder.appendChild(script);
+                    }
+                    
+                    // 监听滚动，等评论区域进入视口时加载
+                    var observer = new IntersectionObserver(function(entries) {
+                        if (entries[0].isIntersecting) {
+                            loadComments();
+                            observer.disconnect();
+                        }
+                    }, { rootMargin: '200px' });
+                    
+                    var commentSection = document.getElementById('comment-section');
+                    if (commentSection) {
+                        observer.observe(commentSection);
+                    }
+                })();
+                </script>
             </div>  
 
     <!-- Side Catalog Container -->
@@ -2958,140 +2753,174 @@ body {
 }
 </style>
 
-<!-- 粒子背景 -->
+<!-- 粒子背景 - 延迟加载 -->
 <div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
-
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 <script>
-  particlesJS("particles-js", {
-    "particles": {
-      "number": { "value": 100 },
-      "color": { "value": "#00ffff" },
-      "shape": { "type": "circle" },
-      "opacity": { "value": 0.6, "random": true },
-      "size": { "value": 3, "random": true },
-      "line_linked": { "enable": false },
-      "move": { "enable": true, "speed": 2, "direction": "none", "random": true }
-    },
-    "interactivity": {
-      "detect_on": "canvas",
-      "events": {
-        "onhover": { "enable": false },
-        "onclick": { "enable": false }
-      }
-    }
-  });
+// 延迟加载粒子特效 - 等页面加载完再加载
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        var particlesScript = document.createElement('script');
+        particlesScript.src = 'https://cdn.bootcdn.net/ajax/libs/particles.js/2.0.0/particles.min.js';
+        document.body.appendChild(particlesScript);
+        
+        particlesScript.onload = function() {
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 30 },
+                    "color": { "value": "#00ffff" },
+                    "shape": { "type": "circle" },
+                    "opacity": { "value": 0.5, "random": true },
+                    "size": { "value": 2, "random": true },
+                    "line_linked": { "enable": false },
+                    "move": { "enable": true, "speed": 1.5, "direction": "none", "random": true }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": { "enable": false },
+                        "onclick": { "enable": false }
+                    }
+                }
+            });
+            console.log("粒子特效加载完成");
+        };
+    }, 1000);
+});
 </script>
 
-<!-- 鼠标点击特效 -->
-<style>
-.click-particle {
-  position: fixed;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  animation: particleExplode 0.6s ease-out forwards;
-}
-
-.click-ripple {
-  position: fixed;
-  border: 3px solid #ff69b4;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-  animation: rippleExpand 0.8s ease-out forwards;
-}
-
-@keyframes particleExplode {
-  0% {
-    opacity: 1;
-    transform: translate(0, 0);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(var(--tx), var(--ty));
-  }
-}
-
-@keyframes rippleExpand {
-  0% {
-    opacity: 1;
-    transform: scale(0);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(3);
-  }
-}
-</style>
-
+<!-- 鼠标点击特效 - Canvas优化 -->
+<canvas id="clickCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;"></canvas>
 <script>
+// Canvas点击特效 - 性能优化
 (function() {
-  var colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff6600', '#0066ff', '#ff3366'];
-  
-  document.addEventListener('click', function(e) {
-    var centerX = e.clientX;
-    var centerY = e.clientY;
+    var canvas = document.getElementById('clickCanvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+    var colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff6600', '#0066ff', '#ff3366'];
     
-    var count = 6;
-    for (var i = 0; i < count; i++) {
-      var angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
-      var distance = 80 + Math.random() * 60;
-      var size = 10 + Math.random() * 16;
-      var particle = document.createElement('div');
-      particle.className = 'click-particle';
-      
-      particle.style.width = size + 'px';
-      particle.style.height = size + 'px';
-      particle.style.left = centerX - size/2 + 'px';
-      particle.style.top = centerY - size/2 + 'px';
-      particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-      particle.style.boxShadow = '0 0 ' + (size/2 + 8) + 'px ' + particle.style.backgroundColor + ', 0 0 ' + (size + 15) + 'px ' + particle.style.backgroundColor;
-      
-      var tx = Math.cos(angle) * distance;
-      var ty = Math.sin(angle) * distance;
-      particle.style.setProperty('--tx', tx + 'px');
-      particle.style.setProperty('--ty', ty + 'px');
-      
-      document.body.appendChild(particle);
-      
-      setTimeout(function(p) {
-        p.remove();
-      }, 600, particle);
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    
+    function Particle(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.size = 5 + Math.random() * 10;
+        var angle = Math.random() * Math.PI * 2;
+        var speed = 2 + Math.random() * 3;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = 0.008 + Math.random() * 0.01;
     }
     
-    var ripple = document.createElement('div');
-    ripple.className = 'click-ripple';
-    ripple.style.width = '40px';
-    ripple.style.height = '40px';
-    ripple.style.left = centerX - 20 + 'px';
-    ripple.style.top = centerY - 20 + 'px';
-    document.body.appendChild(ripple);
+    Particle.prototype.update = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+        this.size *= 0.99;
+    };
     
-    setTimeout(function(r) {
-      r.remove();
-    }, 800, ripple);
-  });
+    Particle.prototype.draw = function() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    };
+    
+    let animating = false;
+    
+    document.addEventListener('click', function(e) {
+        var color = colors[Math.floor(Math.random() * colors.length)];
+        for (var i = 0; i < 5; i++) {
+            particles.push(new Particle(e.clientX, e.clientY, color));
+        }
+        // 如果没在动画，启动动画循环
+        if (!animating) {
+            animating = true;
+            animate();
+        }
+    });
+    
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = particles.length - 1; i >= 0; i--) {
+            particles[i].update();
+            // 只有在粒子还可见的时候才绘制
+            if (particles[i].alpha > 0 && particles[i].size > 0.5) {
+                particles[i].draw();
+            }
+            // 完全消失后再移除
+            if (particles[i].alpha <= 0 || particles[i].size <= 0.5) {
+                particles.splice(i, 1);
+            }
+        }
+        // 只有当还有粒子时才继续动画，否则停止
+        if (particles.length > 0) {
+            requestAnimationFrame(animate);
+        } else {
+            animating = false;
+        }
+    }
 })();
 </script>
 
-<!-- 加载 Font Awesome 图标库 -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+<!-- 加载 Font Awesome 图标库 - 预连接优化 -->
+<link rel="preconnect" href="https://cdn.bootcdn.net">
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
-<!-- Live2D 看板娘 - 本地资源 -->
-<link rel="stylesheet" href="/live2d/css/waifu.css">
-<div class="waifu" id="landlord">
+<!-- Live2D 看板娘 - 延迟加载 -->
+<div class="waifu" id="landlord" style="display: none;">
     <div class="waifu-tips"></div>
     <canvas id="live2d" width="300" height="300"></canvas>
     <div class="hide-button">隐藏</div>
 </div>
 <div class="show-button" id="showWaifuBtn" style="display: none;">🌸</div>
-<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-<script src="/live2d/js/live2d.js"></script>
-<script src="/live2d/js/waifu.js"></script>
 <script>
-  loadlive2d("live2d", "/live2d/model/pio/model.json");
-  console.log("Pio 酱模型已从本地加载");
+// 延迟加载看板娘 - 等页面完全加载后再加载
+window.addEventListener('load', function() {
+    // 延迟3秒后加载看板娘，不阻塞首屏
+    setTimeout(function() {
+        // 加载看板娘CSS
+        var waifuCss = document.createElement('link');
+        waifuCss.rel = 'stylesheet';
+        waifuCss.href = '/live2d/css/waifu.css';
+        document.head.appendChild(waifuCss);
+        
+        // 显示看板娘
+        var waifu = document.getElementById('landlord');
+        if (waifu) {
+            waifu.style.display = 'block';
+        }
+        
+        // 加载Live2D脚本
+        var live2dScript = document.createElement('script');
+        live2dScript.src = '/live2d/js/live2d.js';
+        document.body.appendChild(live2dScript);
+        
+        live2dScript.onload = function() {
+            // 加载waifu.js
+            var waifuScript = document.createElement('script');
+            waifuScript.src = '/live2d/js/waifu.js';
+            document.body.appendChild(waifuScript);
+            
+            waifuScript.onload = function() {
+                // 加载模型
+                loadlive2d("live2d", "/live2d/model/pio/model.json");
+                console.log("Pio 酱模型加载完成");
+            };
+        };
+    }, 3000); // 3秒后加载
+});
 </script>
 
 <style>
@@ -3105,9 +2934,10 @@ input, textarea, [contenteditable] {
 }
 </style>
 
-<script src="/js/anime-cursor/dist/anime-cursor.umd.min.js"></script>
+<script defer src="/js/anime-cursor/dist/anime-cursor.umd.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+// 光标效果 - 文章页延迟加载，避免影响性能
+function initAnimeCursor() {
     try {
         new AnimeCursor({
             fallbackCursor: 'auto',
@@ -3135,37 +2965,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('AnimeCursor initialization failed:', error);
         document.body.classList.add('animecursor-disabled');
     }
-});
+}
 
 document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        var loader = document.getElementById('loader-wrapper');
-        if (loader) {
-            loader.classList.add('loaded');
-            
-            setTimeout(function() {
-                var mainContent = document.getElementById('main-content');
-                if (mainContent) {
-                    mainContent.classList.add('content-fade-in');
-                }
-                
-                setTimeout(function() {
-                    loader.remove();
-                }, 1000);
-            }, 300);
-        }
-    }, 800);
+    
+        // 文章页延迟2秒后加载，不影响文章加载
+        setTimeout(initAnimeCursor, 2000);
+    
 });
-
-var loadPercent = 0;
-var percentInterval = setInterval(function() {
-    loadPercent += Math.random() * 15;
-    if (loadPercent > 95) loadPercent = 95;
-    document.getElementById('loader-percent').textContent = Math.round(loadPercent) + '%';
-}, 200);
-
-document.addEventListener('DOMContentLoaded', function() {
-    clearInterval(percentInterval);
-    document.getElementById('loader-percent').textContent = '100%';
-});
+</script>
 </script>

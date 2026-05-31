@@ -1,0 +1,3076 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="这里是 @PurgationDevil 的个人博客，与你一起发现更大的世界">
+    <meta name="keywords" content="PurgationDevil Blog, 博客, 个人网站, 互联网, Web, 逆向, C语言数据结构">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="Linux 命令 - we1c0me t0 PurgationDevil 810g">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="Linux 命令
+
+第一部分：基础命令
+
+1.1 Linux 简介
+
+1. 什么是 Linux
+
+Linux 是一种类 Unix 操作系统，最初由 Linus Torvalds 于 1991 年开发。
+
+严格来说，Linux 指的是“Linux 内核（Kernel）”。常说的 “Linux 操作系统” 一般是：Linux 内核 + GNU 工具 + 软件生态。因此完整系统通常称为：GNU/L...">
+    
+    <meta property="article:published_time" content=" 2026-05-29T00:00:00Z">
+    
+    
+    
+    <meta property="article:tag" content="操作系统">
+    
+    
+    <meta property="og:image" content="https://PurgationDevil.github.iohttps://github.com/PurgationDevil.png">
+    <meta property="og:url" content="https://PurgationDevil.github.io/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/05/29/Linux%E5%91%BD%E4%BB%A4/">
+    <meta property="og:site_name" content="we1c0me t0 PurgationDevil 810g">
+
+    <title>Linux 命令 - we1c0me t0 PurgationDevil 810g</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://PurgationDevil.github.io/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/05/29/Linux%E5%91%BD%E4%BB%A4/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href=" /css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href=" /css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">PurgationDevil Blog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/">首页</a></li>
+                        <li><a href="/about">关于</a></li>
+                        <li><a href="/archive">归档</a></li>
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa-solid fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+
+<!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa-solid fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="main-content">
+    <!-- Mermaid 支持 -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default'
+    });
+    mermaid.init(undefined, document.querySelectorAll('.language-mermaid'));
+  });
+</script>
+
+<!-- 固定目录（跟随滚动） - PC端 -->
+<style>
+.toc-fixed {
+  position: fixed;
+  right: 20px;
+  top: 40%;
+  transform: translateY(-50%);
+  width: 200px;
+  max-height: 60vh;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 16px;
+  overflow-y: auto;
+  z-index: 999;
+  border: 1px solid #eaeaea;
+}
+
+.toc-fixed h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #0085a1;
+}
+
+.toc-fixed ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-fixed li {
+  margin: 8px 0;
+}
+
+.toc-fixed a {
+  color: #555;
+  text-decoration: none;
+  font-size: 13px;
+  display: block;
+  transition: all 0.2s;
+}
+
+.toc-fixed a:hover {
+  color: #0085a1;
+  transform: translateX(2px);
+}
+
+.toc-fixed a.active {
+  color: #0085a1;
+  font-weight: 500;
+  border-left: 2px solid #0085a1;
+  padding-left: 8px;
+}
+
+/* 滚动条 */
+.toc-fixed::-webkit-scrollbar {
+  width: 4px;
+}
+
+.toc-fixed::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.toc-fixed::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+/* 手机端隐藏PC目录 */
+@media (max-width: 992px) {
+  .toc-fixed {
+    display: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .toc-fixed {
+    background: rgba(10, 20, 30, 0.95);
+    border: 1px solid #2a3f5f;
+  }
+  
+  .toc-fixed h4 {
+    color: #ffffff;
+    border-bottom-color: #00d4ff;
+  }
+  
+  .toc-fixed a {
+    color: #d4d4d4;
+  }
+  
+  .toc-fixed a:hover {
+    color: #00d4ff;
+  }
+  
+  .toc-fixed a.active {
+    color: #00d4ff;
+    border-left-color: #00d4ff;
+  }
+  
+  .toc-fixed::-webkit-scrollbar-track {
+    background: #1a2735;
+  }
+  
+  .toc-fixed::-webkit-scrollbar-thumb {
+    background: #3a5065;
+  }
+}
+</style>
+
+<script>
+(function() {
+  function initToc() {
+    var article = document.querySelector('.post-container');
+    if (!article) return;
+    
+    var headers = article.querySelectorAll('h2, h3');
+    if (headers.length === 0) return;
+    
+    // 创建PC端目录
+    var tocDiv = document.createElement('div');
+    tocDiv.className = 'toc-fixed';
+    tocDiv.innerHTML = '<h4>📖 目录</h4><ul></ul>';
+    var tocList = tocDiv.querySelector('ul');
+    
+    headers.forEach(function(header, index) {
+      var id = 'toc-' + index;
+      header.id = id;
+      
+      // PC端目录项
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.href = '#' + id;
+      a.textContent = header.textContent;
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      li.appendChild(a);
+      tocList.appendChild(li);
+    });
+    
+    document.body.appendChild(tocDiv);
+    
+    // 高亮当前章节
+    var tocLinks = document.querySelectorAll('.toc-fixed a');
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + 100;
+      var currentId = null;
+      
+      headers.forEach(function(header) {
+        var offsetTop = header.offsetTop;
+        if (offsetTop <= scrollPos) {
+          currentId = header.id;
+        }
+      });
+      
+      tocLinks.forEach(function(link) {
+        link.classList.remove('active');
+        var href = link.getAttribute('href').substring(1);
+        if (href === currentId) {
+          link.classList.add('active');
+        }
+      });
+    });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToc);
+  } else {
+    initToc();
+  }
+})();
+</script>
+
+<!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/home-bg.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/home-bg.jpg');
+        background: ;
+    }
+
+    
+</style>
+
+
+
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/archive/?tag=%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F" title="操作系统">操作系统</a>
+                        
+                    </div>
+                    <h1>Linux 命令</h1>
+                    
+                    <h2 class="subheading"></h2>
+                    <span class="meta">Posted by PurgationDevil Blog on May 29, 2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<h1 id="linux-命令">Linux 命令</h1>
+
+<h2 id="第一部分基础命令">第一部分：基础命令</h2>
+
+<h3 id="11-linux-简介">1.1 Linux 简介</h3>
+
+<p><strong>1. 什么是 Linux</strong></p>
+
+<p>Linux 是一种<strong>类 Unix 操作系统</strong>，最初由 Linus Torvalds 于 1991 年开发。</p>
+
+<p>严格来说，<strong>Linux</strong> 指的是“Linux 内核（Kernel）”。常说的 “Linux 操作系统” 一般是：Linux 内核 + GNU 工具 + 软件生态。因此完整系统通常称为：<strong>GNU/Linux</strong></p>
+
+<p><strong>2. Linux 的特点</strong></p>
+
+<p>开源免费、稳定性高、多用户、多任务、安全性高以及可移植性强。</p>
+
+<p><strong>3. Linux 发行版</strong></p>
+
+<p>Linux 内核本身不能直接使用。需要：软件包，图形界面，包管理器，系统工具。组合后形成<strong>Linux 发行版</strong>（Distribution）。</p>
+
+<p>常见发行版有：<strong>Ubuntu</strong>（最接近成熟的 Windows 系统）、Debian（软件仓库大）、CentOS（与 Ubuntu 差不多但停更）、Rocky Linux / AlmaLinux（CentOS 停更后的替代方案）、Kali Linux（渗透工具集合）、Arch Linux（渗透防御系统）</p>
+
+<p><strong>4. Linux 目录结构</strong></p>
+
+<p>Linux 呈树状目录结构</p>
+
+<pre><code class="language-mermaid">graph LR
+
+ROOT["/ 根目录"]
+
+ROOT --&gt; BIN["/bin&lt;br/&gt;基础命令"]
+ROOT --&gt; SBIN["/sbin&lt;br/&gt;系统管理命令"]
+ROOT --&gt; ETC["/etc&lt;br/&gt;配置文件"]
+ROOT --&gt; HOME["/home&lt;br/&gt;普通用户目录"]
+ROOT --&gt; ROOTDIR["/root&lt;br/&gt;root 用户目录"]
+ROOT --&gt; USR["/usr&lt;br/&gt;用户程序与资源"]
+ROOT --&gt; VAR["/var&lt;br/&gt;日志与变化数据"]
+ROOT --&gt; TMP["/tmp&lt;br/&gt;临时文件"]
+ROOT --&gt; DEV["/dev&lt;br/&gt;设备文件"]
+ROOT --&gt; PROC["/proc&lt;br/&gt;进程与内核信息"]
+ROOT --&gt; SYS["/sys&lt;br/&gt;系统硬件信息"]
+ROOT --&gt; BOOT["/boot&lt;br/&gt;启动文件"]
+ROOT --&gt; LIB["/lib&lt;br/&gt;系统库文件"]
+ROOT --&gt; OPT["/opt&lt;br/&gt;第三方软件"]
+ROOT --&gt; MNT["/mnt&lt;br/&gt;临时挂载点"]
+ROOT --&gt; MEDIA["/media&lt;br/&gt;移动设备挂载"]
+ROOT --&gt; SRV["/srv&lt;br/&gt;服务数据"]
+
+HOME --&gt; USER1["user1"]
+HOME --&gt; USER2["user2"]
+
+USR --&gt; USRBIN["/usr/bin"]
+USR --&gt; USRSBIN["/usr/sbin"]
+USR --&gt; USRLOCAL["/usr/local"]
+USR --&gt; USRLIB["/usr/lib"]
+USR --&gt; USRSHARE["/usr/share"]
+
+VAR --&gt; LOG["/var/log"]
+VAR --&gt; SPOOL["/var/spool"]
+VAR --&gt; CACHE["/var/cache"]
+
+DEV --&gt; SDA["sda"]
+DEV --&gt; TTY["tty"]
+DEV --&gt; NULL["null"]
+
+PROC --&gt; PID1["1"]
+PROC --&gt; CPUINFO["cpuinfo"]
+PROC --&gt; MEMINFO["meminfo"]
+</code></pre>
+
+<p><strong>5. 对比 Windows 系统</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>对比</th>
+      <th>Linux</th>
+      <th>Windows</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>是否开源</td>
+      <td>是</td>
+      <td>否</td>
+    </tr>
+    <tr>
+      <td>使用成本</td>
+      <td>免费</td>
+      <td>多数收费</td>
+    </tr>
+    <tr>
+      <td>稳定性</td>
+      <td>高</td>
+      <td>较高</td>
+    </tr>
+    <tr>
+      <td>安全性</td>
+      <td>高</td>
+      <td>较高</td>
+    </tr>
+    <tr>
+      <td>软件生态</td>
+      <td>开发/服务器强</td>
+      <td>桌面软件强</td>
+    </tr>
+    <tr>
+      <td>命令行能力</td>
+      <td>强</td>
+      <td>一般</td>
+    </tr>
+    <tr>
+      <td>游戏支持</td>
+      <td>较弱</td>
+      <td>强</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>总结：Linux 上手难度高（需要掌握命令的使用），更适合工作。Windows 图形界面较强，几乎没有上手难度，更适合娱乐。</p>
+
+<hr />
+
+<h3 id="12-常用快捷键">1.2 常用快捷键</h3>
+
+<p>Linux 终端中大量操作都可以通过快捷键完成。
+ 熟练使用快捷键能够显著提升命令行效率。</p>
+
+<hr />
+
+<p><strong><code class="language-plaintext highlighter-rouge">Tab</code> 自动补全命令、文件名、目录名、参数（部分 Shell 支持）</strong></p>
+
+<p><code class="language-plaintext highlighter-rouge">pw&lt;Tab&gt;</code> → <code class="language-plaintext highlighter-rouge">pwd</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">cat te&lt;Tab&gt;</code> → <code class="language-plaintext highlighter-rouge">cat test.txt</code>（当前目录存在 test.txt）</p>
+
+<p><code class="language-plaintext highlighter-rouge">system&lt;Tab&gt;&lt;Tab&gt;</code> → 会显示所有以 <code class="language-plaintext highlighter-rouge">system</code> 开头的命令。</p>
+
+<p><strong>Ctrl + 类快捷键</strong></p>
+
+<p><strong>Ctrl + C</strong>：强制终止当前命令。</p>
+
+<p><strong>Ctrl + Z</strong>：暂停当前进程（挂起）。</p>
+
+<p><strong><code class="language-plaintext highlighter-rouge">fg</code></strong>：恢复暂停。</p>
+
+<p><strong>Ctrl + D</strong>：退出终端 / 结束输入。（等价于 <code class="language-plaintext highlighter-rouge">exit</code>）</p>
+
+<p><strong>Ctrl + L</strong>：清屏。（等价于 <code class="language-plaintext highlighter-rouge">clear</code>）</p>
+
+<p><strong>Ctrl + A</strong>：光标移动到行首。</p>
+
+<p><strong>Ctrl + E</strong>：光标移动到行尾。</p>
+
+<p><strong>Ctrl + U</strong>：删除光标前所有内容。</p>
+
+<p><strong>Ctrl + K</strong>：删除光标后所有内容。</p>
+
+<p><strong>Ctrl + W</strong>：删除光标前一个单词。</p>
+
+<p><strong>Ctrl + Y</strong>：粘贴最近删除内容。</p>
+
+<p><strong>Ctrl + R</strong>：搜索历史命令。</p>
+
+<p><strong>Ctrl + S</strong>：暂停终端输出。</p>
+
+<p><strong>Ctrl + Q</strong>：恢复终端输出。</p>
+
+<p><strong>历史类命令</strong></p>
+
+<p><code class="language-plaintext highlighter-rouge">history</code>：查看历史命令（曾经使用过的命令）</p>
+
+<p>上下方向键：↑ 上一条命令；↓ 下一条命令。</p>
+
+<p><code class="language-plaintext highlighter-rouge">!编号</code>：执行历史命令。<code class="language-plaintext highlighter-rouge">!100</code> → 执行 history 中编号 100 的命令。</p>
+
+<p><code class="language-plaintext highlighter-rouge">!!</code>：执行上一条命令。</p>
+
+<p><code class="language-plaintext highlighter-rouge">!字符串</code>：执行最近以该字符串开头的命令。<code class="language-plaintext highlighter-rouge">!vim</code> → 执行最近的 <code class="language-plaintext highlighter-rouge">vim</code> 命令。</p>
+
+<p>历史命令保存位置通常在：<code class="language-plaintext highlighter-rouge">~/.bash_history</code></p>
+
+<hr />
+
+<h3 id="13-命令帮助">1.3 命令帮助</h3>
+
+<p>Linux 提供了多种命令帮助工具，用于<strong>查看命令说明、查询参数、查找命令位置、获取系统文档</strong>。</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">man</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">--help</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">whatis</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">help</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">info</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">which</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">whereis</code></p>
+  </li>
+</ul>
+
+<p>熟练使用帮助命令是学习 Linux 的核心能力之一。</p>
+
+<hr />
+
+<p><strong>1. <code class="language-plaintext highlighter-rouge">man</code></strong>（manual）是 Linux 最重要的帮助命令，用于查看命令官方手册。</p>
+
+<p>示例：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>man <span class="nb">ls</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>解释通常包含命令名称、语法、说明，以及参数说明、示例和相关命令。</p>
+
+<p><code class="language-plaintext highlighter-rouge">man</code> 一般操作</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>按键</th>
+      <th>功能</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>↑ ↓</td>
+      <td>上下移动</td>
+    </tr>
+    <tr>
+      <td>PageUp/PageDown</td>
+      <td>翻页</td>
+    </tr>
+    <tr>
+      <td>/关键字</td>
+      <td>搜索</td>
+    </tr>
+    <tr>
+      <td>n</td>
+      <td>下一个匹配</td>
+    </tr>
+    <tr>
+      <td>q</td>
+      <td>退出</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code class="language-plaintext highlighter-rouge">man</code> 章节</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>编号</th>
+      <th>内容</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>用户命令</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>系统调用</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>库函数</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>设备文件</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>配置文件</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>管理员命令</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>例子🌰：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>man 5 passwd    <span class="c"># 查看 /etc/passwd 文件格式。</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>查看命令简介</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>man <span class="nt">-f</span> <span class="nb">ls</span>    <span class="c"># 查找 ls 简介</span>
+whatis <span class="nb">ls</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>搜索相关命令</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>man <span class="nt">-k</span> copy    <span class="c"># 搜索包含 copy 的命令</span>
+apropos copy
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>2. <code class="language-plaintext highlighter-rouge">--help</code></strong> 是 <code class="language-plaintext highlighter-rouge">man</code> 的简洁版。适合速查。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">ls</span> <span class="nt">--help</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>3. <code class="language-plaintext highlighter-rouge">whatis</code></strong> —— 查看命令一句话简介。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>whatis <span class="nb">ls
+ls</span> <span class="o">(</span>1<span class="o">)</span> - list directory contents
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>4. <code class="language-plaintext highlighter-rouge">help</code></strong>是 bash 的内置命令。</p>
+
+<p>或者说当 <code class="language-plaintext highlighter-rouge">man</code> 查找不到时用 <code class="language-plaintext highlighter-rouge">help</code>。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nb">help cd
+help </span><span class="k">if
+</span><span class="nb">help </span><span class="k">for
+</span><span class="nb">help echo</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>5. <code class="language-plaintext highlighter-rouge">info</code></strong> —— 更详细的帮助文档</p>
+
+<p><code class="language-plaintext highlighter-rouge">info</code> 是 GNU 风格帮助系统，内容更详细且支持超链接。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>info <span class="nb">ls</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>常用操作</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>按键</th>
+      <th>功能</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>↑ ↓</td>
+      <td>移动</td>
+    </tr>
+    <tr>
+      <td>Enter</td>
+      <td>进入链接</td>
+    </tr>
+    <tr>
+      <td>n</td>
+      <td>下一节点</td>
+    </tr>
+    <tr>
+      <td>p</td>
+      <td>上一节点</td>
+    </tr>
+    <tr>
+      <td>u</td>
+      <td>返回上级</td>
+    </tr>
+    <tr>
+      <td>q</td>
+      <td>退出</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>6. <code class="language-plaintext highlighter-rouge">which</code></strong> 是查找命令路径（查找可执行文件）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>which <span class="nb">ls</span>
+/usr/bin/ls <span class="c"># 输出</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>原理：在环境变量指定目录中查找命令。<code class="language-plaintext highlighter-rouge">echo $PATH</code></p>
+
+<p><strong>7. <code class="language-plaintext highlighter-rouge">whereis</code></strong> 用于查找命令、源码、man 文档位置（查找命令相关文件）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>whereis <span class="nb">ls
+ls</span>: /usr/bin/ls /usr/share/man/man1/ls.1.gz <span class="c"># 输出</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>8. <code class="language-plaintext highlighter-rouge">apropos</code></strong> —— 搜索相关命令。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>apropos password
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h2 id="第二部分文件与目录操作">第二部分：文件与目录操作</h2>
+
+<h3 id="21-目录操作">2.1 目录操作</h3>
+
+<p>本节介绍最常用的目录操作命令：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">pwd</code></li>
+  <li><code class="language-plaintext highlighter-rouge">cd</code></li>
+  <li><code class="language-plaintext highlighter-rouge">ls</code></li>
+  <li><code class="language-plaintext highlighter-rouge">tree</code></li>
+</ul>
+
+<hr />
+
+<p><strong>1. <code class="language-plaintext highlighter-rouge">pwd</code></strong> —— 查看当前目录</p>
+
+<p><code class="language-plaintext highlighter-rouge">pwd</code> 的全称：<code class="language-plaintext highlighter-rouge">Print Working Directory</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nb">pwd</span>
+/home/user <span class="c"># 输出（表示当前位于/home/user）</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>1. <code class="language-plaintext highlighter-rouge">cd</code></strong> —— 切换目录</p>
+
+<p><code class="language-plaintext highlighter-rouge">cd</code> 的全称：<code class="language-plaintext highlighter-rouge">Change Directory</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre><span class="nb">cd</span> /home <span class="c"># cd &lt;目录路径&gt;</span>
+<span class="nb">cd </span>home <span class="c"># 当前在 `/` 目录时有效</span>
+<span class="nb">cd</span> .. <span class="c"># 返回上一级目录</span>
+<span class="nb">cd</span> <span class="c"># 返回主目录 或者输入 cd ~</span>
+<span class="nb">cd</span> ~
+<span class="nb">cd</span> - <span class="c"># 返回上一次目录</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><em>其中1行和2行涉及相对路径与绝对路径。具体介绍在我的另一篇文章《计算机扫盲》的 “文件与路径”。</em>😊</p>
+
+<p><strong>2. <code class="language-plaintext highlighter-rouge">ls</code></strong> —— 查看目录内容</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">ls</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>参数：-l  -a  -h</p>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">ls -l</code> —— 显示详细信息</p>
+
+<p>输出示例：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nt">-rw-r--r--</span> 1 root root 1024 May 1 test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>字段</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-rw-r--r--</code></td>
+      <td>文件权限</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">1</code></td>
+      <td>硬链接数</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">root</code></td>
+      <td>所有者</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">root</code></td>
+      <td>所属组</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">1024</code></td>
+      <td>文件大小</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">May 1</code></td>
+      <td>修改时间</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">test.txt</code></td>
+      <td>文件名</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">ls -a</code> —— 显示隐藏文件（<code class="language-plaintext highlighter-rouge">.</code>开头的文件）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>.bashrc
+.gitignore
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(3) <code class="language-plaintext highlighter-rouge">ls -lh</code> —— 显示文件大小（一定要配合 <code class="language-plaintext highlighter-rouge">-l</code>）</p>
+
+<p>(4) <code class="language-plaintext highlighter-rouge">ls -lt</code> —— 按时间排序（一定要配合 <code class="language-plaintext highlighter-rouge">-l</code>）</p>
+
+<p>(5) <code class="language-plaintext highlighter-rouge">ls -lr</code> —— 反向排序（一定要配合 <code class="language-plaintext highlighter-rouge">-l</code>）</p>
+
+<p>(6) <code class="language-plaintext highlighter-rouge">ls -R</code> —— 递归显示子目录</p>
+
+<p><strong>4. <code class="language-plaintext highlighter-rouge">tree</code></strong> —— 树状显示目录（部分系统默认没有，需要安装）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>tree
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>输出示例</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre>.
+├── file1.txt
+├── test
+│   ├── a.txt
+│   └── b.txt
+└── demo.py
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">tree -a</code> —— 显示隐藏文件（<code class="language-plaintext highlighter-rouge">.</code>开头的文件）</p>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">tree -d</code> —— 仅显示目录</p>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">tree -L 2</code> —— 只显示两层目录</p>
+
+<p>(3) <code class="language-plaintext highlighter-rouge">tree -h</code> —— 显示文件大小</p>
+
+<hr />
+
+<h3 id="22-文件操作">2.2 文件操作</h3>
+
+<p>本节介绍以下核心命令：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">touch</code></li>
+  <li><code class="language-plaintext highlighter-rouge">cp</code></li>
+  <li><code class="language-plaintext highlighter-rouge">mv</code></li>
+  <li><code class="language-plaintext highlighter-rouge">rm</code></li>
+  <li><code class="language-plaintext highlighter-rouge">mkdir</code></li>
+  <li><code class="language-plaintext highlighter-rouge">rmdir</code></li>
+</ul>
+
+<hr />
+
+<p><strong>1. <code class="language-plaintext highlighter-rouge">touch</code></strong> —— 创建文件</p>
+
+<p><code class="language-plaintext highlighter-rouge">touch</code> 用于<strong>创建空文件或修改文件时间戳</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">touch </span>test.txt <span class="c"># touch 文件名  创建名为 test.txt 的空文件</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>可以同时创建多个文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">touch </span>a.txt b.txt c.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>如果<strong>文件已存在</strong>，则会<strong>修改文件时间</strong>。</p>
+
+<p><strong>2. <code class="language-plaintext highlighter-rouge">cp</code></strong> —— 复制文件与目录</p>
+
+<p><code class="language-plaintext highlighter-rouge">cp</code> 的全称：<code class="language-plaintext highlighter-rouge">Copy</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nb">cp </span>a.txt b.txt <span class="c"># cp 源文件 目标文件  复制 a.txt 为 b.txt</span>
+<span class="nb">cp </span>test.txt /home/user/ <span class="c"># 复制 test.txt 到 home/user/ 目录</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">cp -r</code> —— 递归复制目录（文件夹）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">cp</span> <span class="nt">-r</span> dir1 dir2
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">cp -i</code> —— 覆盖前询问</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">cp</span> <span class="nt">-i</span> a.txt b.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(3) <code class="language-plaintext highlighter-rouge">cp -v</code> —— 显示复制过程</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">cp</span> <span class="nt">-v</span> a.txt backup/
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(4) <code class="language-plaintext highlighter-rouge">cp -a</code> —— 保留文件属性（权限、时间、链接、所有者。常用于备份）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">cp</span> <span class="nt">-i</span> a.txt b.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>3. <code class="language-plaintext highlighter-rouge">mv</code></strong> —— 移动/重命名文件</p>
+
+<p><code class="language-plaintext highlighter-rouge">mv</code> 的全称：<code class="language-plaintext highlighter-rouge">Move</code></p>
+
+<p>重命名文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">mv </span>old.txt new.txt <span class="c"># mv 源文件 目标</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>移动文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">mv </span>test.txt /home/user/
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>移动目录</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">mv </span>dir1 /tmp/
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">mv -i</code> —— 覆盖前询问</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">mv</span> <span class="nt">-i</span> a.txt b.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">cp -v</code> —— 显示移动过程</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">mv</span> <span class="nt">-v</span> file.txt backup/
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>⚠️ 注意：如果目标文件存在，默认会直接覆盖。这就是 <code class="language-plaintext highlighter-rouge">mv -i</code> 存在的意义。</p>
+
+<p><strong>4. <code class="language-plaintext highlighter-rouge">rm</code></strong> —— 删除文件与目录</p>
+
+<p><code class="language-plaintext highlighter-rouge">rm</code> 的全称：<code class="language-plaintext highlighter-rouge">Remove</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nb">rm </span>test.txt <span class="c"># rm 文件名</span>
+<span class="nb">rm </span>a.txt b.txt <span class="c"># 删除多个文件</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">rm -r</code> —— 递归删除目录</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">rm</span> <span class="nt">-r</span> testdir
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">rm -f</code> —— 强制删除</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">rm</span> <span class="nt">-f</span> test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>特点：</p>
+
+<ul>
+  <li>不询问</li>
+  <li>忽略不存在文件</li>
+</ul>
+
+<p>(3) <code class="language-plaintext highlighter-rouge">rm -rf</code> —— 删除前询问</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">rm</span> <span class="nt">-i</span> test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>⚠️ 高危操作警告</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">sudo rm</span> <span class="nt">-rf</span> /
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>含义：root 权限删除包括系统的所有文件。执行完后系统就没了。</p>
+
+<p><strong>5. <code class="language-plaintext highlighter-rouge">mkdir</code></strong> —— 创建目录</p>
+
+<p><code class="language-plaintext highlighter-rouge">mkdir</code> 的全称：<code class="language-plaintext highlighter-rouge">Make Directory</code></p>
+
+<p>创建目录</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nb">mkdir test</span> <span class="c"># mkdir 目录名</span>
+<span class="nb">mkdir </span>dir1 dir2 dir3 <span class="c"># 创建多个目录</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">mkdir -p</code> —— 创建多级目录</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">mkdir</span> <span class="nt">-p</span> large/middle/small
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>6. <code class="language-plaintext highlighter-rouge">rmdir</code></strong> —— 删除空目录</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">rmdir </span>text <span class="c"># rmdir 目录名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>只能删除空目录，否则报错 <code class="language-plaintext highlighter-rouge">Directory not empty</code>（该目录不为空）。</p>
+
+<p>删除非空目录用 <code class="language-plaintext highlighter-rouge">rm -r</code>。</p>
+
+<hr />
+
+<h3 id="23-文件查看">2.3 文件查看</h3>
+
+<p>本节介绍常用文件查看命令：</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">cat</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">tac</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">more</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">less</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">head</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">tail</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">nl</code></p>
+  </li>
+</ul>
+
+<hr />
+
+<p><strong>1. <code class="language-plaintext highlighter-rouge">cat</code></strong> —— 查看文件内容</p>
+
+<p><code class="language-plaintext highlighter-rouge">cat</code> 的全称：<code class="language-plaintext highlighter-rouge">concatenate</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nb">cat </span>test.txt <span class="c"># cat 文件名</span>
+<span class="nb">cat </span>a.txt b.txt <span class="c"># 同时查看多个文件</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">cat -n</code> —— 显示行号</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nb">cat</span> <span class="nt">-n</span> test.txt
+<span class="c"># ↓ 输出 ↓</span>
+1 hello
+2 world
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">cat -b</code> —— 给非空行编号</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">cat</span> <span class="nt">-b</span> test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(3) <code class="language-plaintext highlighter-rouge">cat -A</code> —— 显示特殊字符</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">cat</span> <span class="nt">-A</span> test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>可显示：</p>
+
+<ul>
+  <li>Tab</li>
+  <li>换行</li>
+  <li>隐藏字符</li>
+</ul>
+
+<p>不适合对超大文件使用。</p>
+
+<p><strong>2. <code class="language-plaintext highlighter-rouge">tac</code></strong> —— 倒序查看文件</p>
+
+<p><code class="language-plaintext highlighter-rouge">tac</code> 是 <code class="language-plaintext highlighter-rouge">cat</code> 的反写</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre><span class="nb">tac </span>test.txt <span class="c"># tac 文件名</span>
+<span class="c"># 原文件</span>
+line1
+line2
+line3
+<span class="c"># 实际输出</span>
+line3
+line2
+line1
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>适用于查看日志和逆向分析。</p>
+
+<p><strong>3. <code class="language-plaintext highlighter-rouge">more</code></strong> —— 分页查看文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>more test.txt <span class="c"># more 文件名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>按键</th>
+      <th>功能</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Space</td>
+      <td>下一页</td>
+    </tr>
+    <tr>
+      <td>Enter</td>
+      <td>下一行</td>
+    </tr>
+    <tr>
+      <td>q</td>
+      <td>退出</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>缺点是只能向下翻。因此现在更多使用 <code class="language-plaintext highlighter-rouge">less</code>。</p>
+
+<p><strong>4. <code class="language-plaintext highlighter-rouge">less</code></strong> —— 更强大的分页查看</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>less test.txt <span class="c"># less 文件名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>按键</th>
+      <th>功能</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>↑ ↓</td>
+      <td>上下移动</td>
+    </tr>
+    <tr>
+      <td>Space</td>
+      <td>下一页</td>
+    </tr>
+    <tr>
+      <td>b</td>
+      <td>上一页</td>
+    </tr>
+    <tr>
+      <td>/关键字</td>
+      <td>搜索</td>
+    </tr>
+    <tr>
+      <td>n</td>
+      <td>下一个匹配</td>
+    </tr>
+    <tr>
+      <td>q</td>
+      <td>退出</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>5. <code class="language-plaintext highlighter-rouge">head</code></strong> —— 查看文件开头</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">head </span>test.txt <span class="c"># head 文件名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>默认输出前 10 行</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">head</span> <span class="nt">-n</span> 5 test.txt <span class="c"># 前 5 行</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>6. <code class="language-plaintext highlighter-rouge">tail</code></strong> —— 查看文件结尾</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">tail </span>test.txt <span class="c"># tail 文件名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>默认输出后 10 行</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">tail</span> <span class="nt">-n</span> 20 test.txt <span class="c"># 后 5 行</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">tail -f</code> —— 实时查看日志</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">tail</span> <span class="nt">-f</span> /var/log/syslog <span class="c"># 新日志会实时输出</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>退出实时监控按 <code class="language-plaintext highlighter-rouge">Ctrl + C</code>。</p>
+
+<p><strong>7. <code class="language-plaintext highlighter-rouge">nl</code></strong> —— 显示行号</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">nl </span>test.txt <span class="c"># nl 文件名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">nl</code> 比 <code class="language-plaintext highlighter-rouge">cat</code> 更灵活。</p>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">nl -b a</code> —— 给所有行编号</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">nl</span> <span class="nt">-b</span> a test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">nl -s</code> —— 自定义分隔符：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nb">nl</span> <span class="nt">-s</span> <span class="s2">":"</span> test.txt
+<span class="c"># 输出</span>
+1:hello
+2:world
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<pre><code class="language-mermaid">graph TD
+
+    Info["&lt;b&gt;总结&lt;/b&gt;"]
+    
+A["文件查看命令"]
+A --&gt; B["cat&lt;br/&gt;查看全部"]
+A --&gt; C["tac&lt;br/&gt;倒序查看"]
+A --&gt; D["more&lt;br/&gt;分页查看"]
+A --&gt; E["less&lt;br/&gt;高级分页"]
+A --&gt; F["head&lt;br/&gt;查看开头"]
+A --&gt; G["tail&lt;br/&gt;查看结尾"]
+A --&gt; H["nl&lt;br/&gt;显示行号"]
+
+    style Info fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style A fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    style B fill:#fff9c4,stroke:#f9a825
+    style C fill:#fff9c4,stroke:#f9a825
+    style D fill:#fff9c4,stroke:#f9a825
+    style E fill:#fff9c4,stroke:#f9a825
+    style F fill:#fff9c4,stroke:#f9a825
+    style G fill:#fff9c4,stroke:#f9a825
+    style H fill:#fff9c4,stroke:#f9a825
+</code></pre>
+
+<hr />
+
+<h3 id="24-文件查找">2.4 文件查找</h3>
+
+<p>常见场景：</p>
+
+<ul>
+  <li>找不到文件</li>
+  <li>查找日志</li>
+  <li>搜索配置文件</li>
+  <li>查找命令位置</li>
+  <li>查找程序安装路径</li>
+</ul>
+
+<p>本节介绍：</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">find</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">locate</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">which</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">whereis</code></p>
+  </li>
+</ul>
+
+<hr />
+
+<p><strong>1. <code class="language-plaintext highlighter-rouge">find</code></strong> —— 强大的文件查找命令</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>find /home <span class="nt">-name</span> test.txt <span class="c"># find 查找路径 条件</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">find . -name</code> —— 按文件名查找</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>find <span class="nb">.</span> <span class="nt">-name</span> hello.txt <span class="c"># 精确查找</span>
+find <span class="nb">.</span> <span class="nt">-iname</span> hello.txt <span class="c"># 忽略大小写</span>
+find <span class="nb">.</span> <span class="nt">-name</span> <span class="s2">"*.txt"</span> <span class="c"># 配合通配符查找</span>
+find /var/log <span class="nt">-name</span> <span class="s2">"*.log"</span> <span class="c"># 查找日志文件</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">find . -type</code> —— 按类型查找</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>find <span class="nb">.</span> <span class="nt">-type</span> d <span class="c"># 查找目录</span>
+find <span class="nb">.</span> <span class="nt">-type</span> f <span class="c"># 查找普通文件</span>
+find <span class="nb">.</span> <span class="nt">-type</span> l <span class="c"># 查找链接文件</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(3) <code class="language-plaintext highlighter-rouge">find . -size</code> —— 按大小查找</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>find / <span class="nt">-size</span> +100M <span class="c"># 大于 100MB 文件</span>
+find <span class="nb">.</span> <span class="nt">-size</span> <span class="nt">-10k</span> <span class="c"># 小于 10KB 文件</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(4) <code class="language-plaintext highlighter-rouge">find . -mtime</code> —— 按时间查找</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>find <span class="nb">.</span> <span class="nt">-mtime</span> <span class="nt">-7</span> <span class="c"># 7 天内修改文件</span>
+find <span class="nb">.</span> <span class="nt">-mtime</span> +30 <span class="c"># 30 天前修改文件</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(4) <code class="language-plaintext highlighter-rouge">find . -user</code> —— 按用户查找</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>find / <span class="nt">-user</span> root <span class="c"># 查找 root 用户文件</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(5) <code class="language-plaintext highlighter-rouge">find . -empty</code> —— 查找空文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>find <span class="nb">.</span> <span class="nt">-empty</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>find 执行操作</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>find <span class="nb">.</span> <span class="nt">-name</span> <span class="s2">"*.tmp"</span> <span class="nt">-delete</span> <span class="c"># 查找后删除</span>
+find <span class="nb">.</span> <span class="nt">-name</span> <span class="s2">"*.log"</span> <span class="nt">-exec</span> <span class="nb">rm</span> <span class="o">{}</span> <span class="se">\;</span> <span class="c"># 查找后执行命令</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">{}</code> → 当前查找到文件	<code class="language-plaintext highlighter-rouge">\;</code> → 命令结束</p>
+
+<p><strong>2. <code class="language-plaintext highlighter-rouge">locate</code></strong> —— 快速文件查找</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>locate test.txt <span class="c"># locate 文件名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">locate</code> 不实时扫描磁盘，它查询文件索引数据库。因此速度极快。缺点是不实时。</p>
+
+<p>如果新文件找不到，先 <code class="language-plaintext highlighter-rouge">sudo updatedb</code> 再 <code class="language-plaintext highlighter-rouge">locate test.txt</code></p>
+
+<p><strong>3. <code class="language-plaintext highlighter-rouge">which</code></strong> —— 查找命令位置</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>which <span class="nb">ls</span> <span class="c"># which 命令名</span>
+which python gcc bash <span class="c"># 查看多个命令</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>原理是 <code class="language-plaintext highlighter-rouge">which</code> 在环境变量中查找然后 <code class="language-plaintext highlighter-rouge">echo $PATH</code>。</p>
+
+<p><code class="language-plaintext highlighter-rouge">which</code> 通常由于验证某些系统变量如 <code class="language-plaintext highlighter-rouge">python3</code> 是否安装。</p>
+
+<p><strong>3. <code class="language-plaintext highlighter-rouge">whereis</code></strong> —— 查找命令相关文件</p>
+
+<p>由于查找命令、源码、man 手册位置</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>whereis <span class="nb">ls</span> <span class="c"># which 命令名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>比 <code class="language-plaintext highlighter-rouge">which</code> 多个相关文件</p>
+
+<pre><code class="language-mermaid">graph TD
+
+    Info["&lt;b&gt;总结&lt;/b&gt;"]
+    
+A["文件查找"]
+A --&gt; B["find&lt;br/&gt;实时递归查找"]
+A --&gt; C["locate&lt;br/&gt;数据库快速查找"]
+A --&gt; D["which&lt;br/&gt;查找命令路径"]
+A --&gt; E["whereis&lt;br/&gt;查找相关文件"]
+
+    style Info fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style A fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    style B fill:#fff9c4,stroke:#f9a825
+    style C fill:#fff9c4,stroke:#f9a825
+    style D fill:#fff9c4,stroke:#f9a825
+    style E fill:#fff9c4,stroke:#f9a825
+</code></pre>
+
+<hr />
+
+<h3 id="25-文件比较">2.5 文件比较</h3>
+
+<p>Linux 中常用文件比较命令：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">diff</code></li>
+  <li><code class="language-plaintext highlighter-rouge">cmp</code></li>
+  <li><code class="language-plaintext highlighter-rouge">comm</code></li>
+</ul>
+
+<p>它们用于：</p>
+
+<ul>
+  <li>比较文件差异</li>
+  <li>查找修改内容</li>
+  <li>分析配置变化</li>
+  <li>代码版本对比</li>
+  <li>文本行比较</li>
+</ul>
+
+<hr />
+
+<p><strong>1. <code class="language-plaintext highlighter-rouge">diff</code></strong> —— 文本差异比较</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre>diff a.txt b.txt <span class="c"># diff 文件1 文件2</span>
+<span class="c"># 输出举例（a 相较于 b）</span>
+2c2
+&lt; linux
+<span class="nt">---</span>
+<span class="o">&gt;</span> unix
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>输出说明</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>符号</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">&lt;</code></td>
+      <td>文件1内容</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">&gt;</code></td>
+      <td>文件2内容</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">c</code></td>
+      <td>changed（修改）</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">a</code></td>
+      <td>added（新增）</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">d</code></td>
+      <td>deleted（删除）</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">diff -u</code> —— 输出更清晰</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>diff <span class="nt">-u</span> a.txt b.txt
+<span class="c"># 输出举例（a 相较于 b）</span>
+- linux
++ unix
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">diff -y</code> —— 并排显示</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>diff <span class="nt">-y</span> a.txt b.txt
+<span class="c"># 输出举例（a 相较于 b）</span>
+linux | unix
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(3) <code class="language-plaintext highlighter-rouge">diff -r</code> —— 递归比较目录</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>diff <span class="nt">-r</span> dir1 dir2
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(4) <code class="language-plaintext highlighter-rouge">diff -i</code> —— 忽略大小写</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>diff <span class="nt">-i</span> a.txt b.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(5) <code class="language-plaintext highlighter-rouge">diff -w</code> —— 忽略空白</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>diff <span class="nt">-w</span> a.txt b.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>2. <code class="language-plaintext highlighter-rouge">cmp</code></strong> —— 字节级比较</p>
+
+<p>常用于二进制文件，更底层，更精确。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>cmp a.txt b.txt <span class="c"># cmp 文件1 文件2</span>
+<span class="c"># 输出</span>
+a.txt b.txt differ: byte 7, line 2
+<span class="c"># 第 2 行，第 7 个字节不同</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">cmp -l</code> —— 显示所有不同字节</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>cmp <span class="nt">-l</span> a.txt b.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">cmp -s</code> —— 静默模式（通常用于 Shell 脚本）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>cmp <span class="nt">-s</span> a.txt b.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>3. <code class="language-plaintext highlighter-rouge">comm</code></strong> —— 行比较工具</p>
+
+<p><code class="language-plaintext highlighter-rouge">comm</code> 必须排序</p>
+
+<p>错误示例：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="nb">comm </span>a.txt b.txt
+<span class="c"># 输出</span>
+<span class="nb">comm</span>: file is not <span class="k">in </span>sorted order
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>正确方式：先排序处理，后比较。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="nb">sort </span>a.txt <span class="nt">-o</span> a.txt
+<span class="nb">sort </span>b.txt <span class="nt">-o</span> b.txt
+<span class="nb">comm </span>a.txt b.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>一共会输出三列：</p>
+
+<ul>
+  <li>第一列：<code class="language-plaintext highlighter-rouge">a.txt</code> 独有。</li>
+  <li>第二列：<code class="language-plaintext highlighter-rouge">b.txt</code> 独有。</li>
+  <li>第三列：两文件共有。</li>
+</ul>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">comm -1</code> —— 不显示第一列</p>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">comm -2</code> —— 不显示第二列</p>
+
+<p>(3) <code class="language-plaintext highlighter-rouge">comm -3</code> —— 不显示第三列</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="nb">comm</span> <span class="nt">-1</span> a.txt b.txt
+<span class="nb">comm</span> <span class="nt">-2</span> a.txt b.txt
+<span class="nb">comm</span> <span class="nt">-3</span> a.txt b.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<pre><code class="language-mermaid">graph TD
+
+    Info["&lt;b&gt;总结&lt;/b&gt;"]
+
+A["文件比较"]
+A --&gt; B["diff&lt;br/&gt;逐行比较"]
+A --&gt; C["cmp&lt;br/&gt;字节级比较"]
+A --&gt; D["comm&lt;br/&gt;排序行比较"]
+
+    style Info fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style A fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    style B fill:#fff9c4,stroke:#f9a825
+    style C fill:#fff9c4,stroke:#f9a825
+    style D fill:#fff9c4,stroke:#f9a825
+</code></pre>
+
+<hr />
+
+<h2 id="第三部分文本处理">第三部分：文本处理</h2>
+
+<p>文本处理是 Linux 最强大的能力之一。</p>
+
+<p>Linux 的设计理念：“一切皆文本”</p>
+
+<h3 id="31-文本统计">3.1 文本统计</h3>
+
+<p>本节介绍：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">wc</code></li>
+  <li><code class="language-plaintext highlighter-rouge">sort</code></li>
+  <li><code class="language-plaintext highlighter-rouge">uniq</code></li>
+</ul>
+
+<hr />
+
+<p><strong>1. <code class="language-plaintext highlighter-rouge">wc</code></strong> —— 文本统计</p>
+
+<p><code class="language-plaintext highlighter-rouge">wc</code> 的全称：<code class="language-plaintext highlighter-rouge">Word Count</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">wc </span>test.txt <span class="c"># wc 文件名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>输出：行数	单词数	字节数</p>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">wc -l</code> —— 统计行数</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">wc</span> <span class="nt">-l</span> test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">wc -w</code> —— 统计单词数</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">wc</span> <span class="nt">-w</span> test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(3) <code class="language-plaintext highlighter-rouge">wc -c</code> —— 统计字节数</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">wc</span> <span class="nt">-c</span> test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(4) <code class="language-plaintext highlighter-rouge">wc -m</code> —— 统计字符数</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">wc</span> <span class="nt">-m</span> test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">wc</code> 还可以统计命令输出</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nb">ls</span> | <span class="nb">wc</span> <span class="nt">-l</span> <span class="c"># 统计当前文件数</span>
+<span class="nb">wc</span> <span class="nt">-l</span> app.log <span class="c"># 统计日志行数</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>2. <code class="language-plaintext highlighter-rouge">sort</code></strong> —— 文本排序</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">sort </span>fruits.txt <span class="c"># sort 文件名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>排序示例：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>banana		apple
+apple	→	banana
+orange		orange
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">sort -r</code> —— 倒序排序</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">sort</span> <span class="nt">-r</span> fruits.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">sort -n</code> —— 数字排序（非首字符排序）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">sort</span> <span class="nt">-n</span> num.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(3) <code class="language-plaintext highlighter-rouge">sort -u</code> —— 排序并去重</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">sort</span> <span class="nt">-u</span> test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(4) <code class="language-plaintext highlighter-rouge">sort -k</code> —— 按指定列排序</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">sort</span> <span class="nt">-k2</span> <span class="nt">-n</span> score.txt <span class="c"># 按第二列排序</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(5) <code class="language-plaintext highlighter-rouge">sort -t</code> —— 指定分隔符</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">sort</span> <span class="nt">-t</span> <span class="s2">":"</span> <span class="nt">-k3</span> /etc/passwd
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>3. <code class="language-plaintext highlighter-rouge">uniq</code></strong> —— 文本去重</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">uniq </span>text.txt <span class="c"># uniq 文件名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>⚠️ 重要注意：只能处理连续重复行</p>
+
+<p>正确执行方式</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="nb">sort</span> | <span class="nb">uniq</span> <span class="c"># 通常</span>
+<span class="c"># 示例</span>
+<span class="nb">sort </span>text.txt | <span class="nb">uniq</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">uniq -c</code> —— 统计重复次数</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">uniq</span> <span class="nt">-c</span> text.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">uniq -d</code> —— 只显示重复行</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">uniq</span> <span class="nt">-d</span> text.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(3) <code class="language-plaintext highlighter-rouge">uniq -u</code> —— 只显示唯一行</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">uniq</span> <span class="nt">-u</span> text.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<pre><code class="language-mermaid">graph TD
+
+    Info["&lt;b&gt;总结&lt;/b&gt;"]
+
+A["文本统计"]
+A --&gt; B["wc&lt;br/&gt;统计"]
+A --&gt; C["sort&lt;br/&gt;排序"]
+A --&gt; D["uniq&lt;br/&gt;去重"]
+
+    style Info fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style A fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    style B fill:#fff9c4,stroke:#f9a825
+    style C fill:#fff9c4,stroke:#f9a825
+    style D fill:#fff9c4,stroke:#f9a825
+</code></pre>
+
+<hr />
+
+<h3 id="32-文本搜索">3.2 文本搜索</h3>
+
+<p>Linux 中核心文本搜索工具</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">grep</code></li>
+  <li><code class="language-plaintext highlighter-rouge">egrep</code></li>
+  <li><code class="language-plaintext highlighter-rouge">fgrep</code></li>
+</ul>
+
+<p>它们广泛用于：</p>
+
+<ul>
+  <li>日志分析</li>
+  <li>配置文件搜索</li>
+  <li>代码搜索</li>
+  <li>运维排障</li>
+  <li>安全分析</li>
+</ul>
+
+<hr />
+
+<p><strong>1. <code class="language-plaintext highlighter-rouge">grep</code></strong> —— 文本搜索核心命令</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">grep</span> <span class="s2">"hello"</span> test.txt <span class="c"># grep "关键字" 文件名</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>匹配成功的整行会被输出</p>
+
+<p>(1) <code class="language-plaintext highlighter-rouge">grep -i</code> —— 忽略大小写</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">grep</span> <span class="nt">-i</span> <span class="s2">"hello"</span> test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(2) <code class="language-plaintext highlighter-rouge">grep -n</code> —— 显示行号</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">grep</span> <span class="nt">-n</span> <span class="s2">"hello"</span> test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(3) <code class="language-plaintext highlighter-rouge">grep -v</code> —— 反向匹配</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">grep</span> <span class="nt">-v</span> <span class="s2">"hello"</span> test.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>输出不包含 hello 的行</p>
+
+<p>(4) <code class="language-plaintext highlighter-rouge">grep -r</code> —— 递归搜索目录</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">grep</span> <span class="nt">-r</span> <span class="s2">"password"</span> /etc
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(5) <code class="language-plaintext highlighter-rouge">grep -l</code> —— 只显示文件名</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">grep</span> <span class="nt">-l</span> <span class="s2">"hello"</span> <span class="k">*</span>.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(6) <code class="language-plaintext highlighter-rouge">grep -c</code> —— 统计匹配行数</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">grep</span> <span class="nt">-c</span> <span class="s2">"ERROR"</span> app.log <span class="c"># 查看日志</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(7) <code class="language-plaintext highlighter-rouge">grep --color</code> —— 高亮显示</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">grep</span> <span class="nt">--color</span> <span class="s2">"root"</span> /etc/passwd
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(8) <code class="language-plaintext highlighter-rouge">grep -w</code> —— 精确匹配单词</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">grep</span> <span class="nt">-w</span> <span class="s2">"root"</span> file.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>(8) <code class="language-plaintext highlighter-rouge">grep -o</code> —— 精确匹配单词</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">grep</span> <span class="nt">-o</span> <span class="s2">"root"</span> file.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/05/20/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%89%AB%E7%9B%B2/" data-toggle="tooltip" data-placement="top" title="计算机扫盲">
+                        上一篇<br>
+                        <span>计算机扫盲</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/05/31/%E6%94%BB%E9%98%B2%E4%B8%96%E7%95%8Creverse/" data-toggle="tooltip" data-placement="top" title="攻防世界 reverse">
+                        下一篇<br>
+                        <span>攻防世界 reverse</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                <!-- giscus 评论系统 - 延迟加载 -->
+                <div class="comment" id="comment-section">
+                    <h4>💬 评论</h4>
+                    <div id="comment-placeholder" style="color: #999; font-size: 14px;">评论加载中...</div>
+                </div>
+                <script>
+                (function() {
+                    function loadComments() {
+                        var placeholder = document.getElementById('comment-placeholder');
+                        if (!placeholder) return;
+                        
+                        var script = document.createElement('script');
+                        script.src = 'https://giscus.app/client.js';
+                        script.setAttribute('data-repo', 'PurgationDevil/PurgationDevil.github.io');
+                        script.setAttribute('data-repo-id', 'R_kgDOR4wBWA');
+                        script.setAttribute('data-category', 'General');
+                        script.setAttribute('data-category-id', 'DIC_kwDOR4wBWM4C83Ny');
+                        script.setAttribute('data-mapping', 'pathname');
+                        script.setAttribute('data-strict', '0');
+                        script.setAttribute('data-reactions-enabled', '1');
+                        script.setAttribute('data-emit-metadata', '0');
+                        script.setAttribute('data-input-position', 'bottom');
+                        script.setAttribute('data-theme', 'preferred_color_scheme');
+                        script.setAttribute('data-lang', 'zh-CN');
+                        script.setAttribute('crossorigin', 'anonymous');
+                        script.async = true;
+                        
+                        placeholder.innerHTML = '';
+                        placeholder.appendChild(script);
+                    }
+                    
+                    // 监听滚动，等评论区域进入视口时加载
+                    var observer = new IntersectionObserver(function(entries) {
+                        if (entries[0].isIntersecting) {
+                            loadComments();
+                            observer.disconnect();
+                        }
+                    }, { rootMargin: '200px' });
+                    
+                    var commentSection = document.getElementById('comment-section');
+                    if (commentSection) {
+                        observer.observe(commentSection);
+                    }
+                })();
+                </script>
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+
+                <!-- Friends Blog -->
+                
+<hr>
+<h5>FRIENDS</h5>
+<ul class="list-inline">
+  
+  <li><a href="http://qiyue.jiushi.gay/">七月的博客</a></li>
+  
+</ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+</div>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p class="copyright text-muted">
+                    Copyright &copy; PurgationDevil Blog 2026
+                    <br>
+                    Powered by Jekyll
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+<script>
+(function() {
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview"><a href="{url}"><h2 class="post-title">{title}</h2><div class="post-meta">标签: {tags} | {date}</div></a></div>',
+        noResultsText: '<div class="alert alert-warning">没有找到相关文章</div>'
+    });
+    
+    var searchPage = document.querySelector('.search-page');
+    var searchIcon = document.querySelector('.search-icon a');
+    var searchClose = document.querySelector('.search-icon-close');
+    var searchInput = document.getElementById('search-input');
+    
+    if (searchIcon) {
+        searchIcon.addEventListener('click', function() {
+            searchPage.classList.add('search-active');
+            setTimeout(function() {
+                searchInput.focus();
+            }, 400);
+        });
+    }
+    
+    if (searchClose) {
+        searchClose.addEventListener('click', function() {
+            searchPage.classList.remove('search-active');
+        });
+    }
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && searchPage.classList.contains('search-active')) {
+            searchPage.classList.remove('search-active');
+        }
+    });
+})();
+</script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+
+<!-- 回到顶部按钮 -->
+<style>
+.go-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  background: #0085a1;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 25px;
+  padding-left: 19px;
+  font-weight: bold;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 999;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  text-decoration: none;
+  border: none;
+}
+
+.go-top:hover {
+  background: #006680;
+  transform: scale(1.08);
+}
+
+.go-top.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 768px) {
+  .go-top {
+    bottom: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+}
+
+/* 手机端浮动目录按钮 - 默认隐藏 */
+.toc-mobile-btn {
+  position: fixed;
+  right: 15px;
+  bottom: 100px;
+  width: 45px;
+  height: 45px;
+  background: #0085a1;
+  color: #fff;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 1000;
+  display: none !important;
+}
+
+.toc-mobile-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 2000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.toc-mobile-panel.active {
+  transform: translateX(0);
+}
+
+.toc-mobile-content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 85%;
+  max-width: 320px;
+  height: 100%;
+  background: #fff;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.toc-mobile-content h4 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #0085a1;
+}
+
+.toc-mobile-content ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-mobile-content li {
+  margin: 10px 0;
+}
+
+.toc-mobile-content a {
+  color: #555;
+  text-decoration: none;
+  font-size: 14px;
+  display: block;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.toc-mobile-content a:hover,
+.toc-mobile-content a.active {
+  background: #f0f0f0;
+  color: #0085a1;
+}
+
+.toc-mobile-close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+}
+
+/* 手机端显示目录按钮 */
+@media (max-width: 992px) {
+  .toc-mobile-btn.show {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* 深色模式手机端目录 */
+@media (prefers-color-scheme: dark) {
+  .toc-mobile-content {
+    background: #0a141e;
+  }
+  
+  .toc-mobile-content h4 {
+    color: #fff;
+    border-bottom-color: #00d4ff;
+  }
+  
+  .toc-mobile-content a {
+    color: #d4d4d4;
+  }
+  
+  .toc-mobile-content a:hover,
+  .toc-mobile-content a.active {
+    background: rgba(0, 212, 255, 0.15);
+    color: #00d4ff;
+  }
+  
+  .toc-mobile-close {
+    color: #666;
+  }
+}
+</style>
+
+<div class="go-top" id="goTopBtn">↑</div>
+
+<!-- 手机端目录按钮 -->
+<div class="toc-mobile-btn" id="tocMobileBtn">☰</div>
+
+<!-- 手机端目录面板 -->
+<div class="toc-mobile-panel" id="tocMobilePanel">
+  <div class="toc-mobile-content">
+    <div class="toc-mobile-close" id="tocMobileClose">×</div>
+    <h4>📖 目录</h4>
+    <ul id="tocMobileList"></ul>
+  </div>
+</div>
+
+<script>
+(function() {
+  var btn = document.getElementById('goTopBtn');
+  if (!btn) return;
+  
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 300) {
+      btn.classList.add('show');
+    } else {
+      btn.classList.remove('show');
+    }
+  });
+  
+  btn.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
+<!-- 目录功能 JavaScript -->
+<script>
+(function() {
+  function initToc() {
+    var article = document.querySelector('.post-container');
+    if (!article) return;
+    
+    var headers = article.querySelectorAll('h2, h3');
+    if (headers.length === 0) return;
+    
+    // 显示目录按钮（只有文章页面才显示）
+    var mobileBtn = document.getElementById('tocMobileBtn');
+    if (mobileBtn) {
+      mobileBtn.classList.add('show');
+    }
+    
+    // 创建手机端目录列表
+    var mobileTocList = document.getElementById('tocMobileList');
+    if (!mobileTocList) return;
+    mobileTocList.innerHTML = '';
+    
+    headers.forEach(function(header, index) {
+      var id = 'toc-' + index;
+      header.id = id;
+      
+      // 手机端目录项
+      var mobileLi = document.createElement('li');
+      var mobileA = document.createElement('a');
+      mobileA.href = '#' + id;
+      mobileA.textContent = header.textContent;
+      mobileA.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('tocMobilePanel').classList.remove('active');
+      });
+      mobileLi.appendChild(mobileA);
+      mobileTocList.appendChild(mobileLi);
+    });
+    
+    // 高亮当前章节
+    var tocLinks = document.querySelectorAll('.toc-mobile-content a');
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + 100;
+      var currentId = null;
+      
+      headers.forEach(function(header) {
+        var offsetTop = header.offsetTop;
+        if (offsetTop <= scrollPos) {
+          currentId = header.id;
+        }
+      });
+      
+      tocLinks.forEach(function(link) {
+        link.classList.remove('active');
+        var href = link.getAttribute('href').substring(1);
+        if (href === currentId) {
+          link.classList.add('active');
+        }
+      });
+    });
+  }
+  
+  // 手机端目录按钮事件
+  var mobileBtn = document.getElementById('tocMobileBtn');
+  var mobilePanel = document.getElementById('tocMobilePanel');
+  var mobileClose = document.getElementById('tocMobileClose');
+  
+  if (mobileBtn && mobilePanel) {
+    mobileBtn.addEventListener('click', function() {
+      mobilePanel.classList.add('active');
+    });
+  }
+  
+  if (mobileClose && mobilePanel) {
+    mobileClose.addEventListener('click', function() {
+      mobilePanel.classList.remove('active');
+    });
+  }
+  
+  if (mobilePanel) {
+    mobilePanel.addEventListener('click', function(e) {
+      if (e.target === mobilePanel) {
+        mobilePanel.classList.remove('active');
+      }
+    });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToc);
+  } else {
+    initToc();
+  }
+})();
+</script>
+
+<!-- 代码块深色主题（统一风格） -->
+<style>
+.highlight,
+pre.highlight {
+    background: #282c34 !important;
+    color: #abb2bf !important;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-x: auto;
+}
+
+/* 代码块内文字颜色 */
+.highlight .c  { color: #5c6370 !important; font-style: italic; } /* 注释 */
+.highlight .k  { color: #c678dd !important; } /* 关键字 */
+.highlight .s  { color: #98c379 !important; } /* 字符串 */
+.highlight .n  { color: #abb2bf !important; } /* 变量名 */
+.highlight .p  { color: #abb2bf !important; } /* 括号 */
+.highlight .cm { color: #5c6370 !important; } /* 多行注释 */
+.highlight .nt { color: #e06c75 !important; } /* 标签 */
+
+/* 补充更多代码高亮样式 */
+.highlight .err { color: #960050 !important; background-color: #1e0010 !important; }
+.highlight .l { color: #98c379 !important; }
+.highlight .o { color: #abb2bf !important; }
+.highlight .cp { color: #5c6370 !important; font-style: italic; }
+.highlight .c1 { color: #5c6370 !important; font-style: italic; }
+.highlight .cs { color: #5c6370 !important; font-style: italic; }
+.highlight .kc { color: #c678dd !important; }
+.highlight .kd { color: #c678dd !important; }
+.highlight .kn { color: #c678dd !important; }
+.highlight .kp { color: #c678dd !important; }
+.highlight .kr { color: #c678dd !important; }
+.highlight .kt { color: #c678dd !important; }
+.highlight .ld { color: #98c379 !important; }
+.highlight .m { color: #d19a66 !important; }
+.highlight .na { color: #d19a66 !important; }
+.highlight .nb { color: #e5c07b !important; }
+.highlight .nc { color: #e5c07b !important; }
+.highlight .no { color: #e5c07b !important; }
+.highlight .nd { color: #e5c07b !important; }
+.highlight .ni { color: #e5c07b !important; }
+.highlight .ne { color: #e5c07b !important; }
+.highlight .nf { color: #abb2bf !important; }
+.highlight .nl { color: #e5c07b !important; }
+.highlight .nn { color: #abb2bf !important; }
+.highlight .nx { color: #abb2bf !important; }
+.highlight .py { color: #e5c07b !important; }
+.highlight .nv { color: #e5c07b !important; }
+.highlight .ow { font-weight: 700; }
+.highlight .w { color: #f8f8f2 !important; }
+.highlight .mf { color: #d19a66 !important; }
+.highlight .mh { color: #d19a66 !important; }
+.highlight .mi { color: #d19a66 !important; }
+.highlight .mo { color: #d19a66 !important; }
+.highlight .sb { color: #98c379 !important; }
+.highlight .sc { color: #98c379 !important; }
+.highlight .sd { color: #98c379 !important; }
+.highlight .s2 { color: #98c379 !important; }
+.highlight .se { color: #98c379 !important; }
+.highlight .sh { color: #98c379 !important; }
+.highlight .si { color: #98c379 !important; }
+.highlight .sx { color: #98c379 !important; }
+.highlight .sr { color: #56b6c2 !important; }
+.highlight .s1 { color: #98c379 !important; }
+.highlight .ss { color: #56b6c2 !important; }
+.highlight .bp { color: #e5c07b !important; }
+.highlight .vc { color: #e5c07b !important; }
+.highlight .vg { color: #e5c07b !important; }
+.highlight .vi { color: #e06c75 !important; }
+.highlight .il { color: #d19a66 !important; }
+
+/* 行号样式 */
+.highlight .lineno {
+    color: #5c6370 !important;
+    padding-right: 12px;
+    border-right: 1px solid #3e4451;
+    margin-right: 12px;
+}
+</style>
+
+<!-- 搜索页面样式 -->
+<style>
+.search-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: 2000;
+  transform: translateY(100%);
+  transition: transform 0.4s ease;
+  overflow-y: auto;
+}
+
+.search-page.search-active {
+  transform: translateY(0);
+}
+
+.search-icon-close-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  font-size: 24px;
+  z-index: 2001;
+}
+
+.search-main {
+  padding-top: 80px;
+}
+
+#search-input {
+  width: 100%;
+  padding: 15px;
+  font-size: 24px;
+  border: none;
+  border-bottom: 2px solid #0085a1;
+  outline: none;
+}
+
+#search-results {
+  margin-top: 30px;
+}
+</style>
+
+<!-- 页面背景和文字颜色样式 - 跟随系统主题 -->
+<style>
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --text-light: #666666;
+  --heading-color: #000000;
+  --link-color: #0085a1;
+  --navbar-bg: rgba(255, 255, 255, 0.85);
+  --navbar-text: #66ccff;
+  --gradient-end: rgba(255, 255, 255, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #0a141e;
+    --text-color: #e6e6e6;
+    --text-light: #d4d4d4;
+    --heading-color: #ffffff;
+    --link-color: #00d4ff;
+    --navbar-bg: rgba(10, 20, 30, 0.85);
+    --navbar-text: #66ccff;
+    --gradient-end: rgba(10, 20, 30, 1);
+  }
+}
+
+body {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+}
+
+.post-container,
+.article-container {
+  color: var(--text-color) !important;
+}
+
+.post-container p,
+.post-container li,
+.post-container span {
+  color: var(--text-light) !important;
+}
+
+.post-container h1,
+.post-container h2,
+.post-container h3,
+.post-container h4,
+.post-container h5,
+.post-container h6 {
+  color: var(--heading-color) !important;
+}
+
+.post-container a {
+  color: var(--link-color) !important;
+}
+
+.navbar-custom .nav li a,
+.navbar-custom .navbar-brand {
+    color: var(--navbar-text) !important;
+}
+
+.navbar-custom .nav li a:hover,
+.navbar-custom .navbar-brand:hover {
+    color: #3399ff !important;
+}
+
+.navbar-custom {
+    background-color: var(--navbar-bg) !important;
+}
+
+.intro-header .site-heading h1,
+.intro-header .page-heading h1 {
+    color: #ffffff !important;
+    font-size: 60px !important;
+}
+
+.intro-header .site-heading .subheading {
+    color: #ffffff !important;
+}
+
+.intro-header {
+    position: relative;
+}
+
+.intro-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--gradient-end));
+    pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* 首页文章卡片 */
+  .post-card {
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  .post-card-title a {
+    color: #ffffff !important;
+  }
+  .post-card-title a:hover {
+    color: #00d4ff !important;
+  }
+  .post-card-date,
+  .post-card-meta {
+    color: #b3b3b3 !important;
+  }
+  .post-card-excerpt {
+    color: #d4d4d4 !important;
+  }
+  
+  /* 归档页面 */
+  .archive-year {
+    color: #ffffff !important;
+    border-left-color: #00d4ff !important;
+  }
+  .archive-date {
+    color: #b3b3b3 !important;
+  }
+  .archive-item a {
+    color: #e6e6e6 !important;
+  }
+  .archive-item a:hover {
+    color: #00d4ff !important;
+  }
+  
+  /* 归档标签按钮 */
+  #tag_cloud a,
+  #tag_cloud .tag-button--all {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e6e6e6 !important;
+  }
+  #tag_cloud a.active,
+  #tag_cloud .tag-button--all.active {
+    background: #0085a1 !important;
+    color: #ffffff !important;
+  }
+  #tag_cloud a:hover,
+  #tag_cloud .tag-button--all:hover {
+    background: rgba(0, 212, 255, 0.3) !important;
+    color: #ffffff !important;
+  }
+  #tag_cloud sup {
+    color: #999 !important;
+  }
+  #tag_cloud a.active sup,
+  #tag_cloud .tag-button--all.active sup {
+    color: #ffffff !important;
+  }
+  
+  .waifu-tips {
+    background-color: rgba(30, 40, 60, 0.9) !important;
+    border-color: rgba(0, 212, 255, 0.5) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.2) !important;
+    color: #ffffff !important;
+  }
+  .hide-button {
+    background: rgba(0, 212, 255, 0.2) !important;
+    border-color: rgba(0, 212, 255, 0.4) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
+    color: #ffffff !important;
+  }
+  .hide-button:hover {
+    background: rgba(0, 212, 255, 0.3) !important;
+    border-color: #00d4ff !important;
+  }
+  .show-button {
+    background: rgba(0, 212, 255, 0.8) !important;
+    border-color: rgba(0, 212, 255, 0.6) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
+  }
+}
+</style>
+
+<!-- 粒子背景 - 延迟加载 -->
+<div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
+<script>
+// 延迟加载粒子特效 - 等页面加载完再加载
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        var particlesScript = document.createElement('script');
+        particlesScript.src = 'https://cdn.bootcdn.net/ajax/libs/particles.js/2.0.0/particles.min.js';
+        document.body.appendChild(particlesScript);
+        
+        particlesScript.onload = function() {
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 30 },
+                    "color": { "value": "#00ffff" },
+                    "shape": { "type": "circle" },
+                    "opacity": { "value": 0.5, "random": true },
+                    "size": { "value": 2, "random": true },
+                    "line_linked": { "enable": false },
+                    "move": { "enable": true, "speed": 1.5, "direction": "none", "random": true }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": { "enable": false },
+                        "onclick": { "enable": false }
+                    }
+                }
+            });
+            console.log("粒子特效加载完成");
+        };
+    }, 1000);
+});
+</script>
+
+<!-- 鼠标点击特效 - Canvas优化 -->
+<canvas id="clickCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;"></canvas>
+<script>
+// Canvas点击特效 - 性能优化
+(function() {
+    var canvas = document.getElementById('clickCanvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+    var colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff6600', '#0066ff', '#ff3366'];
+    
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    
+    function Particle(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.size = 5 + Math.random() * 10;
+        var angle = Math.random() * Math.PI * 2;
+        var speed = 2 + Math.random() * 3;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = 0.008 + Math.random() * 0.01;
+    }
+    
+    Particle.prototype.update = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+        this.size *= 0.99;
+    };
+    
+    Particle.prototype.draw = function() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    };
+    
+    let animating = false;
+    
+    document.addEventListener('click', function(e) {
+        var color = colors[Math.floor(Math.random() * colors.length)];
+        for (var i = 0; i < 5; i++) {
+            particles.push(new Particle(e.clientX, e.clientY, color));
+        }
+        // 如果没在动画，启动动画循环
+        if (!animating) {
+            animating = true;
+            animate();
+        }
+    });
+    
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = particles.length - 1; i >= 0; i--) {
+            particles[i].update();
+            // 只有在粒子还可见的时候才绘制
+            if (particles[i].alpha > 0 && particles[i].size > 0.5) {
+                particles[i].draw();
+            }
+            // 完全消失后再移除
+            if (particles[i].alpha <= 0 || particles[i].size <= 0.5) {
+                particles.splice(i, 1);
+            }
+        }
+        // 只有当还有粒子时才继续动画，否则停止
+        if (particles.length > 0) {
+            requestAnimationFrame(animate);
+        } else {
+            animating = false;
+        }
+    }
+})();
+</script>
+
+<!-- 加载 Font Awesome 图标库 - 预连接优化 -->
+<link rel="preconnect" href="https://cdn.bootcdn.net">
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+<!-- Live2D 看板娘 - 延迟加载 -->
+<div class="waifu" id="landlord" style="display: none;">
+    <div class="waifu-tips"></div>
+    <canvas id="live2d" width="300" height="300"></canvas>
+    <div class="hide-button">隐藏</div>
+</div>
+<div class="show-button" id="showWaifuBtn" style="display: none;">🌸</div>
+<script>
+// 延迟加载看板娘 - 等页面完全加载后再加载
+window.addEventListener('load', function() {
+    // 延迟3秒后加载看板娘，不阻塞首屏
+    setTimeout(function() {
+        // 加载看板娘CSS
+        var waifuCss = document.createElement('link');
+        waifuCss.rel = 'stylesheet';
+        waifuCss.href = '/live2d/css/waifu.css';
+        document.head.appendChild(waifuCss);
+        
+        // 显示看板娘
+        var waifu = document.getElementById('landlord');
+        if (waifu) {
+            waifu.style.display = 'block';
+        }
+        
+        // 加载Live2D脚本
+        var live2dScript = document.createElement('script');
+        live2dScript.src = '/live2d/js/live2d.js';
+        document.body.appendChild(live2dScript);
+        
+        live2dScript.onload = function() {
+            // 加载waifu.js
+            var waifuScript = document.createElement('script');
+            waifuScript.src = '/live2d/js/waifu.js';
+            document.body.appendChild(waifuScript);
+            
+            waifuScript.onload = function() {
+                // 加载模型
+                loadlive2d("live2d", "/live2d/model/pio/model.json");
+                console.log("Pio 酱模型加载完成");
+            };
+        };
+    }, 3000); // 3秒后加载
+});
+</script>
+
+<style>
+.animecursor-disabled,
+.animecursor-disabled * {
+  cursor: auto !important;
+}
+
+input, textarea, [contenteditable] {
+  cursor: text !important;
+}
+</style>
+
+<script defer src="/js/anime-cursor/dist/anime-cursor.umd.min.js"></script>
+<script>
+// 光标效果 - 文章页延迟加载，避免影响性能
+function initAnimeCursor() {
+    try {
+        new AnimeCursor({
+            fallbackCursor: 'auto',
+            excludeSelectors: 'input, textarea, [contenteditable]',
+            cursors: {
+                default: {
+                    image: '/img/mouse/default_001.png',
+                    default: true,
+                    offset: [0, 0]
+                },
+                pointer: {
+                    tags: ['a', 'button'],
+                    image: '/img/mouse/default_001.png',
+                    offset: [0, 0]
+                },
+                landlord: {
+                    tags: ['.waifu', '#landlord', '#live2d'],
+                    image: '/img/mouse/landlord_001.png',
+                    offset: [0, 0]
+                }
+            }
+        });
+        console.log('AnimeCursor initialized successfully');
+    } catch (error) {
+        console.error('AnimeCursor initialization failed:', error);
+        document.body.classList.add('animecursor-disabled');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+        // 文章页延迟2秒后加载，不影响文章加载
+        setTimeout(initAnimeCursor, 2000);
+    
+});
+</script>
+</script>

