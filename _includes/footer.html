@@ -13,7 +13,7 @@
 </footer>
 
 <!-- jQuery -->
-<script src="{{ "/js/jquery.min.js " | prepend: site.baseurl }}"></script>
+<script defer src="{{ "/js/jquery.min.js " | prepend: site.baseurl }}"></script>
 
 <!-- Bootstrap Core JavaScript -->
 <script defer src="{{ "/js/bootstrap.min.js " | prepend: site.baseurl }}"></script>
@@ -23,6 +23,49 @@
 
 <!-- Simple Jekyll Search -->
 <script defer src="{{ "/js/simple-jekyll-search.min.js" | prepend: site.baseurl }}"></script>
+
+<!-- Search Optimization - Lazy Load & Debounce -->
+<script defer>
+let searchLoaded = false;
+let searchInstance = null;
+
+function debounce(fn, delay) {
+    let timer;
+    return function() {
+        clearTimeout(timer);
+        const args = arguments;
+        timer = setTimeout(() => {
+            fn.apply(this, args);
+        }, delay);
+    };
+}
+
+function initSearch() {
+    if (searchLoaded) return;
+    searchLoaded = true;
+
+    searchInstance = SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '{{ site.baseurl }}/search.json',
+        searchResultTemplate: '<li><a href="{url}">{title}</a></li>',
+        limit: 10,
+        noResultsText: '没有找到结果'
+    });
+
+    // 搜索输入防抖
+    const originalSearch = searchInstance.search;
+    searchInstance.search = debounce(originalSearch, 300);
+}
+
+// 用户打开搜索时才加载
+document.addEventListener('DOMContentLoaded', function() {
+    const searchPage = document.querySelector('.search-page');
+    if (searchPage) {
+        searchPage.addEventListener('click', initSearch, { once: true });
+    }
+});
+</script>
 
 <!-- Service Worker -->
 {% if site.service-worker %}
