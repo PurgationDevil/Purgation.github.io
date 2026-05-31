@@ -13,8 +13,8 @@ future: false
 # SNS settings
 RSS: false
 github_username: PurgationDevil
-facebook_username:  PurgationDevil
-youtube_channel: PurgationDevil
+facebook_username: PurgationDevil
+youtube_channel: @PurgationDevil
 gitee_username: PurgationDevil
 
 # Build settings
