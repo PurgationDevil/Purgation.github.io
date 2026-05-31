@@ -77,7 +77,7 @@ initTips();
         referrer.href = document.referrer;
     }
 
-    if(referrer.href !== '' && referrer.hostname != 'litblc.com'){
+    if(referrer.href !== '' && referrer.hostname != 'PurgationDevil.github.io'){
         var referrer = document.createElement('a');
         referrer.href = document.referrer;
         text = 'Hello! 来自 <span style="color:#0099cc;">' + referrer.hostname + '</span> 的朋友';
@@ -90,7 +90,7 @@ initTips();
             text = 'Hello! 来自 谷歌搜索 的朋友<br>欢迎阅读<span style="color:#0099cc;">『' + document.title.split(' - ')[0] + '』</span>';
         }
     }else {
-        if (window.location.href == 'https://www.litblc.com/') { //如果是主页
+        if (window.location.href == 'https://PurgationDevil.github.io/') { //如果是主页
             var now = (new Date()).getHours();
             if (now > 23 || now <= 5) {
                 text = '你是夜猫子呀？这么晚还不睡觉，明天起的来嘛';
@@ -125,22 +125,23 @@ function showHitokoto() {
         showMessage(result.hitokoto, 5000);
     });
 }
+var hideTimer = null;
 function showMessage(text, timeout, flag){
-    if(flag || sessionStorage.getItem('waifu-text') === '' || sessionStorage.getItem('waifu-text') === null){
-        if(Array.isArray(text)) text = text[Math.floor(Math.random() * text.length + 1)-1];
-        //console.log(text);
-        if(flag) sessionStorage.setItem('waifu-text', text);
-        $('.waifu-tips').stop();
-        $('.waifu-tips').html(text).fadeTo(200, 1);
-        if (timeout === null) timeout = 5000;
-        hideMessage(timeout);
-    }
+    if(Array.isArray(text)) text = text[Math.floor(Math.random() * text.length + 1)-1];
+    if(flag) sessionStorage.setItem('waifu-text', text);
+    $('.waifu-tips').stop();
+    $('.waifu-tips').html(text).fadeTo(200, 1);
+    if (timeout === null) timeout = 5000;
+    hideMessage(timeout);
 }
 function hideMessage(timeout){
     $('.waifu-tips').stop().css('opacity',1);
     if (timeout === null) timeout = 5000;
-    window.setTimeout(function() {sessionStorage.removeItem('waifu-text')}, timeout);
-    $('.waifu-tips').delay(timeout).fadeTo(200, 0);
+    if (hideTimer) clearTimeout(hideTimer);
+    hideTimer = setTimeout(function() {
+        sessionStorage.removeItem('waifu-text');
+        $('.waifu-tips').fadeTo(200, 0);
+    }, timeout);
 }
 function initLive2d() {
     $('.hide-button').fadeOut(0).on('click', () => {
