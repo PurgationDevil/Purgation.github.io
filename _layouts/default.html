@@ -676,14 +676,14 @@ window.addEventListener('load', function() {
         this.vx = Math.cos(angle) * speed;
         this.vy = Math.sin(angle) * speed;
         this.alpha = 1;
-        this.decay = 0.02 + Math.random() * 0.02;
+        this.decay = 0.008 + Math.random() * 0.01;
     }
     
     Particle.prototype.update = function() {
         this.x += this.vx;
         this.y += this.vy;
         this.alpha -= this.decay;
-        this.size *= 0.98;
+        this.size *= 0.99;
     };
     
     Particle.prototype.draw = function() {
@@ -714,8 +714,12 @@ window.addEventListener('load', function() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (var i = particles.length - 1; i >= 0; i--) {
             particles[i].update();
-            particles[i].draw();
-            if (particles[i].alpha <= 0) {
+            // 只有在粒子还可见的时候才绘制
+            if (particles[i].alpha > 0 && particles[i].size > 0.5) {
+                particles[i].draw();
+            }
+            // 完全消失后再移除
+            if (particles[i].alpha <= 0 || particles[i].size <= 0.5) {
                 particles.splice(i, 1);
             }
         }
