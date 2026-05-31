@@ -5,8 +5,8 @@
     <description>这里是 @PurgationDevil 的个人博客，与你一起发现更大的世界</description>
     <link>https://PurgationDevil.github.io/</link>
     <atom:link href="https://PurgationDevil.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 31 May 2026 11:35:34 +0000</pubDate>
-    <lastBuildDate>Sun, 31 May 2026 11:35:34 +0000</lastBuildDate>
+    <pubDate>Sun, 31 May 2026 11:56:53 +0000</pubDate>
+    <lastBuildDate>Sun, 31 May 2026 11:56:53 +0000</lastBuildDate>
     <generator>Jekyll v4.4.1</generator>
     
       <item>
@@ -22254,17 +22254,17 @@ N3 = 123 - 105 = 18
     &lt;tr&gt;
       &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;前序遍历&lt;/strong&gt;（根左右）&lt;/td&gt;
       &lt;td style=&quot;text-align: left&quot;&gt;根 → 左子树 → 右子树&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;A B D H E I C F G&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;A B D E H I C F&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;中序遍历&lt;/strong&gt;（左根右）&lt;/td&gt;
       &lt;td style=&quot;text-align: left&quot;&gt;左子树 → 根 → 右子树&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;H D I B E A F C G&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;D B H E I A C F&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;后序遍历&lt;/strong&gt;（左右根）&lt;/td&gt;
       &lt;td style=&quot;text-align: left&quot;&gt;左子树 → 右子树 → 根&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;H I D E B F G C A&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;D H I E B F C A&lt;/td&gt;
     &lt;/tr&gt;
   &lt;/tbody&gt;
 &lt;/table&gt;
