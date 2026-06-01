@@ -47,8 +47,12 @@ function initTips() {
             $.each(result.click, function (index, tips) {
                 $(document).on("click", tips.selector, function () {
                     var text = tips.text;
-                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
-                    text = text.render({text: $(this).text()});
+                    if (Array.isArray(tips.text)) {
+                        text = tips.text[Math.floor(Math.random() * tips.text.length)];
+                    }
+                    if (text && text.indexOf('{text}') !== -1) {
+                        text = text.render({text: $(this).text() || '这里'});
+                    }
                     showMessage(text, 3000, true);
                 });
             });
