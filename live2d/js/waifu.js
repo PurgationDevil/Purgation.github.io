@@ -33,7 +33,7 @@ $(document).on('copy', function (){
 function initTips() {
     $.ajax({
         cache: false,
-        url: "live2d/message.json?" + new Date().getTime(),
+        url: "/live2d/message.json?" + new Date().getTime(),
         dataType: "json",
         success: function (result) {
             $.each(result.mouseover, function (index, tips) {
@@ -64,7 +64,7 @@ function initTips() {
                 if ((after.split('/')[0] <= now.getMonth() + 1 && now.getMonth() + 1 <= before.split('/')[0]) &&
                     (after.split('/')[1] <= now.getDate() && now.getDate() <= before.split('/')[1])) {
                     var text = tips.text;
-                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
+                    if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * text.length + 1) - 1];
                     text = text.render({year: now.getFullYear()});
                     showMessage(text, 6000, true);
                 }
