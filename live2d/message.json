@@ -5,8 +5,20 @@
       "text": ["要看看 <span style=\"color:#0099cc;\">{text}</span> 么？"]
     },
     {
-      "selector": ".navbar-container .navbar-logo",
-      "text": ["回到最开始的地方吧"]
+      "selector": ".navbar-brand",
+      "text": ["欢迎回来！", "主人的博客首页哦~", "回到首页看看吧"]
+    },
+    {
+      "selector": ".pager .previous a",
+      "text": ["去上一页看看吧", "上一篇文章", "还有更多内容哦"]
+    },
+    {
+      "selector": ".pager .next a",
+      "text": ["去下一页看看吧", "下一篇文章", "继续探索吧"]
+    },
+    {
+      "selector": ".list-inline li a",
+      "text": ["主人的朋友们~", "友情链接", "去看看其他博客吧"]
     },
     {
       "selector": "#comment-form #textarea",
@@ -17,43 +29,23 @@
       "text": ["要提交了吗，首次评论需要审核，请耐心等待~"]
     },
     {
-      "selector": ".page-navigator .prev",
-      "text": ["去上一页看看吧"]
-    },
-    {
-      "selector": ".page-navigator .next",
-      "text": ["去下一页看看吧"]
-    },
-    {
       "selector": ".navbar-menu a[href^='https://github.com/PurgationDevil']",
-      "text": [ "这里有一些关于我家主人的秘密哦，要不要看看呢" ]
-    },
-    {
-      "selector": ".list-inline a[href*='csdn.net'], .navbar-menu a[href*='csdn.net']",
-      "text": ["主人的 CSDN 博客，快来阅读吧~", "这里有主人的技术文章哦"]
-    },
-    {
-      "selector": ".navbar-menu a[href*='gitee.com']",
-      "text": ["主人在 Gitee 也有代码仓库哦", "快来看看主人的开源项目~"]
-    },
-    {
-      "selector": ".navbar-menu a[href*='facebook.com']",
-      "text": ["主人的 Facebook 主页，来关注一下吧"]
+      "text": ["这里有一些关于我家主人的秘密哦，要不要看看呢？"]
     },
     {
       "selector": ".list-inline a[href*='github.com']",
       "text": ["主人的 GitHub，有很多有趣的代码哦", "去看看主人写的程序吧~"]
     },
     {
-      "selector": ".list-inline a[href*='csdn.net']",
+      "selector": ".list-inline a[href*='csdn.net'], .navbar-menu a[href*='csdn.net']",
       "text": ["主人的 CSDN 博客，快来阅读吧~", "这里有主人的技术文章哦"]
     },
     {
-      "selector": ".list-inline a[href*='gitee.com']",
+      "selector": ".list-inline a[href*='gitee.com'], .navbar-menu a[href*='gitee.com']",
       "text": ["主人在 Gitee 也有代码仓库哦", "快来看看主人的开源项目~"]
     },
     {
-      "selector": ".list-inline a[href*='facebook.com']",
+      "selector": ".list-inline a[href*='facebook.com'], .navbar-menu a[href*='facebook.com']",
       "text": ["主人的 Facebook 主页，来关注一下吧"]
     },
     {
@@ -66,13 +58,13 @@
     },
     {
       "selector": ".waifu #live2d",
-      "text": ["干嘛呢你，快把手拿开", "鼠…鼠标放错地方了！"]
+      "text": ["干嘛呢你，快把手拿开~~", "鼠…鼠标放错地方了！", "怕怕", "非礼呀！救命！( ⓛ ω ⓛ *)", "喵喵喵？", "你要干嘛呀？"]
     }
   ],
   "click": [
     {
       "selector": ".waifu #live2d",
-      "text": ["是…是不小心碰到了吧", "萝莉控是什么呀", "你看到我的小熊了吗", "再摸的话我可要报警了！⌇●﹏●⌇", "110吗，这里有个变态一直在摸我(ó﹏ò｡)"]
+      "text": ["是…是不小心碰到的吧！(´・ω・`)", "萝莉控是什么呀？", "干嘛动我啊，小心我咬你！(〃｀ 3′〃)", "不要再摸我啦，我告诉你老婆来打你的！", "真…真是不知羞耻！", "我要生气了哦", "再摸的话我可要报警了！⌇●﹏●⌇", "110吗，这里有个变态一直在摸我(ó﹏ò｡)"]
     }
   ],
   "seasons": [
