@@ -238,51 +238,25 @@ layout: default
                 </ul>
                 <hr style="visibility: hidden;">
 
-                <!-- giscus 评论系统 - 延迟加载 -->
+                <!-- giscus 评论系统 -->
                 <div class="comment" id="comment-section">
                     <h4>💬 评论</h4>
-                    <div id="comment-placeholder" style="color: #999; font-size: 14px;">评论加载中...</div>
+                    <script src="https://giscus.app/client.js"
+                        data-repo="PurgationDevil/PurgationDevil.github.io"
+                        data-repo-id="R_kgDOR4wBWA"
+                        data-category="General"
+                        data-category-id="DIC_kwDOR4wBWM4C83Ny"
+                        data-mapping="pathname"
+                        data-strict="0"
+                        data-reactions-enabled="1"
+                        data-emit-metadata="0"
+                        data-input-position="bottom"
+                        data-theme="preferred_color_scheme"
+                        data-lang="zh-CN"
+                        crossorigin="anonymous"
+                        async>
+                    </script>
                 </div>
-                <script>
-                (function() {
-                    function loadComments() {
-                        var placeholder = document.getElementById('comment-placeholder');
-                        if (!placeholder) return;
-                        
-                        var script = document.createElement('script');
-                        script.src = 'https://giscus.app/client.js';
-                        script.setAttribute('data-repo', 'PurgationDevil/PurgationDevil.github.io');
-                        script.setAttribute('data-repo-id', 'R_kgDOR4wBWA');
-                        script.setAttribute('data-category', 'General');
-                        script.setAttribute('data-category-id', 'DIC_kwDOR4wBWM4C83Ny');
-                        script.setAttribute('data-mapping', 'pathname');
-                        script.setAttribute('data-strict', '0');
-                        script.setAttribute('data-reactions-enabled', '1');
-                        script.setAttribute('data-emit-metadata', '0');
-                        script.setAttribute('data-input-position', 'bottom');
-                        script.setAttribute('data-theme', 'preferred_color_scheme');
-                        script.setAttribute('data-lang', 'zh-CN');
-                        script.setAttribute('crossorigin', 'anonymous');
-                        script.async = true;
-                        
-                        placeholder.innerHTML = '';
-                        placeholder.appendChild(script);
-                    }
-                    
-                    // 监听滚动，等评论区域进入视口时加载
-                    var observer = new IntersectionObserver(function(entries) {
-                        if (entries[0].isIntersecting) {
-                            loadComments();
-                            observer.disconnect();
-                        }
-                    }, { rootMargin: '200px' });
-                    
-                    var commentSection = document.getElementById('comment-section');
-                    if (commentSection) {
-                        observer.observe(commentSection);
-                    }
-                })();
-                </script>
             </div>  
 
     <!-- Side Catalog Container -->
