@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "upload-lebs"
+title: "upload-labs"
 toc: true
 date: 2026-04-03
 categories: 分类名称
