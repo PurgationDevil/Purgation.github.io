@@ -213,8 +213,6 @@ __int64 __fastcall main(int a1, char **crackme_masm, char **a3)
 }
 ```
 
-首先
-
 然后直接分析重点：`PeMapping` 函数
 
 ```c
