@@ -2,7 +2,7 @@
 layout: post
 title: "Google CTF reverse"
 toc: true
-date: 2026-06-13
+date: 2026-06-14
 categories: 分类名称
 tags: [逆向]
 ---
@@ -373,7 +373,6 @@ struct Context {
     uint32_t mB;              // 0x3F: 虚拟寄存器 B
     uint32_t mC;              // 0x43: 虚拟寄存器 C
     uint32_t mD;              // 0x47: 虚拟寄存器 D
-    // ... 刚好填满到 0x4B 字节
 };
 ```
 
@@ -448,6 +447,10 @@ if ( v5[48] ) // 48 十进制 = 0x30。如果触发了异常标志位
 
 ------
 
+修改：在需要修改的函数中，把初始化参数类型右键点击 `Reset Type` 或者通过 `y` 键改成 `Context*`
+
+------
+
 **总结这一小部分：**
 
 在虚拟机（VM）逆向中，首先就是要**找全 `Context` 结构体**的 “内部元素”。其内部元素是：**先找 ”内存段“ 指针**（代码段、数据段、栈段），**再找 “控制流寄存器”**（PC、SP），**然后找 “通用寄存器”**（A、B、C、D / R0、R1...），**最后找 “标志位寄存器”**（EFLAGS / Z-Flag）。
@@ -457,3 +460,444 @@ if ( v5[48] ) // 48 十进制 = 0x30。如果触发了异常标志位
 ------
 
 #### 2. 操作码分析
+
+（这里为了方便比对直接拿成品进行分析）
+
+这里相当于是操作码的 main 函数。
+
+```c
+__int64 __fastcall VmMachineTick(Context *ctx, __int64 a2)
+{
+  unsigned __int8 vmMode; // al
+  __int64 v3; // rdx
+  __int64 v4; // rcx
+  unsigned __int64 v5; // r8
+
+  vmMode = getVMMode(ctx);
+  if ( !vmMode )
+    return handleVMStack(ctx, a2, v3, v4, v5);
+  if ( vmMode == 1 )
+    return handleVMReg(ctx);
+  fwrite("[E] nice qubit\n", 1u, 0xFu, stderr);
+  return 0;
+}
+```
+
+主要的逻辑非常阴，**如果结果是 `0` ➡️ 变身“栈虚拟机”，如果结果是 `1` ➡️ 变身“寄存器虚拟机”**。
+
+重点是：它是会发生“选择”和“切换”！
+
+它是以“栈模式”为主体结构启动的。（根据后面的分析）
+
+当需要做复杂乘法时，它会切入寄存器模式。
+
+在寄存器模式里疯狂运算完之后，执行寄存器模式的退出指令，再次把开关拨回栈模式。
+
+首先分析 `handleVMStack` 函数（容易一些）
+
+------
+
+**`handleVMStack` 第一部分**
+
+第一步处理程序的基本运算符、跳转指令和系统调用如下所示。
+
+```c
+case ADD:                             // ADD
+  if ( (unsigned __int8)pop_stack_u32(ctx, (char *)&syscall_id + 1)
+    && (unsigned __int8)pop_stack_u32(ctx, &operand2)
+    && (unsigned __int8)push_stack_u32(ctx, *(SyscallIDs *)((char *)&syscall_id + 1) + operand2) )
+  {
+    goto LABEL_22;
+  }
+  ctx->trigger_execption = 1;
+  return 0;
+case SUB:                             // SUB
+  if ( (unsigned __int8)pop_stack_u32(ctx, (char *)&syscall_id + 1)
+    && (unsigned __int8)pop_stack_u32(ctx, &operand2)
+    && (unsigned __int8)push_stack_u32(ctx, *(SyscallIDs *)((char *)&syscall_id + 1) - operand2) )
+  {
+    goto LABEL_22;
+  }
+  ctx->trigger_execption = 1;
+  return 0;
+case XOR:                             // XOR
+  if ( (unsigned __int8)pop_stack_u32(ctx, (char *)&syscall_id + 1)
+    && (unsigned __int8)pop_stack_u32(ctx, &operand2)
+    && (unsigned __int8)push_stack_u32(ctx, operand2 ^ *(SyscallIDs *)((char *)&syscall_id + 1)) )
+  {
+     goto LABEL_22;
+  }
+  ctx->trigger_execption = 1;
+  return 0;
+case AND:                             // AND
+  if ( (unsigned __int8)pop_stack_u32(ctx, (char *)&syscall_id + 1)
+    && (unsigned __int8)pop_stack_u32(ctx, &operand2)
+    && (unsigned __int8)push_stack_u32(ctx, operand2 & *(SyscallIDs *)((char *)&syscall_id + 1)) )
+  {
+    goto LABEL_22;
+  }
+  ctx->trigger_execption = 1;
+  return 0;
+```
+
+这些都比较好辨识。带 `+`、`-`、`^`、`&` 这些符号。主要是下面的逻辑。
+
+------
+
+**`handleVMStack`第二部分**
+
+```c
+case JMP:                             // JMP
+  ctx->memory_offset = *(StackVMOpcodes *)((char *)&opcode + 1);
+  return success;
+case JZ:                              // JZ
+  if ( (ctx->eflag & 1) == 0 )
+    goto LABEL_22;
+  ctx->memory_offset = *(StackVMOpcodes *)((char *)&opcode + 1);
+  return success;
+case JNZ:                             // JNZ
+  if ( (ctx->eflag & 1) != 0 )
+    goto LABEL_22;
+  ctx->memory_offset = *(StackVMOpcodes *)((char *)&opcode + 1);
+  return success;
+case CMP:                             // CMP
+  if ( !(unsigned __int8)pop_stack_u32(ctx, (char *)&syscall_id + 1)
+    || !(unsigned __int8)pop_stack_u32(ctx, &operand2) )
+  {
+    ctx->trigger_execption = 1;
+    return 0;
+  }
+  compare(ctx, *(SyscallIDs *)((char *)&syscall_id + 1), operand2);
+  break;
+default:
+  goto LABEL_91;
+```
+
+1\. `case JMP:` （无条件跳转）
+
+```c
+ctx->memory_offset = *(StackVMOpcodes *)((char *)&opcode + 1);
+return success;
+```
+
+`ctx->memory_offset` 就是虚拟机的 **`PC`（程序计数器）**
+
+没有任何 `if` 判断，把 `opcode` 后面紧跟的 4 个字节（也就是跳转的目标地址）**强行塞给了 `ctx->memory_offset`**。
+
+2\. `case JZ:` 和 `case JNZ:` （条件跳转）
+
+```c
+if ( (ctx->eflag & 1) == 0 )   // 👈 如果标志位是 0 
+  goto LABEL_22;               // 绕过修改 PC 的代码（不跳转）
+
+ctx->memory_offset = *(StackVMOpcodes *)((char *)&opcode + 1); // 否则，修改 PC（发生跳转）
+return success;
+
+if ( (ctx->eflag & 1) != 0 )   // 👈 如果标志位不是 0
+  goto LABEL_22;               // 绕过修改 PC 的代码（不跳转）
+
+ctx->memory_offset = *(StackVMOpcodes *)((char *)&opcode + 1); // 否则，修改 PC（发生跳转）
+return success;
+```
+
+它们都在开头检查了 `ctx->eflag & 1`（这道题里，标志位第 0 位代表比较结果）
+
+- 在 `JZ` 里：如果标志位是 0（代表之前比较的结果**不相等/不为零**），它就 `goto LABEL_22` 溜了，也就是**不跳转**；只有当标志位是 1 时，才会执行修改 `ctx->memory_offset` 的操作。
+- 在 `JNZ` 里：逻辑正好相反。
+
+3\. `case CMP:` （比较指令）
+
+```c
+if ( !(unsigned __int8)pop_stack_u32(ctx, ...) || !(unsigned __int8)pop_stack_u32(ctx, &operand2) )
+{
+  ctx->trigger_execption = 1; // 弹栈失败就触发异常崩溃
+  return 0;
+}
+compare(ctx, *(SyscallIDs *)((char *)&syscall_id + 1), operand2); // 👈 核心运算
+break;
+```
+
+- 它连续调用了两次 `pop_stack_u32`。这说明什么？说明这是一个**栈虚拟机**的比较指令，它要比较的两个数字，是**刚刚被压入栈顶的两个元素**。它先把这两个数从栈里“拔”出来。
+- 拿到这两个数后，它调用了一个出题人自己写的函数：`compare(ctx, 数1, 数2);`。
+- 如果双击点进这个 `compare` 函数，100% 会看到：它在里面对这两个数做了减法或者比对，然后**把比对结果（0或1）写进了 `ctx->eflag`**。
+
+------
+
+**`handleVMStack`第三部分**
+
+```c
+if ( (_BYTE)opcode == SYSCALL )             // syscall
+{
+    if ( IsSyscallAllowed(ctx) )
+    {
+        if ( (unsigned __int8)GetSyscallIndex(ctx, &syscall_id) )
+        {
+            switch ( (char)syscall_id )
+            {
+                case SYS_GET_INPUT:
+                    if ( (unsigned __int8)sub_1805((__int64)ctx, (__int64)&operand2)
+                        && (unsigned __int8)push_stack_u32(ctx, operand2) )
+                    {
+                        goto LABEL_22;
+                    }
+                    ctx->trigger_execption = 1;
+                    return 0;
+                case SYS_PRINT:
+                    fwrite("[E] unsupported syscall!\n", 1u, 0x19u, stderr);
+                    ctx->trigger_execption = 1;
+                    return 0;
+                case SYS_WRITE:
+                    if ( (unsigned __int8)pop_stack_u32(ctx, &operand2)
+                        && (unsigned __int8)GetSyscallIndex(ctx, (char *)&syscall_id + 1)
+                        && (unsigned __int8)sub_18C5(ctx, operand2, BYTE1(syscall_id)) )
+                    {
+                        goto LABEL_22;
+                    }
+                    ctx->trigger_execption = 1;
+                    return 0;
+                case SYS_SRAND:
+                    if ( !(unsigned __int8)pop_stack_u32(ctx, &operand2) )
+                    {
+                        ctx->trigger_execption = 1;
+                        return 0;
+                    }
+                    srand(operand2);
+                    break;
+                case SYS_RAND:
+                    if ( (unsigned __int8)sub_194C((__int64)ctx, &operand2) && (unsigned __int8)push_stack_u32(ctx, operand2) )
+                        goto LABEL_22;
+                    ctx->trigger_execption = 1;
+                    return 0;
+                case SYS_FLAG:
+                    if ( (unsigned __int8)sub_196B(ctx) )
+                        goto LABEL_22;
+                    ctx->trigger_execption = 1;
+                    return 0;
+                case SYS_MALLOC:
+                    if ( (unsigned __int8)pop_stack_u32(ctx, (char *)&syscall_id + 1)
+                        && (unsigned __int8)syscall_mem_alloc(
+                            (__int64)ctx,
+                            *(SyscallIDs *)((char *)&syscall_id + 1),
+                            &operand2,
+                            v11,
+                            v12)
+                        && (unsigned __int8)push_stack_u32(ctx, operand2) )
+                    {
+                        goto LABEL_22;
+                    }
+                    ctx->trigger_execption = 1;
+                    return 0;
+                default:
+                    fwrite("[E] bad syscall!\n", 1u, 0x11u, stderr);
+                    ctx->trigger_execption = 1;
+                    return 0;
+            }
+            goto LABEL_22;
+        }
+        ctx->trigger_execption = 1;
+    }
+    else
+    {
+        fwrite("[E] can't execute that syscall!\n", 1u, 0x20u, stderr);
+        ctx->trigger_execption = 1;
+    }
+    return 0;
+}
+```
+
+这里是系统调用（SYSCALL）
+
+**1. `case SYS_GET_INPUT:`**（获取输入）
+
+```c
+if ( (unsigned __int8)sub_1805((__int64)ctx, (__int64)&operand2)
+  && (unsigned __int8)push_stack_u32(ctx, operand2) )
+```
+
+**行为特征：** 它先调用了 `sub_1805` 读入数据（里面包着 `fgetc` 和 `__isoc99_fscanf`），存入 `operand2`，接着**立刻调用 `push_stack_u32` 把输入压入虚拟栈顶**。
+
+**做题影响：** 这就是为什么在运行 Challenge 1、2、3 时，程序会停下来问你话。在这里输入的东西，就是通过这个分支吃进去并放到栈里的。
+
+**2. `case SYS_PRINT:`**（空壳子）
+
+```c
+fwrite("[E] unsupported syscall!\n", 1u, 0x19u, stderr);
+```
+
+报错就输出，无意义。
+
+**3. `case SYS_WRITE:`**（打印输出）
+
+```c
+if ( (unsigned __int8)pop_stack_u32(ctx, &operand2)
+  && (unsigned __int8)GetSyscallIndex(ctx, (char *)&syscall_id + 1)
+  && (unsigned __int8)sub_18C5(ctx, operand2, BYTE1(syscall_id)) )
+```
+
+**行为特征：** 它先从栈顶 `pop` 出一个数字（这通常是字符串的内存地址或者长度），然后调用 `sub_18C5`（里面是用 `fwrite` 输出）。
+
+**做题影响：** 屏幕上显示的那些 `"What's your favorite number?"` 或者是 `"Challenge 1 Passed!"`，全都是通过这个 `SYS_WRITE` 吐出来的
+
+**4. `case SYS_SRAND:` 和 `case SYS_RAND:`**（致命的随机数陷阱）
+
+这两个是**第三关（Challenge 3）能够通关的绝对核心**
+
+```c
+// SYS_SRAND：设置随机数种子
+if ( !(unsigned __int8)pop_stack_u32(ctx, &operand2) ) // ...
+srand(operand2); // 👈 调用了 C 语言的 srand
+
+// SYS_RAND：生成随机数并压栈
+if ( (unsigned __int8)sub_194C((__int64)ctx, &operand2) && (unsigned __int8)push_stack_u32(ctx, operand2) )
+```
+
+**行为特征：** * `SYS_SRAND` 弹出栈顶的数字，直接作为种子传给底层的 `srand()`。
+
+- `SYS_RAND` 在 `sub_194C` 里调用了底层的 `rand()`，生成随机数后，**立刻 `push_stack_u32` 塞回虚拟栈顶**。
+
+**做题影响（还记得我们第一轮聊的坑吗）：** 因为它们直接调用了系统的 `srand()` 和 `rand()`。如果该程序在 Windows 下跑这个虚拟机，它调用的就是 Windows 的随机数算法；在 Linux 下跑，调用的就是 Linux 的 `glibc` 随机数。 **两者的算法算出来的数字序列完全不同！** 导致在 Windows 下后续的 `CMP` 永远不可能相等，只能走向 `trigger_exception = 1` 崩溃。
+
+所以 Challenge 3 必须在 Linux 环境下跑。
+
+**5. `case SYS_FLAG:`**（输出 flag）
+
+```c
+if ( (unsigned __int8)sub_196B(ctx) )
+```
+
+**行为特征：** 当程序一路过关斩将走到这里时，说明你前面的输入全对了。它会触发 `SYS_FLAG`，调用 `sub_196B`（读取 flag）。
+
+**6. `case SYS_MALLOC:`**（动态内存分配）
+
+```c
+if ( (unsigned __int8)pop_stack_u32(ctx, (char *)&syscall_id + 1)
+  && (unsigned __int8)syscall_mem_alloc(
+    (__int64)ctx,
+    *(SyscallIDs *)((char *)&syscall_id + 1),
+    &operand2,
+    v11,
+    v12)
+  && (unsigned __int8)push_stack_u32(ctx, operand2) )
+```
+
+**行为特征：** 弹出栈顶需要的大小，然后在虚拟机内部调用 `syscall_mem_alloc` 分配一块新内存，并把分配好的虚拟内存地址压回栈顶（`push_stack_u32`）。
+
+**做题影响：** 为后面的复杂算法（比如第二关、第三关）在运行时临时开辟草稿纸空间。
+
+------
+
+**`handleVMStack` 第四部分**
+
+```c
+case PUSH_STACK:
+v9 = push_stack_u32(ctx, *(StackVMOpcodes *)((char *)&opcode + 1));
+  if ( (_BYTE)v9 )
+    goto LABEL_22;
+  ctx->trigger_execption = 1;
+  return v9;
+case S_LDP:
+  if ( (unsigned __int8)getInstructionsSize4(ctx, *(unsigned int *)((char *)&opcode + 1), &operand2) )
+  {
+    if ( (unsigned __int8)push_stack_u32(ctx, operand2) )
+      goto LABEL_22;
+  }
+  else
+  {
+    fwrite("[E] invalid S.LDP, bad addr\n", 1u, 0x1Cu, stderr);
+  }
+  ctx->trigger_execption = 1;
+  return 0;
+case POP_STACK:
+  v10 = pop_stack_u32(ctx, &operand2);
+  if ( (_BYTE)v10 )
+    goto LABEL_22;
+  ctx->trigger_execption = 1;
+  return v10;
+// ......
+if ( (_BYTE)opcode != S_HLT )
+  goto LABEL_91;
+success = 0;
+if ( memcmp((char *)&opcode + 1, &unk_40E4, 4u) )
+{
+  fwrite("[E] invalid S.HLT\n", 1u, 0x12u, stderr);
+  ctx->trigger_execption = 1;
+}
+```
+
+**1. `case PUSH_STACK:`**（压入立即数）
+
+```c
+v9 = push_stack_u32(ctx, *(StackVMOpcodes *)((char *)&opcode + 1));
+if ( (_BYTE)v9 )
+  goto LABEL_22;
+```
+
+把 `opcode` 后面跟着的 4 字节数据 直接调用 `push_stack_u32` 丢进虚拟栈的栈顶。
+
+```c
+__int64 __fastcall push_stack_u32(Context *ctx, int a2)
+{
+  __int64 v3; // rsi
+
+  v3 = ctx->stack_offset - 4;
+  ctx->stack_offset = v3;
+  return sub_1659((__int64)ctx, v3, a2);
+}
+```
+
+**2. `case S_LDP:`**（Load Pointer / 虚拟指针读取）
+
+```c
+if ( (unsigned __int8)getInstructionsSize4(ctx, *(unsigned int *)((char *)&opcode + 1), &operand2) )
+{
+  if ( (unsigned __int8)push_stack_u32(ctx, operand2) )
+    goto LABEL_22;
+}
+```
+
+它先取出了这条指令后面跟着的 4 字节虚拟内存地址：`*(unsigned int *)((char *)&opcode + 1)`。
+
+然后调用了 `getInstructionsSize4`。这个函数会当一个“搬运工”，**前往虚拟机的数据段（`data_section`）或者代码段，把那个地址里存着的 4 字节数据抠出来**，存进 `operand2`。
+
+最后，通过 `push_stack_u32(ctx, operand2)`，把**抠出来的这 4 字节数据压入栈顶**。
+
+**3. `case POP_STACK:`**（出栈）
+
+```c
+v10 = pop_stack_u32(ctx, &operand2);
+if ( (_BYTE)v10 )
+  goto LABEL_22;
+```
+
+把栈顶的那个 4 字节数字“拔”出来，存进 `operand2` 里。
+
+**4. `S_HLT`**（验证）
+
+```c
+if ( memcmp((char *)&opcode + 1, &unk_40E4, 4u) )
+```
+
+------
+
+**`handleVMStack: `**
+
+```c
+enum StackVMOpcodes
+{
+    S_LDB = 0x10,
+    S_LDW = 0x20,
+    PUSH_STACK = 0x30,
+    S_LDP = 0x40,
+    POP_STACK = 0x50,
+    ADD = 0x60,
+    SUB = 0x61,
+    XOR = 0x62,
+    AND = 0x63,
+    JMP = 0x70,
+    JZ = 0x71,
+    JNZ = 0x72,
+    CMP = 0x80,
+    SYSCALL = 0xA0,
+    S_HLT = 0xFF,
+};
+```
