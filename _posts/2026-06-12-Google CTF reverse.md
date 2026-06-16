@@ -899,3 +899,109 @@ enum StackVMOpcodes
     S_HLT = 0xFF,
 };
 ```
+
+```c
+enum SyscallIDs
+{
+    SYS_GET_INPUT = 0x0,
+    SYS_PRINT = 0x1,
+    SYS_WRITE = 0x2,
+    SYS_SRAND = 0x3,
+    SYS_RAND = 0x4,
+    SYS_FLAG = 0x5,
+    SYS_MALLOC = 0x6,
+};
+```
+
+------
+
+**`handleVMReg`**
+
+因为这个函数与 `handleVMStack` 差不多，找类似 switch-case 的就可以。这里就不一一分析了。
+
+```c
+enum RegVMOpcodes
+{
+    REG_HALT = 0x0,
+    REG_SYSCALL = 0x1,
+    REG_PUSH = 0x10,
+    PUSH_REG0 = 0x11,
+    PUSH_REG1 = 0x12,
+    PUSH_REG2 = 0x13,
+    PUSH_REG3 = 0x14,
+    POP_REG0 = 0x15,
+    POP_REG1 = 0x16,
+    POP_REG2 = 0x17,
+    POP_REG3 = 0x18,
+    ADD_REG = 0x20,
+    ADD_IMM = 0x21,
+    SUB_REG = 0x30,
+    SUB_IMM = 0x31,
+    XOR_REG = 0x40,
+    XOR_IMM = 0x41,
+    MUL_REG = 0x50,
+    MUL_IMM = 0x51,
+    JMP_ABS = 0x60,
+    CALL = 0x61,
+    JZ_REG = 0x62,
+    JNZ_REG = 0x63,
+    JMP_FLAG2 = 0x64,
+    JMP_IMM = 0x68,
+};
+```
+
+**1. 基础控制与系统调用**
+
+- **`REG_HALT = 0x0`**：退出当前寄存器模式，把控制权交还给栈模式。
+- **`REG_SYSCALL = 0x1`**：拉起系统调用（比如打印、输入、申请内存、生成随机数等）。
+
+**2. 数据传输（栈与寄存器互动）**
+
+这里的 `REG0 ~ REG3` 分别对应结构体里的 `mA, mB, mC, mD`。
+
+- **`REG_PUSH = 0x10`**：把一个立即数（写死的数字）压入虚拟栈。
+- **`PUSH_REG0 ~ PUSH_REG3 (0x11~0x14)`**：把寄存器（`mA/mB/mC/mD`）里的值压入虚拟栈。
+- **`POP_REG0 ~ POP_REG3 (0x15~0x18)`**：从虚拟栈顶弹出一个值，写进对应的寄存器中。
+
+**3. 数学运算（核心算法区）**
+
+- **`ADD_REG / ADD_IMM (0x20/0x21)`**：加法。要么两个寄存器相加，要么寄存器加一个立即数。
+- **`SUB_REG / SUB_IMM (0x30/0x31)`**：减法。
+- **`XOR_REG / XOR_IMM (0x40/0x41)`**：异或。
+- **`MUL_REG / MUL_IMM (0x50/0x51)`**：乘法。**注意：** 它做的是 64 位乘法，乘积的低 32 位扔进 `mA`，高 32 位扔进 `mD`。
+
+**4. 跳转与分支（控制流）**
+
+- **`JMP_ABS = 0x60`**：绝对跳转（类似于函数调用或直接跳到某个 PC 地址）。
+- **`CALL = 0x61`**：调用子程序。
+- **`JZ_REG / JNZ_REG (0x62/0x63)`**：条件跳转。`JZ` 是结果为 0（或相等）时跳，`JNZ` 是结果不为 0（或不相等）时跳。
+- **`JMP_FLAG2 = 0x64`**：根据第二个状态标志位进行跳转。
+- **`JMP_IMM = 0x68`**：带着立即数偏移进行跳转。
+
+------
+
+自此，虚拟机分析完毕。开始进军 Google CTF 2025 `multiarch` 核心解密！
+
+我们可以根据 IDA 解出的程序 16 进制码，自己写脚本反编译出可读代码。
+
+或者，我们为所有操作码设置断点，并开始监视调用链。然后，我们跳过完整的跟踪链，只关注任务的主要操作。
+
+------
+
+### 手动反编译
+
+
+
+
+
+------
+
+### 动态调试还原
+
+
+
+
+
+------
+
+如果你在阅读时发现了任何错误，请评论或发邮件告诉我，因为错误是学习和发展的一部分！
