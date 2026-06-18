@@ -2,7 +2,7 @@
 layout: post
 title: "Google CTF reverse"
 toc: true
-date: 2026-06-14
+date: 2026-06-18
 categories: 分类名称
 tags: [逆向]
 ---
@@ -62,9 +62,9 @@ tags: [逆向]
 
 ### 分析类型
 
-一共两个文件，一个文件是 crackme.masm，另一个文件是 multiarch。
+一共两个文件，一个文件是 `crackme.masm`，另一个文件是 `multiarch`。
 
-其中 crackme.masm 文件不能分析，直接分析 multiarch 文件。（原始版本）
+其中 `crackme.masm` 文件不能分析，直接分析 `multiarch` 文件。（原始版本）
 
 ```c
 __int64 __fastcall main(int a1, char **a2, char **a3)
@@ -301,7 +301,7 @@ memcpy(v4, *(const void **)(a1 + 16), *(_QWORD *)(a1 + 24)); // 拷贝到 v4 (�
 memcpy(v5, *(const void **)(a1 + 32), *(_QWORD *)(a1 + 40)); // 拷贝到 v5 (偏移 0x18)
 ```
 
-`sub_1319` 的输入参数 `a1` 是一个代表 `.masm` 编译后文件的结构体。这个函数一启动，就把文件里的三块数据，分别原封不动地抄写（memcpy）到了 `v3`、`v4` 和 `v5` 里面。
+`sub_1319` 的输入参数 `a1` 是一个代表 `.masm` 编译后文件的结构体。这个函数一启动，就把文件里的三块数据，分别原封不动地抄写（`memcpy`）到了 `v3`、`v4` 和 `v5` 里面。
 
 只要是可执行文件（无论是标准的 ELF/PE，还是这种题目自定义的 VM 目标文件），它被加载到内存里去执行时，最基础的标配就是：存放着机器码 或者 存放着程序里写死的常量、字符串、全局变量。那它们必然对应着这个 `crackme.masm` 程序的**代码内容**和**初始数据内容**。（一定要分析出这点，后面分析程序会用到）
 
@@ -990,6 +990,136 @@ enum RegVMOpcodes
 
 ### 手动反编译
 
+```python
+import struct
+
+# 1. 录入你之前找齐的密码本（Opcode 对照表）
+STACK_OPCODES = {
+    0x10: "S_LDB", 0x20: "S_LDW", 0x30: "PUSH_STACK",
+    0x40: "S_LDP", 0x50: "POP_STACK", 0x60: "ADD",
+    0x61: "SUB", 0x62: "XOR", 0x63: "AND",
+    0x70: "JMP", 0x71: "JZ", 0x72: "JNZ",
+    0x80: "CMP", 0xA0: "SYSCALL", 0xFF: "S_HLT",
+}
+
+REG_OPCODES = {
+    0x00: "REG_HALT", 0x01: "REG_SYSCALL", 0x10: "REG_PUSH",
+    0x11: "PUSH_REG0", 0x12: "PUSH_REG1", 0x13: "PUSH_REG2", 0x14: "PUSH_REG3",
+    0x15: "POP_REG0", 0x16: "POP_REG1", 0x17: "POP_REG2", 0x18: "POP_REG3",
+    0x20: "ADD_REG", 0x21: "ADD_IMM", 0x30: "SUB_REG", 0x31: "SUB_IMM",
+    0x40: "XOR_REG", 0x41: "XOR_IMM", 0x50: "MUL_REG", 0x51: "MUL_IMM",
+    0x60: "JMP_ABS", 0x61: "CALL", 0x62: "JZ_REG", 0x63: "JNZ_REG",
+    0x64: "JMP_FLAG2", 0x68: "JMP_IMM",
+}
+
+# 2. 读取从题目程序（crackme.masm）里抠出来的纯二进制字节码
+# 假设你已经把代码段保存为了 crackme_code.bin （在与 py 脚本同一文件夹下）
+with open("./crackme_code.bin", "rb") as f:
+    code = f.read()
+
+pc = 0
+mode = 0 # 默认 0 是栈模式，1 是寄存器模式
+
+print("=== 虚拟机反汇编剧本开始 ===")
+
+while pc < len(code):
+    # 如果撞到了故事对白区，直接闭眼跳过去
+    if pc == 0:
+        pc = 0x13  # 直接空降到字符串后面的代码区
+        continue
+    if pc == 0x176:
+        print(f"--- [跳过 0x176 ~ 0x2c7 的字符串数据区] ---")
+        pc = 0x2c7
+        continue
+
+    current_pc = pc
+    opcode = code[pc]
+
+    # ---------------- 栈模式解析 (Mode 0) ----------------
+    if mode == 0:
+        op_name = STACK_OPCODES.get(opcode, f"UNK_STACK_{hex(opcode)}")
+
+        # 只要不是未知的乱码指令，我们统统当成 5 字节指令（吃掉后面的4字节对齐）
+        if not op_name.startswith("UNK_STACK_"):
+            chunk = code[pc + 1:pc + 5]
+            if len(chunk) < 4:
+                chunk = chunk.ljust(4, b'\x00')
+            imm = struct.unpack("<I", chunk)[0]
+
+            # 如果后面带的 4 字节是 0，说明只是对齐用的空壳，我们打印好看一点
+            if imm == 0:
+                print(f"[StackVM] {hex(current_pc)}: {op_name}")
+            else:
+                print(f"[StackVM] {hex(current_pc)}: {op_name} {hex(imm)}")
+
+            pc += 5  # 强行推过 5 个字节！
+        else:
+            # 只有遇到真正认不出来的字节，才 1 字节 1 字节地往前挪，暴露真相
+            print(f"[StackVM] {hex(current_pc)}: {op_name}")
+            pc += 1
+
+    # ---------------- 寄存器模式解析 (Mode 1) ----------------
+    else:
+        op_name = REG_OPCODES.get(opcode, f"UNK_REG_{hex(opcode)}")
+
+        # 寄存器模式下带 4 字节立即数的指令
+        if op_name in ["REG_PUSH", "ADD_IMM", "SUB_IMM", "XOR_IMM", "MUL_IMM", "JMP_ABS", "JMP_IMM"]:
+            chunk = code[pc + 1:pc + 5]
+            if len(chunk) < 4:
+                chunk = chunk.ljust(4, b'\x00')
+            imm = struct.unpack("<I", chunk)[0]
+            print(f"[RegVM]   {hex(current_pc)}: {op_name} {hex(imm)}")
+            pc += 5
+        # 寄存器模式下带 1 字节寄存器索引的指令
+        elif op_name in ["ADD_REG", "SUB_REG", "XOR_REG", "MUL_REG"]:
+            reg_info = code[pc + 1]
+            reg1 = (reg_info >> 4) - 1
+            reg2 = (reg_info & 0xF) - 1
+            print(f"[RegVM]   {hex(current_pc)}: {op_name} m{reg1}, m{reg2}")
+            pc += 2
+        elif op_name == "REG_HALT":
+            print(f"[RegVM]   {hex(current_pc)}: REG_HALT (切回栈模式)")
+            mode = 0  # 还原模式
+            pc += 1
+        else:
+            print(f"[RegVM]   {hex(current_pc)}: {op_name}")
+            pc += 1
+```
+
+这段代码会还原部分可读代码。但是依然需要分析
+
+#### Challenge 1 - What's your favorite number?
+
+```text
+=== 虚拟机反汇编剧本开始 ===
+[StackVM] 0x13: S_LDB 0x4b        加载打印 Welcome 的参数
+[StackVM] 0x18: PUSH_STACK 0x2000 把缓冲区指针压栈
+[StackVM] 0x1d: S_LDB 0x2
+[StackVM] 0x22: SYSCALL           拉起系统调用：打印 Welcome
+[StackVM] 0x27: S_LDB 0x2b        加载 Challenge 1题目的参数
+[StackVM] 0x2c: PUSH_STACK 0x20ad
+[StackVM] 0x31: S_LDB 0x2
+[StackVM] 0x36: SYSCALL           打印“Challenge 1 - What's your favorite number?”
+[StackVM] 0x3b: S_LDB
+[StackVM] 0x40: SYSCALL           拉起系统调用：等待选手在控制台敲入第一个数字
+[StackVM] 0x45: S_LDW 0x1337      把0x1337压入虚拟栈（2字节）
+[StackVM] 0x4a: S_LDW 0x539       把0x539压入虚拟栈（2字节）
+[StackVM] 0x4f: PUSH_STACK 0x8675309 把0x8675309压入虚拟栈（4字节）
+[StackVM] 0x54: XOR               把栈顶的两个数进行异或
+[StackVM] 0x59: ADD               然后再加上输入的数字
+[StackVM] 0x5e: PUSH_STACK 0xaaaaaaaa 把0xaaaaaaaa压入虚拟栈
+[StackVM] 0x63: CMP               算好的数字与栈顶的0xaaaaaaaa比较
+[StackVM] 0x68: JNZ 0x110b        对不上就跳转（退出程序）
+```
+
+这里有一个坑，在压入栈时执行了三次，但是计算时是把两个数进行计算而非三个数。我在压入栈的步骤里明确写了是 2 字节。在原码中 20 37 13  00 00 20 39 05 00 00，栈中这两个 2 字节的数据是挨在一起的。在计算机底层原理中，4 字节是一个单位（又叫 “字长”）（C语言的 int 理解），所以被后续的计算当作了一个值。
+
+不难看出计算公式：$0x13370539 \oplus 0x8675309 + input = 0xAAAAAAAA$
+
+#### Challenge 2 - Tell me a joke
+
+
+
 
 
 
@@ -997,6 +1127,43 @@ enum RegVMOpcodes
 ------
 
 ### 动态调试还原
+
+#### Challenge 1 - What's your favorite number?
+
+检查操作数中包含的内容：
+
+- **操作数 1：** `0x8675309`
+- **操作数 2：** `0x13370539`
+- **结果：** `0x1B505630`
+
+先记下这一点，然后继续进行下一步。
+
+然后在 Local Types 的页面观察下一个操作码，下一个操作码是 ADD。查看操作数，可以看到 XOR 结果是如何添加到数字中的： `0x1B505630 + (we entered 123321)` 。然后再次记录这一点，然后继续执行。
+
+接下来，立即执行了 CMP 操作码，将数字 `0x1B5237E9` 与参考值 `0xAAAAAAAA` 进行比较，这将立即导致 `trigger_exception = true` 并退出程序。
+
+Challenge 1 没有了，就只有这些。现在我们可以完整地看到检查数字的算法：
+
+```python
+bool challenge1(uint32_t value)
+{
+    uint32_t r1 = 0x8675309 ^ 0x13370539;
+    uint32_t r2 = r1 + value;
+    
+    if (r2 == 0xAAAAAAAA)
+    {
+        return true;
+    }
+
+    return false;
+}
+```
+
+得到 `0x8F5A547A`。这就是正确答案。
+
+#### Challenge 2 - Tell me a joke
+
+
 
 
 
