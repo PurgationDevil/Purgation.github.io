@@ -7,16 +7,30 @@ layout: default
   document.addEventListener('DOMContentLoaded', function() {
     mermaid.initialize({
       startOnLoad: true,
-      theme: 'default'
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#ffffff',
+        primaryTextColor: '#000000',
+        secondaryColor: '#f4f4f4',
+        lineColor: '#333333',
+        textColor: '#000000',
+        mainBkg: '#ffffff'
+      }
     });
-    mermaid.init(undefined, document.querySelectorAll('.language-mermaid'));
+
+    mermaid.run({
+      querySelector: '.language-mermaid'
+    });
   });
 </script>
 
-<!-- Mermaid 深色模式文字颜色 -->
+<!-- Mermaid 强制白底黑字 -->
 <style>
-@media (prefers-color-scheme: dark) {
-  .mermaid text { fill: #333 !important; color: #333 !important; }
+.mermaid svg text,
+.mermaid .nodeLabel,
+.mermaid .edgeLabel {
+    fill: #000 !important;
+    color: #000 !important;
 }
 </style>
 
