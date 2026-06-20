@@ -9,8 +9,18 @@ layout: default
       startOnLoad: true,
       theme: 'default'
     });
+    
     mermaid.run({
       querySelector: '.language-mermaid'
+    }).then(function() {
+      setTimeout(function() {
+        var mermaidTexts = document.querySelectorAll('.mermaid svg text, .mermaid svg tspan');
+        mermaidTexts.forEach(function(el) {
+          el.style.fill = '#000';
+          el.style.color = '#000';
+          el.setAttribute('fill', '#000');
+        });
+      }, 500);
     });
   });
 </script>
