@@ -468,26 +468,26 @@ body {
   color: var(--text-color) !important;
 }
 
-.post-container,
-.article-container {
+.post-container:not(.mermaid),
+.article-container:not(.mermaid) {
   color: var(--text-color) !important;
 }
 
-.post-container p,
-.post-container li {
+.post-container :not(.mermaid) p,
+.post-container :not(.mermaid) li {
   color: var(--text-light) !important;
 }
 
-.post-container h1,
-.post-container h2,
-.post-container h3,
-.post-container h4,
-.post-container h5,
-.post-container h6 {
+.post-container :not(.mermaid) h1,
+.post-container :not(.mermaid) h2,
+.post-container :not(.mermaid) h3,
+.post-container :not(.mermaid) h4,
+.post-container :not(.mermaid) h5,
+.post-container :not(.mermaid) h6 {
   color: var(--heading-color) !important;
 }
 
-.post-container a {
+.post-container :not(.mermaid) a {
   color: var(--link-color) !important;
 }
 
