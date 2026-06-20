@@ -15,6 +15,8 @@ tags: [逆向]
 >
 > 描述：栈很有趣，寄存器很容易，但既然可以两者兼顾，为什么只做其中一个呢？欢迎来到多架构时代。
 
+------
+
 ### 预览
 
 **1. 分析 `PeMapping` Linux 虚拟机环境（`multiarch` 进程）**
@@ -62,6 +64,8 @@ tags: [逆向]
 - **虚拟机内部逻辑**：调用了虚拟机自带的系统调用 `SYS_SRAND` 和 `SYS_RAND`。它将输入的数字作为伪随机数种子，生成随机数序列，经过特定的位运算后，要求序列能够碰撞出 `0xC0FFEE`。
 - **解题关键（大坑）**：Windows 和 Linux 的 `rand()` 标准库实现不同，导致生成的随机数序列不同。这题是 Linux 题目，**必须在 Linux 环境下跑爆破脚本**才能得到正确的种子。
 - **正确答案**：**`1399320`**（十六进制 `0x155A18`）。
+
+------
 
 ### 分析类型
 
@@ -1146,18 +1150,20 @@ while pc < len(code):
 Challenge 1 没有了，就只有这些。现在我们可以完整地看到检查数字的算法：
 
 ```python
-bool challenge1(uint32_t value)
-{
-    uint32_t r1 = 0x8675309 ^ 0x13370539;
-    uint32_t r2 = r1 + value;
+def challenge1(value):
+    # 1. 异或运算
+    r1 = 0x8675309 ^ 0x13370539
     
-    if (r2 == 0xAAAAAAAA)
-    {
-        return true;
-    }
+    # 2. 加法运算（同样用 & 0xFFFFFFFF 模拟 32 位底层溢出截断）
+    r2 = (r1 + value) & 0xFFFFFFFF
+    
+    # 3. 终极碰撞
+    if r2 == 0xAAAAAAAA:
+        return True
+    
+    return False
 
-    return false;
-}
+print(f"验证结果: {challenge1(test_value)}")
 ```
 
 得到 `0x8F5A547A`。这就是正确答案。
