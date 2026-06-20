@@ -1,0 +1,10 @@
+{% if site.announcement.enabled %}
+<div class="sidebar-module announcement-module">
+  <h4>{{ site.announcement.title }}</h4>
+  <ul class="list-unstyled">
+    {% for item in site.announcement.items %}
+    <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
