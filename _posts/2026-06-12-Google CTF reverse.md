@@ -2,63 +2,66 @@
 layout: post
 title: "Google CTF reverse"
 toc: true
-date: 2026-06-18
+date: 2026-06-20
 categories: 分类名称
 tags: [逆向]
 ---
 
-*暂时是有这个意图，但是看我能不能学明白吧。*🧐*就先放出来放这放着，学多少写多少。*🤓
-
 # Google CTF reverse
 
-## MULTIARCH-1 (p. 1) （2025）
+## multiarch-1（2025）
+
+> Description: Stacks are fun, registers are easy, but why do one when you can do both? Welcome to the multiarch. 
+>
+> 描述：栈很有趣，寄存器很容易，但既然可以两者兼顾，为什么只做其中一个呢？欢迎来到多架构时代。
 
 ### 预览
 
-  **1. 分析 `PeMapping` Linux 虚拟机环境（`multiarch` 进程）**
+**1. 分析 `PeMapping` Linux 虚拟机环境（`multiarch` 进程）**
 
-**它在为它自己解析并映射自定义的字节码文件（`crackme.masm`）** (pp. 1, 3)。
+**它在为它自己解析并映射自定义的字节码文件（`crackme.masm`）**。
 
-- 它通过 `mmap` 分配了 3 个大小为 `0x1000` 字节的虚拟内存块（`nmap_section1_1000` 等），用来存放虚拟机的**代码段、数据段和堆栈** (pp. 3-4)。
+- 它通过 `mmap` 分配了 3 个大小为 `0x1000` 字节的虚拟内存块（`nmap_section1_1000` 等），用来存放虚拟机的**代码段、数据段和堆栈**。
 
-- 随后，它把解密或提取出来的字节码 `memcpy` 到这些内存里，并初始化了虚拟机的通用寄存器（mA, mB, mC, mD）和 SP（堆栈指针）、PC（程序计数器） (pp. 3-4)。
+- 随后，它把解密或提取出来的字节码 `memcpy` 到这些内存里，并初始化了虚拟机的通用寄存器（mA, mB, mC, mD）和 SP（堆栈指针）、PC（程序计数器）。
 
-  **2. 分析 `VmCore`（虚拟机核心分发器）**
+**2. 分析 `VmCore`（虚拟机核心分发器）**
 
-当 `PeMapping` 执行完并返回 `Context` 结构体后，主程序会进入一个 `while(VmMachineTick)` 的死循环 (p. 2)。在这个循环的底层，就是最核心的 **`VmCore` 函数** (p. 5)。
+当 `PeMapping` 执行完并返回 `Context` 结构体后，主程序会进入一个 `while(VmMachineTick)` 的死循环。在这个循环的底层，就是最核心的 **`VmCore` 函数**。
 
-根据题解的第 5 节，这个虚拟机采用了**双重处理器模式（Dual-Handler）** (p. 5)：
+这个虚拟机采用了**双重处理器模式（Dual-Handler）**：
 
-1\. **栈模式结构（Stack VM）**：当模式标志不为 1 时，进入 `handleVMStack` (p. 5)。
+1\. **栈模式结构（Stack VM）**：当模式标志为 0 时，进入 `handleVMStack`。
 
-   - 包含基本的栈操作：`PUSH_STACK (0x30)`、`POP_STACK (0x50)`、加减异或等 (pp. 5-7)。
+   - 包含基本的栈操作：`PUSH_STACK (0x30)`、`POP_STACK (0x50)`、加减异或等。
 
-2\. **寄存器模式结构（Register VM）**：当模式标志为 1 时，进入 `handleVMReg` (p. 5)。
-   - 包含传统的寄存器操作：`ADD_REG (0x20)`、`XOR_IMM (0x41)`、`CALL (0x61)` 等 (p. 7)。
+2\. **寄存器模式结构（Register VM）**：当模式标志为 1 时，进入 `handleVMReg`。
 
-  **3. 🏁 终极目标：逆向解密三个关卡（Challenges）**
+   - 包含传统的寄存器操作：`ADD_REG (0x20)`、`XOR_IMM (0x41)`、`CALL (0x61)` 等。
 
-运行这个程序后，虚拟机会要求你回答 **3 个问题**，全对才能拿到 Flag (p. 1)。
+**3. 🏁 终极目标：逆向解密三个关卡（Challenges）**
 
-1️⃣ 第一关：What's your favorite number? (最爱的数字) (p. 8)
+运行这个程序后，虚拟机会问 **3 个问题**，全对才能拿到 Flag。
 
-- **虚拟机内部逻辑**：它将两个固定的常量进行异或：`0x8675309 ^ 0x13370539 = 0x1B505630` (pp. 8-9)。然后加上你输入的数字，最后和目标值 `0xAAAAAAAA` 进行比较 (pp. 8-9)。
+1️⃣ 第一关：What's your favorite number? (最爱的数字)
 
-- **解题公式**：直接用减法逆推 (pp. 9, 12)。
+- **虚拟机内部逻辑**：它将两个固定的常量进行异或：`0x8675309 ^ 0x13370539 = 0x1B505630`。然后加上输入的数字，最后和目标值 `0xAAAAAAAA` 进行比较。
+
+- **解题公式**：直接用减法逆推。
 
   $Answer = 0xAAAAAAAA - 0x1B505630 = 0x8F5A547A → 2405061754（十进制）$
 
-2️⃣ 第二关：Tell me a joke (讲个笑话) (p. 9)
+2️⃣ 第二关：Tell me a joke (讲个笑话)
 
-- **虚拟机内部逻辑**：它是一个循环 7 次的哈希/乘法混淆 (pp. 9-10)。每次将魔术字 `0xCAFEBABE` 乘以你输入的字符的 ASCII 码，右移 32 位（取高 32 位），并不断与寄存器异或 (pp. 9-10)。最终要求高位结果以 `0x7331` 开头 (pp. 10, 12)。
-- **解题方法**：由于空间很小（只需爆破 2 个 ASCII 字符），直接写一段简单的脚本（如题解中的 Node.js 脚本）进行**暴力破解** (pp. 10, 12)。
-- **正确答案**：字符 **`F'`**（十六进制 `0x4691`） (pp. 10-11)。
+- **虚拟机内部逻辑**：它是一个循环 7 次的哈希/乘法混淆。每次将魔术字 `0xCAFEBABE` 乘以输入的字符的 ASCII 码，右移 32 位（取高 32 位），并不断与寄存器异或。最终要求高位结果以 `0x7331` 开头。
+- **解题方法**：由于空间很小（只需爆破 2 个 ASCII 字符），直接写一段简单的脚本进行**暴力破解**。
+- **正确答案**：字符 **`F'`**（十六进制 `0x4691`）。
 
-3️⃣ 第三关：Predict the future (预测未来) (p. 10)
+3️⃣ 第三关：Predict the future (预测未来)
 
-- **虚拟机内部逻辑**：调用了虚拟机自带的系统调用 `SYS_SRAND` 和 `SYS_RAND` (p. 10)。它将你输入的数字作为伪随机数种子（Seed），生成随机数序列，经过特定的位运算后，要求序列能够碰撞出 `0xC0FFEE` (pp. 11-12)。
-- **解题关键（大坑）**：Windows 和 Linux 的 `rand()` 标准库实现不同，导致生成的随机数序列不同 (p. 11)。这题是 Linux 题目，**必须在 Linux 环境下跑爆破脚本**才能得到正确的种子 (pp. 1, 11)。
-- **正确答案**：**`1399320`**（十六进制 `0x155A18`） (p. 11)。
+- **虚拟机内部逻辑**：调用了虚拟机自带的系统调用 `SYS_SRAND` 和 `SYS_RAND`。它将输入的数字作为伪随机数种子，生成随机数序列，经过特定的位运算后，要求序列能够碰撞出 `0xC0FFEE`。
+- **解题关键（大坑）**：Windows 和 Linux 的 `rand()` 标准库实现不同，导致生成的随机数序列不同。这题是 Linux 题目，**必须在 Linux 环境下跑爆破脚本**才能得到正确的种子。
+- **正确答案**：**`1399320`**（十六进制 `0x155A18`）。
 
 ### 分析类型
 
@@ -993,7 +996,7 @@ enum RegVMOpcodes
 ```python
 import struct
 
-# 1. 录入你之前找齐的密码本（Opcode 对照表）
+# 1. 录入之前找齐的密码本（Opcode 对照表）
 STACK_OPCODES = {
     0x10: "S_LDB", 0x20: "S_LDW", 0x30: "PUSH_STACK",
     0x40: "S_LDP", 0x50: "POP_STACK", 0x60: "ADD",
@@ -1116,13 +1119,11 @@ while pc < len(code):
 
 不难看出计算公式：$0x13370539 \oplus 0x8675309 + input = 0xAAAAAAAA$
 
-#### Challenge 2 - Tell me a joke
+#### Challenge 2 和 Challenge 3 放弃手动反编译
 
+手动独立反编译在这里遇到了困难，如果没有其他题解的帮助根本不知道哪里是 Challenge 2。所以还是需要动态调试辅助定位。
 
-
-
-
-
+而且后面的输出内容完全是乱的，如果想完全修改需要花费很多的时间研究思考，所以这里放弃手动反编译。
 
 ------
 
@@ -1163,11 +1164,139 @@ bool challenge1(uint32_t value)
 
 #### Challenge 2 - Tell me a joke
 
+**执行步骤：**
 
+  1\. 使用 MUL_IMM 指令将 `0xCAFEBABE` （常量）乘以我们的 ASCII 符号。
 
+  2\. 将结果值放入寄存器 A 中。
 
+  3\. 使用常量 `>> 0x20` 将结果截断并放入寄存器 D 中
 
+  4\. 对 B 和 D 执行按位异或运算（B 等于 0，值也是常量）。
 
+  5\. 执行此算法 7 次
+
+  6\. 使用 CMP 进行参考值检查
+
+大致代码逻辑如下：
+
+```python
+bool challenge2(uint32_t hex_symbol)
+{
+    uint32_t A{};
+    uint64_t D{};
+    uint64_t B{};
+
+    for (int i = 0; i < 7; i++)
+    {
+        uint32_t A = 0xCAFEBABE * hex_symbol;
+        
+        D = A >> 0x20;
+        B = B ^ D;
+    }
+    
+    if (B == expected_value)
+    {
+        return true;
+    }
+    
+    return false;
+}
+```
+
+需要得到一个数字，该数字以参考编号 `0x7331` 开头，乘以 `0xCAFEBABE` （不需要关心后面的值，它们将被 `>> 0x20` 截断）
+
+其实完全不用关注异或运算，因为在第 7 次迭代后就会返回结果数字。
+
+这里采用最优解 $→$ 暴力破解：
+
+```python
+for i in range(0x10FFF + 1):
+    result = i * 0xCAFEBABE
+    
+    # 转成十六进制字符串，并变成大写
+    pair_hex = f"{i:04X}"
+    result_hex = f"{result:X}"
+    
+    # 寻找以 7331 开头的数字
+    if result_hex.startswith("7331"):
+        print(f"通关输入 HEX: {pair_hex} -> 乘法结果: {result_hex}")
+```
+
+**结果：** `9146 -> 乘法结果: 7331C96CADF4`
+
+`0x4691` 它的 ASCII 码是 **`F'`**
+
+#### Challenge 3 - Almost there! But can you predict the future? What number am I thinking of?
+
+输入一个数字 `value` 这个数会被当成随机数 `srand(value)`
+
+然后生成 32 位的随机数：因为标准的 `rand()` 函数通常只返回 15 位或 16 位的随机数，出题人为了凑满一个 4 字节的单位，做了一个高低位拼接：`val = rand(); val |= rand() << 16;`（把两次生成的随机数拼成一个大的 32 位数字）。
+
+拿拼好的随机数异或 `0x133700`。
+
+再异或 `0xF2F2F2F2`。
+
+最后用 `& 0xFFFFFF` 只切出它的低 24 位。
+
+终极对比：看切出来的低 24 位是不是等于 0xC0FFEE（黑客界著名的魔术常数 Coffee ☕）。如果等于，你就成功“预测了未来”！
+
+Windows 系统无法解出但 Linux 系统就能够解出。这需要计算机底层的逆向视角，这个锅必须由 微软的 C 运行时库来背。
+
+这是计算机底层一个非常经典的跨平台大坑：Windows 和 Linux 的 `rand()` 算法完全不一样。
+
+- Windows (MSVCRT) 用的随机数公式：它的最大随机数（RAND_MAX）只有 0x7FFF（32767）。它每次只生成 15 位的随机数。
+
+- Linux (glibc) 用的随机数公式：它的最大随机数（RAND_MAX）高达 0x7FFFFFFF（21亿）。它每次能生成 31 位的随机数。
+
+由于这个虚拟机在被出题人编译时，是在 Linux 环境下编译的。所以虚拟机在执行 RAND 这条特制指令时，用的是 Linux 的 glibc 随机数大口袋算法。
+
+```python
+import sys
+
+# 🌟 手动还原 Linux (glibc) 的伪随机数生成器 (LGCG算法)
+# 该代码无论是在 Windows 还是在 Mac 运行，结果都和 Linux 完全一致
+class LinuxRand:
+    def __init__(self, seed):
+        self.state = seed
+
+    def rand(self):
+        # Linux glibc 的标准线性同余公式参数
+        self.state = (self.state * 1103515245 + 12345) & 0x7FFFFFFF
+        # 提取高 15 位作为随机数返回
+        return (self.state >> 16) & 0x7FFF
+
+def challenge3(value):
+    # 初始化 Linux 随机数种子
+    lr = LinuxRand(value)
+
+    for i in range(10):
+        # 1. 模拟 C++ 里的两次 rand() 并拼接成 32 位大口袋
+        val_low = lr.rand()
+        val_high = lr.rand()
+        val = val_low | (val_high << 16)
+
+        # 2. 完美复刻题解里的三次连环魔改
+        r1 = 0x133700 ^ val
+        r2 = r1 ^ 0xF2F2F2F2
+        r3 = r2 & 0xFFFFFF  # 只切出低 24 位
+
+        # 3. 终极碰撞 Coffee
+        if r3 == 0xC0FFEE:
+            return True
+            
+    return False
+
+# 为了极速出结果，我们根据题解的范围缩小到 0x200000 即可
+for i in range(0x200000):
+    if challenge3(i):
+        print(f"成功抓到通关种子! 十六进制: {hex(i).upper()} | 十进制: {i}")
+        sys.exit(0)
+
+print("未找到结果，请检查魔术常数验证。")
+```
+
+multiarch-1 完结
 
 ------
 
