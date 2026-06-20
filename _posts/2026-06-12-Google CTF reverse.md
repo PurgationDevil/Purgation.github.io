@@ -17,6 +17,10 @@ tags: [逆向]
 
 ------
 
+### 下载题目
+
+[点击下载题目][https://github.com/PurgationDevil/Reverse-Challenge-Share]
+
 ### 预览
 
 **1. 分析 `PeMapping` Linux 虚拟机环境（`multiarch` 进程）**
@@ -1303,6 +1307,28 @@ print("未找到结果，请检查魔术常数验证。")
 ```
 
 multiarch-1 完结
+
+------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ------
 
