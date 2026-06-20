@@ -7,14 +7,7 @@ layout: default
   document.addEventListener('DOMContentLoaded', function() {
     mermaid.initialize({
       startOnLoad: true,
-      theme: 'base',
-      themeVariables: {
-        primaryTextColor: '#333',
-        primaryColor: '#fff',
-        noteTextColor: '#333',
-        lineColor: '#666',
-        titleColor: '#333'
-      }
+      theme: 'default'
     });
     mermaid.init(undefined, document.querySelectorAll('.language-mermaid'));
   });
@@ -23,13 +16,7 @@ layout: default
 <!-- Mermaid 深色模式文字颜色 -->
 <style>
 @media (prefers-color-scheme: dark) {
-  .mermaid svg text,
-  .mermaid text,
-  .language-mermaid svg text,
-  .language-mermaid text {
-    fill: #333 !important;
-    color: #333 !important;
-  }
+  .mermaid text { fill: #333 !important; color: #333 !important; }
 }
 </style>
 
