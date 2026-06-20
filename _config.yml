@@ -85,6 +85,13 @@ service-worker: true
 # MathJax rendering for layout:page (e.g. post preview)
 page-mathjax: false
 
+# 公告配置
+announcement:
+  enabled: true
+  title: 📢 公告
+  items:
+    - "正在学习安全逆向 (^_^)"
+
 # Friends
 friends:
   [
