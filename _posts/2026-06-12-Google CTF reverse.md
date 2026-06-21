@@ -19,7 +19,7 @@ tags: [逆向]
 
 ### 下载题目
 
-[点击下载题目][https://github.com/PurgationDevil/Reverse-Challenge-Share]
+[点击去下载题目位置](https://github.com/PurgationDevil/Reverse-Challenge-Share)
 
 re_Google_multiarch-1.zip
 
