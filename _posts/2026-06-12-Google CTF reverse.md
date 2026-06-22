@@ -9,7 +9,7 @@ tags: [逆向]
 
 # Google CTF reverse
 
-## multiarch-1（2025）
+## Google CTF 2025 multiarch-1（2025）
 
 > Description: Stacks are fun, registers are easy, but why do one when you can do both? Welcome to the multiarch. 
 >
@@ -1309,28 +1309,6 @@ print("未找到结果，请检查魔术常数验证。")
 ```
 
 multiarch-1 完结
-
-------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ------
 
