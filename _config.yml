@@ -20,7 +20,7 @@ csdn_url: https://blog.csdn.net/2504_94717629
 # Build settings
 # from 2016, 'pygments' is unsupported on GitHub Pages. Use 'rouge' for highlighting instead.
 highlighter: rouge
-permalink: pretty
+permalink: /:title/
 paginate: 10
 exclude:
   [
@@ -90,7 +90,7 @@ announcement:
   enabled: true
   title: 📢 公告
   items:
-    - "停更一段时间，心情不好😥"
+    - "正在学习安全逆向 (^_^)"
 
 # Friends
 friends:
