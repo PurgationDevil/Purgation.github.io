@@ -2,7 +2,7 @@
 layout: post
 title: "攻防世界 reverse"
 toc: true
-date: 2026-06-1
+date: 2026-06-28
 categories: 分类名称
 tags: [逆向]
 ---
@@ -1908,6 +1908,219 @@ ciphertext = bytes([
 
 flag = rc4_decrypt(key, ciphertext) # RC4加密和解密完全相同，所以这么写
 print(flag.decode(errors='ignore'))
+```
+
+------
+
+## reverse_re2
+
+打开程序后发现 main 函数无法正常生成伪代码，而其它函数均可以正常反编译，说明开发者很可能只对 main 做了代码混淆。
+
+![截图](/img/posts/xctf_adworld_reverse/屏幕截图 2026-04-02 164448.png)
+
+**正常函数的标准流程**
+
+```asm
+push   ebp              ; 保存调用者的栈底
+mov    ebp, esp         ; 设置自己的栈底
+sub    esp, 0x20        ; 分配局部变量空间
+
+; ... 函数体 ...
+
+mov    esp, ebp         ; 释放局部变量空间
+pop    ebp              ; 恢复调用者的栈底
+retn                    ; 返回调用者
+```
+
+字符串窗口搜索 "Correct!"，交叉引用后可以发现只有 main 调用了输出函数，因此 flag 校验逻辑一定仍然位于 main 中。
+
+```c++
+int __usercall sub_411A19@<eax>(int a1@<eax>, int a2@<ebp>)
+{
+  *(_DWORD *)(a2 - 1200) = dword_4960C4 ^ a1;
+  sub_404831(*(_DWORD *)(a2 - 1200), "%s", (const char *)(a2 - 656));
+  v2 = j__strlen((const char *)(a2 - 136));
+  sub_401C21(*(_DWORD *)(a2 - 1188), a2 - 136, v2);
+  if ( sub_402473() )
+    return 3;
+  v4 = j__strlen((const char *)(a2 - 656));
+  sub_402DEC(*(_DWORD *)(a2 - 1188), a2 - 656, v4);
+  if ( sub_40149C() )
+    return 2;
+  if ( !j__strcmp((const char *)(a2 - 656), (const char *)(a2 - 1176)) )
+    sub_404831(dword_4960C0, "%s\n", "Correct!");
+  return 0;
+}
+```
+
+经过分析几个调用函数可以发现 `sub_401C21` 具有典型 RC4 KSA 特征：初始化 SBox 和根据 Key 打乱 SBox，而 `sub_402DEC` 函数是CR4加密，则具有典型 PRGA 特征：不断交换 SBox 和生成密钥流，与数据异或。
+
+因此可以确定：
+
+sub_401C21 -> RC4 初始化(KSA)
+
+sub_402DEC -> RC4 加解密(PRGA)
+
+密钥需要在有混淆代码的main函数中提取。
+
+由于是损坏的函数、且程序可以正常运行，所以直接去看反编译代码大概是干什么的
+
+```asm
+sub_4116CE:
+    mov     eax, offset sub_4116CE      ; eax = 0x4116CE（自己的地址）
+    mov     ebx, offset byte_4116E3     ; ebx = 0x4116E3（另一个地址）
+    sub     ebx, eax                    ; ebx = 0x4116E3 - 0x4116CE = 0x15
+    pop     eax                         ; eax = 返回地址（0x4116CD）
+    inc     eax                         ; eax = 0x4116CE
+    add     eax, 1                      ; eax = 0x4116CF
+    add     ebx, eax                    ; ebx = 0x15 + 0x4116CF = 0x4116E4
+    push    ebx                         ; 把 0x4116E4 压栈
+    retn                                ; 跳转到 0x4116E4
+```
+
+IDA 无法反编译的原因，并不是函数真的损坏，而是入口处存在一段故意破坏控制流的代码。
+
+观察入口：
+
+```assembly
+mov eax, offset sub_4116CE
+mov ebx, offset byte_4116E3
+...
+push ebx
+retn
+```
+
+开头`sub_4116CE`移入寄存器（开始），然后`byte_4116E3`移入寄存器，紧接着就是初始化，最后把`byte_4116E3`压入栈并跳转到`0x4116E4`。
+
+这里最关键的是
+
+```assembly
+push ebx
+retn
+```
+
+其实它本质等价于 `pop eip`
+
+这里程序故意压入 `0x4116E4`
+
+实际上等价于
+
+```assembly
+jmp 0x4116E4
+```
+
+**所以把 0x4116E4 压栈后，不会执行后面的代码，而是跳到 `0x4116E4`。**
+
+*↓ 这才是真正要执行的指令 ↓*
+
+```asm
+.text:004116E3 byte_4116E3     db 8Dh                  ; DATA XREF: sub_4116CE+5↑o
+.text:004116E4                 dd 0FF2748E8h, 74C085FFh, 539680Ah, 0F2E80000h, 0E8FFFF23h
+.text:004116F8                 dd 1
+.text:004116FC                 db 0C7h
+```
+
+**混淆的目的**：让 IDA 误以为 `0x4116E4` 不是代码，从而无法反编译。
+
+由于 `0x4116E4` 被 IDA 当作数据而不是代码，因此控制流分析在这里中断，最终导致 `main` 无法生成伪代码。
+
+对 `byte_4116E3` 数据选中按下 `U`（取消定义），再在 `0x4116E4` 按下 `C`（强制转为代码），分析为函数↓
+
+```asm
+call    sub_403E31      ; 反调试函数（检测是否被调试）
+test    eax, eax        ; 检查返回值
+jz      short loc_4116F7; 如果 eax == 0（未调试），跳转
+push    539h            ; 如果 eax != 0（被调试），压入错误码
+call    j___loaddll     ; 加载 DLL（可能是报错或退出）
+loc_4116F7:				; CODE XREF: .text:004116EB↑j
+call    sub_4116FD      ; 另一个混淆函数
+```
+
+`sub_403E31`是反调试函数。这个函数正常运行必定执行`jz short loc_4116F7`
+
+然后在`0x4116FD`之下的错误函数和未识别的汇编语言基本跟上面的原理一样。但是下面的函数并没有任何用处，单纯的混淆。
+
+从`.text:004116C8`到`.text:004117A0` 再往后找还有从`.text:00411935`到`.text:00411A1E`直接nop填充。再重载分析程序。
+
+但是利用代码全改nop后出现了一些问题。函数依然是被破坏着。在`_main_0`按下P重新分析出现了`sp-analysis failed`：**栈指针平衡检测失败**
+
+**什么是栈指针（SP）？**
+
+在 x86 汇编中，`esp` 寄存器指向当前栈顶。函数调用时：
+
+```asm
+push   ebp              ; esp -= 4
+mov    ebp, esp         ; esp 不变
+sub    esp, 0x6F4       ; esp -= 0x6F4（分配局部变量空间）
+...
+pop    ebp              ; esp += 4
+retn                    ; esp 应该回到最初的值
+```
+
+**函数结束时，`esp` 必须和函数开始时相等**，否则 `retn` 会从错误的位置弹出返回地址，程序崩溃。
+
+IDA 会模拟执行每条指令，跟踪 `esp` 的变化：
+
+| 指令         | 对 esp 的影响                                  |
+| :----------- | :--------------------------------------------- |
+| `push reg`   | `esp -= 4`                                     |
+| `pop reg`    | `esp += 4`                                     |
+| `sub esp, x` | `esp -= x`                                     |
+| `add esp, x` | `esp += x`                                     |
+| `retn`       | 不改变 esp，但 IDA 期望此时 esp 与函数开头相同 |
+
+如果 IDA 在 `retn` 处计算出的 `esp` 偏移量 ≠ 0，就报 **`sp-analysis failed`**。
+
+IDA 会模拟整个函数执行过程，如果任意路径 ESP 无法恢复到函数入口状态，就会认为函数存在异常，因此拒绝生成伪代码。
+
+不看伪代码了。修复控制流之后，在静态程序完全可以找到：
+
+```text
+key = "12345678";
+
+cipher = [0xDD,0x9F,0x58,0xB3,0x72,0xC8,0xB1,0xD2,0x91,0x41,0x6F,0xBB,0xC9,0x5C,0x7B,0xC1,0x13,0xED,0xFB,0x28,0xB3,0x10,0x0B,0xCF,0x21,0x68,0xA2,0x86,0x6B,0x9E,0x90,0x1D,0xCA,0xF4,0x09,0x1E,0xE8,0x79,0x6A]
+```
+
+然后异或处理，跑python就出来了。
+
+```python
+import struct
+
+def tea_decrypt(v, k):
+    v0 = v[0]
+    v1 = v[1]
+    delta = 0x9e3779b9
+    sum_val = (delta * 32) & 0xFFFFFFFF  # 保持32位无符号整数
+    
+    for _ in range(32):
+        # 所有运算都需要保持32位无符号整数
+        v1 = (v1 - (((v0 << 4) + k[2]) ^ (v0 + sum_val) ^ ((v0 >> 5) + k[3]))) & 0xFFFFFFFF
+        v0 = (v0 - (((v1 << 4) + k[0]) ^ (v1 + sum_val) ^ ((v1 >> 5) + k[1]))) & 0xFFFFFFFF
+        sum_val = (sum_val - delta) & 0xFFFFFFFF
+    
+    return [v0, v1]
+
+def main():
+    enc = [
+        0x79AE1A3B, 0x596080D3, 0x80E03E80, 0x846C8D73,
+        0x21A01CF7, 0xC7CACA32, 0x45F9AC14, 0xC5F5F22F
+    ]
+    key = [0x11, 0x11, 0x11, 0x11]
+    
+    for i in range(4):
+        v = [enc[i * 2], enc[i * 2 + 1]]
+        decrypted = tea_decrypt(v, key)
+        # 输出大写的十六进制，保持8位宽度
+        print(f"{decrypted[0]:08X}{decrypted[1]:08X}", end='')
+
+if __name__ == "__main__":
+    main()
+```
+
+flag：
+
+```text
+flag{youaretoasdaseazxvzxsw123sssssxxx}
 ```
 
 ------
