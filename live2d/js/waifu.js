@@ -99,11 +99,11 @@ initTips();
     showMessage(text, 6000);
 })();
 
-window.hitokotoTimer = window.setInterval(showHitokoto,30000);
+window.hitokotoTimer = window.setInterval(showHitokoto,60000);
 
 function showHitokoto() {
     $.getJSON("https://v1.hitokoto.cn/", function (result) {
-        showMessage(result.hitokoto, 5000);
+        showMessage(result.hitokoto, 10000);
     });
 }
 var hideTimer = null;
