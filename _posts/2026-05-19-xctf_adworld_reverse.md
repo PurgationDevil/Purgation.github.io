@@ -1916,7 +1916,7 @@ print(flag.decode(errors='ignore'))
 
 打开程序后发现 main 函数无法正常生成伪代码，而其它函数均可以正常反编译，说明开发者很可能只对 main 做了代码混淆。
 
-![截图](/img/posts/xctf_adworld_reverse/屏幕截图 2026-04-02 164448.png)
+![截图](./../img/posts/xctf_adworld_reverse/屏幕截图 2026-04-02 164448.png)
 
 **正常函数的标准流程**
 
