@@ -2,7 +2,7 @@
 layout: post
 title: "攻防世界 reverse"
 toc: true
-date: 2026-06-28
+date: 2026-06-29
 categories: 分类名称
 tags: [逆向]
 ---
@@ -2121,6 +2121,184 @@ flag：
 
 ```text
 flag{youaretoasdaseazxvzxsw123sssssxxx}
+```
+
+------
+
+## reverse_re3
+
+```c
+__int64 __fastcall main(__int64 a1, char **a2, char **a3)
+{
+  sub_11B4(a1, a2, a3);
+  do
+    v4 = sub_940();
+  while ( v4 != 1 && v4 != -1 );
+  return 0;
+}
+```
+
+main 函数非常简单，仅调用了两个函数。
+
+`sub_11B4(); sub_940();`
+
+一个负责初始化；一个负责主要逻辑。
+
+先看 `sub_11B4`。
+
+```c
+unsigned __int64 sub_11B4()
+{
+  v1 = __readfsqword(0x28u); // 用于反调试
+  dword_202AB0 = 0;
+  return __readfsqword(0x28u) ^ v1;
+}
+```
+
+这里只进行了栈保护（Stack Canary）的读取与校验，同时将全局变量 `dword_202AB0` 初始化为 0，并没有涉及题目的核心逻辑，因此继续分析 `sub_940`。
+
+```c
+__int64 sub_940()
+{
+  v5 = __readfsqword(0x28u);
+  v3 = 0;
+  memset(v4, 0, 0x200u);
+  _isoc99_scanf(&unk_1278, v4, v4);
+  while ( 1 )
+  {
+    do
+    {
+      v2 = 0;
+      sub_86C();
+      v0 = (char)v4[v3];
+      if ( v0 == 100 )
+      {
+        v2 = sub_E23();
+      }
+      else if ( v0 > 100 )
+      {
+        if ( v0 == 115 )
+        {
+          v2 = sub_C5A();
+        }
+        else if ( v0 == 119 )
+        {
+          v2 = sub_A92();
+        }
+      }
+      else
+      {
+        if ( v0 == 27 )
+          return 0xFFFFFFFFLL;
+        if ( v0 == 97 )
+          v2 = sub_FEC();
+      }
+      ++v3;
+    }
+    while ( v2 != 1 );
+    if ( dword_202AB0 == 2 )
+      break;
+    ++dword_202AB0;
+  }
+  puts("success! the flag is flag{md5(your input)}");
+  return 1;
+}
+```
+
+交叉引用看会更清晰。`v4` 是**输入**，**转移**至 `v0` 再**检查**是否等于 `w、s、a、d、Esc` （上下左右退出），`v3` 有 `++v3` 说明是**计数**的，`v2` 最后**执行**结果。flag就是输入的md5加密。
+
+```mermaid
+flowchart LR
+    A[scanf] --> B["v4(输入字符串)"]
+    B --> C["v0 = v4[v3]"]
+    C --> D{"switch(v0)"}
+    D -->|a| E[左]
+    D -->|s| F[下]
+    D -->|d| G[右]
+```
+
+这就好像是一个游戏一样控制角色上下左右移动。（以 `sub_E23` 为例）
+
+```c
+__int64 sub_E23()
+{
+  if ( dword_202AB8 != 14 )
+  {
+    if ( dword_202020[225 * dword_202AB0 + 1 + 15 * dword_202AB4 + dword_202AB8] == 1 )
+    {
+      dword_202020[225 * dword_202AB0 + 1 + 15 * dword_202AB4 + dword_202AB8] = 3; // 推算起点是3
+      dword_202020[225 * dword_202AB0 + 15 * dword_202AB4 + dword_202AB8] = 1;
+    } // 推算路径是1
+    else if ( dword_202020[225 * dword_202AB0 + 1 + 15 * dword_202AB4 + dword_202AB8] == 4 ) // 推算终点是4
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
+```
+
+因此大胆猜测：**程序实际上模拟的是一个迷宫游戏。**
+
+而 `dword_202020` 是一个迷宫！
+
+```assembly
+dd 5 dup(1), 3 dup(0), 1, 6 dup(0), 5 dup(1), 3 dup(0)
+dd 1, 6 dup(0), 5 dup(1), 3 dup(0), 5 dup(1), 2 dup(0)
+dd 5 dup(1), 7 dup(0), 1, 2 dup(0), 5 dup(1), 7 dup(0)
+dd 1, 2 dup(0), 5 dup(1), 7 dup(0), 2 dup(1), 0, 5 dup(1)
+dd 8 dup(0), 1, 0, 5 dup(1), 8 dup(0), 4, 0, 4Dh dup(1)
+d 0Dh dup(0), 2 dup(1), 0, 3, 5 dup(1), 6 dup(0), 2 dup(1)
+dd 0, 2 dup(1), 3 dup(0), 1, 6 dup(0), 2 dup(1), 6 dup(0)
+dd 1, 6 dup(0), 2 dup(1), 0, 2 dup(1), 3 dup(0), 5 dup(1)
+dd 2 dup(0), 2 dup(1), 0, 2 dup(1), 7 dup(0), 1, 2 dup(0)
+dd 2 dup(1), 0, 2 dup(1), 7 dup(0), 1, 2 dup(0), 2 dup(1)
+dd 0, 2 dup(1), 5 dup(0), 4 dup(1), 0, 2 dup(1), 0, 2 dup(1)
+dd 5 dup(0), 1, 2 dup(0), 1, 0, 2 dup(1), 0, 2 dup(1)
+dd 5 dup(0), 1, 4 dup(0), 2 dup(1), 0, 6 dup(1), 0, 1
+dd 0, 2 dup(1), 0, 2 dup(1), 0, 0Bh dup(1), 0, 2 dup(1)
+dd 0Bh dup(0), 4, 0, 1Eh dup(1), 10h dup(0), 3, 2 dup(1)
+dd 0Eh dup(0), 1, 0, 3 dup(1), 0Ah dup(0), 3 dup(1), 0
+dd 1, 0Bh dup(0), 1, 2 dup(0), 1, 8 dup(0), 2 dup(1), 0
+dd 1, 2 dup(0), 1, 9 dup(0), 3 dup(1), 2 dup(0), 1, 0Eh dup(0)
+dd 1, 0Eh dup(0), 4 dup(1), 0Eh dup(0), 1, 0Eh dup(0)
+dd 1, 0Eh dup(0), 1, 0Eh dup(0), 4 dup(1), 0Eh dup(0)
+dd 1, 0Eh dup(0), 4, 0
+```
+
+接下来就是迷宫提取了
+
+按 `Shift + E` 由于是迷宫，所以必须**保持 dword 类型，不被拆成字节**，用 `initialized C variable` 导出。
+
+```python
+# 读取文件，提取每行的第一个字符（去掉逗号）
+with open('[文件路径]', 'r') as f:
+    # 读取所有行，去掉空白和逗号，取第一个字符
+    ins_list = [line.strip().strip(',')[0] for line in f if line.strip()]
+
+row, col = 0, 0
+for i, ch in enumerate(ins_list):
+    print(ch, end=" ")
+    col += 1
+    if col == 15:
+        print()  # 换行
+        col = 0
+        row += 1
+    if row == 15:
+        print()  # 额外空行
+        row = 0
+```
+
+最后走迷宫。
+
+```text
+ddsssddddsssdssdddddsssddddsssaassssdddsddssddwddssssssdddssssdddss
+```
+
+md5加密。
+
+```text
+flag{aeea66fcac7fa80ed8f79f38ad5bb953}
 ```
 
 ------
