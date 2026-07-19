@@ -4,7 +4,7 @@ title: "Google CTF reverse"
 toc: true
 date: 2026-06-20
 categories: 分类名称
-tags: [逆向]
+tags: [逆向工程]
 ---
 
 # Google CTF reverse
