@@ -7,23 +7,42 @@ layout: default
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     mermaid.initialize({
-      startOnLoad: true,
-      theme: 'default'
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: {
+        primaryTextColor: '#333',
+        secondaryTextColor: '#666',
+        primaryColor: '#0085a1',
+        lineColor: '#666',
+        backgroundColor: '#fff'
+      }
+    });
+    
+    var preElements = document.querySelectorAll('pre');
+    preElements.forEach(function(pre) {
+      var code = pre.querySelector('code');
+      if (code && code.textContent) {
+        var text = code.textContent.trim();
+        if (text.startsWith('graph ') || 
+            text.startsWith('flowchart ') || 
+            text.startsWith('sequenceDiagram') || 
+            text.startsWith('classDiagram') || 
+            text.startsWith('stateDiagram') || 
+            text.startsWith('pie ') || 
+            text.startsWith('gantt') || 
+            text.startsWith('erDiagram') ||
+            text.startsWith('journey')) {
+          code.className = 'language-mermaid';
+        }
+      }
     });
     
     mermaid.run({
       querySelector: '.language-mermaid'
     }).then(function() {
-      setTimeout(function() {
-        var mermaidTexts = document.querySelectorAll('.mermaid svg text, .mermaid svg tspan');
-        mermaidTexts.forEach(function(el) {
-          el.style.fill = '#000';
-          el.style.color = '#000';
-          el.setAttribute('fill', '#000');
-        });
-        
-        initMermaidViewer();
-      }, 500);
+      initMermaidViewer();
+    }).catch(function(err) {
+      console.error('Mermaid rendering error:', err);
     });
   });
   
@@ -68,14 +87,7 @@ layout: default
       var container = document.createElement('div');
       container.className = 'mermaid-container';
       
-      var svg = mermaidEl.querySelector('svg');
-      if (svg) {
-        svg.style.maxWidth = 'none';
-        svg.style.maxHeight = 'none';
-        container.appendChild(svg);
-      } else {
-        container.appendChild(mermaidEl.cloneNode(true));
-      }
+      container.appendChild(mermaidEl);
       
       var hint = document.createElement('div');
       hint.className = 'mermaid-hint';
@@ -86,7 +98,14 @@ layout: default
       viewer.appendChild(container);
       viewer.appendChild(hint);
       
-      mermaidEl.parentNode.replaceChild(viewer, mermaidEl);
+      mermaidEl.parentNode.insertBefore(viewer, mermaidEl);
+      mermaidEl.remove();
+      
+      var svg = container.querySelector('svg');
+      if (svg) {
+        svg.style.maxWidth = 'none';
+        svg.style.maxHeight = 'none';
+      }
       
       var panzoom = panzoom(container, {
         zoomSpeed: 0.05,
@@ -255,16 +274,12 @@ layout: default
 
 .mermaid-viewer .mermaid-container {
   width: 100%;
-  height: 100%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: auto;
+  touch-action: none;
 }
 
 .mermaid-viewer .mermaid-container svg {
-  max-width: 100%;
-  max-height: 100%;
+  display: block;
 }
 
 .mermaid-viewer .mermaid-hint {
