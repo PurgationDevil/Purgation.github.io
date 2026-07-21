@@ -37,116 +37,89 @@ layout: default
 }
 </style>
 
-<!-- 固定目录（跟随滚动） - PC端 -->
+<!-- 文章目录样式 - 手机版模式 -->
 <style>
-.toc-fixed {
-  position: fixed;
-  right: 20px;
-  top: 40%;
-  transform: translateY(-50%);
-  width: 200px;
-  max-height: 60vh;
+.post-toc {
+  margin-bottom: 30px;
+  padding: 16px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  padding: 16px;
-  overflow-y: auto;
-  z-index: 999;
   border: 1px solid #eaeaea;
 }
 
-.toc-fixed h4 {
+.post-toc h4 {
   margin: 0 0 12px 0;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: #333;
   padding-bottom: 8px;
   border-bottom: 2px solid #0085a1;
 }
 
-.toc-fixed ul {
+.post-toc ul {
   list-style: none;
   padding-left: 0;
   margin: 0;
 }
 
-.toc-fixed li {
-  margin: 8px 0;
+.post-toc li {
+  margin: 6px 0;
 }
 
-.toc-fixed a {
+.post-toc a {
   color: #555;
   text-decoration: none;
-  font-size: 13px;
+  font-size: 14px;
   display: block;
   transition: all 0.2s;
 }
 
-.toc-fixed a:hover {
+.post-toc a:hover {
   color: #0085a1;
-  transform: translateX(2px);
 }
 
-.toc-fixed a.active {
+.post-toc a.active {
   color: #0085a1;
   font-weight: 500;
-  border-left: 2px solid #0085a1;
-  padding-left: 8px;
 }
 
-/* 滚动条 */
-.toc-fixed::-webkit-scrollbar {
-  width: 4px;
+.post-toc .toc-h2 {
+  padding-left: 0;
 }
 
-.toc-fixed::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+.post-toc .toc-h3 {
+  padding-left: 15px;
+  font-size: 13px;
 }
 
-.toc-fixed::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
-}
-
-/* 手机端隐藏PC目录 */
-@media (max-width: 992px) {
-  .toc-fixed {
-    display: none;
-  }
+.post-toc .toc-h4 {
+  padding-left: 30px;
+  font-size: 13px;
 }
 
 @media (prefers-color-scheme: dark) {
-  .toc-fixed {
+  .post-toc {
     background: rgba(10, 20, 30, 0.95);
     border: 1px solid #2a3f5f;
   }
   
-  .toc-fixed h4 {
+  .post-toc h4 {
     color: #ffffff;
     border-bottom-color: #00d4ff;
   }
   
-  .toc-fixed a {
+  .post-toc a {
     color: #d4d4d4;
   }
   
-  .toc-fixed a:hover {
+  .post-toc a:hover {
     color: #00d4ff;
   }
   
-  .toc-fixed a.active {
+  .post-toc a.active {
     color: #00d4ff;
-    border-left-color: #00d4ff;
-  }
-  
-  .toc-fixed::-webkit-scrollbar-track {
-    background: #1a2735;
-  }
-  
-  .toc-fixed::-webkit-scrollbar-thumb {
-    background: #3a5065;
   }
 }
 </style>
@@ -157,12 +130,11 @@ layout: default
     var article = document.querySelector('.post-container');
     if (!article) return;
     
-    var headers = article.querySelectorAll('h2, h3');
+    var headers = article.querySelectorAll('h2, h3, h4');
     if (headers.length === 0) return;
     
-    // 创建PC端目录
     var tocDiv = document.createElement('div');
-    tocDiv.className = 'toc-fixed';
+    tocDiv.className = 'post-toc';
     tocDiv.innerHTML = '<h4>📖 目录</h4><ul></ul>';
     var tocList = tocDiv.querySelector('ul');
     
@@ -170,11 +142,11 @@ layout: default
       var id = 'toc-' + index;
       header.id = id;
       
-      // PC端目录项
       var li = document.createElement('li');
       var a = document.createElement('a');
       a.href = '#' + id;
       a.textContent = header.textContent;
+      a.className = 'toc-' + header.tagName.toLowerCase();
       a.addEventListener('click', function(e) {
         e.preventDefault();
         document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -183,10 +155,9 @@ layout: default
       tocList.appendChild(li);
     });
     
-    document.body.appendChild(tocDiv);
+    article.insertBefore(tocDiv, article.firstChild);
     
-    // 高亮当前章节
-    var tocLinks = document.querySelectorAll('.toc-fixed a');
+    var tocLinks = document.querySelectorAll('.post-toc a');
     window.addEventListener('scroll', function() {
       var scrollPos = window.scrollY + 100;
       var currentId = null;
