@@ -40,7 +40,7 @@
   height: 0;
   border-left: 9px solid transparent;
   border-right: 9px solid transparent;
-  border-bottom: 14px solid #fff;
+  border-top: 14px solid #fff;
 }
 
 .go-top:hover {
@@ -53,23 +53,13 @@
   visibility: visible;
 }
 
-@media (max-width: 768px) {
-  .go-top {
-    bottom: 20px;
-    right: 20px;
-    width: 42px;
-    height: 42px;
-    font-size: 20px;
-  }
-}
-
 /* 浮动目录按钮 */
 .toc-mobile-btn {
   position: fixed;
   right: 20px;
-  bottom: 70px;
-  width: 45px;
-  height: 45px;
+  bottom: 95px;
+  width: 44px;
+  height: 44px;
   background: #0085a1;
   border-radius: 50%;
   display: flex;
@@ -81,15 +71,20 @@
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
-  flex-direction: column;
-  gap: 5px;
 }
 
-.toc-mobile-btn span {
-  width: 18px;
+.toc-mobile-btn::before,
+.toc-mobile-btn::after {
+  content: '';
+  position: absolute;
+  width: 16px;
   height: 2px;
   background: #fff;
   border-radius: 1px;
+}
+
+.toc-mobile-btn::before {
+  box-shadow: 0 5px 0 #fff, 0 -5px 0 #fff;
 }
 
 .toc-mobile-btn.show {
@@ -100,16 +95,6 @@
 .toc-mobile-btn:hover {
   background: #006680;
   transform: scale(1.08);
-}
-
-@media (max-width: 768px) {
-  .toc-mobile-btn {
-    right: 15px;
-    bottom: 62px;
-    width: 42px;
-    height: 42px;
-    font-size: 16px;
-  }
 }
 
 .toc-mobile-panel {
@@ -240,11 +225,7 @@
 <div class="go-top" id="goTopBtn"></div>
 
 <!-- 目录按钮 -->
-<div class="toc-mobile-btn" id="tocMobileBtn">
-  <span></span>
-  <span></span>
-  <span></span>
-</div>
+<div class="toc-mobile-btn" id="tocMobileBtn"></div>
 
 <!-- 手机端目录面板 -->
 <div class="toc-mobile-panel" id="tocMobilePanel">
