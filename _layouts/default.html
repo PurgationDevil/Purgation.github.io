@@ -24,8 +24,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 22px;
-  font-weight: bold;
+  font-size: 20px;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
@@ -33,7 +32,6 @@
   box-shadow: 0 2px 12px rgba(0,0,0,0.15);
   text-decoration: none;
   border: none;
-  line-height: 1;
 }
 
 .go-top:hover {
@@ -69,14 +67,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 16px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.2);
   cursor: pointer;
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
-  line-height: 1;
 }
 
 .toc-mobile-btn.show {
@@ -224,10 +221,10 @@
 }
 </style>
 
-<div class="go-top" id="goTopBtn">↑</div>
+<div class="go-top" id="goTopBtn"><i class="fa-solid fa-arrow-up"></i></div>
 
-<!-- 手机端目录按钮 -->
-<div class="toc-mobile-btn" id="tocMobileBtn">☰</div>
+<!-- 目录按钮 -->
+<div class="toc-mobile-btn" id="tocMobileBtn"><i class="fa-solid fa-bars"></i></div>
 
 <!-- 手机端目录面板 -->
 <div class="toc-mobile-panel" id="tocMobilePanel">
