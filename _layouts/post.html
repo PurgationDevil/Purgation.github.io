@@ -8,50 +8,33 @@ layout: default
   document.addEventListener('DOMContentLoaded', function() {
     mermaid.initialize({
       startOnLoad: false,
-      theme: 'base',
-      themeVariables: {
-        primaryTextColor: '#333',
-        secondaryTextColor: '#666',
-        primaryColor: '#0085a1',
-        lineColor: '#666',
-        backgroundColor: '#fff'
-      }
+      theme: 'default'
     });
     
-    var preElements = document.querySelectorAll('pre');
-    preElements.forEach(function(pre) {
+    var mermaidPatterns = ['graph ', 'flowchart ', 'sequenceDiagram', 'classDiagram', 
+                          'stateDiagram', 'pie ', 'gantt', 'erDiagram', 'journey', 'mindmap'];
+    
+    document.querySelectorAll('pre').forEach(function(pre) {
       var code = pre.querySelector('code');
-      if (code && code.textContent) {
-        var text = code.textContent.trim();
-        if (text.startsWith('graph ') || 
-            text.startsWith('flowchart ') || 
-            text.startsWith('sequenceDiagram') || 
-            text.startsWith('classDiagram') || 
-            text.startsWith('stateDiagram') || 
-            text.startsWith('pie ') || 
-            text.startsWith('gantt') || 
-            text.startsWith('erDiagram') ||
-            text.startsWith('journey')) {
-          code.className = 'language-mermaid';
+      if (!code) return;
+      
+      var text = code.textContent.trim();
+      for (var i = 0; i < mermaidPatterns.length; i++) {
+        if (text.startsWith(mermaidPatterns[i])) {
+          pre.innerHTML = '<div class="mermaid">' + text + '</div>';
+          break;
         }
       }
     });
     
-    mermaid.run({
-      querySelector: '.language-mermaid'
-    }).then(function() {
+    mermaid.run().then(function() {
       initMermaidViewer();
-    }).catch(function(err) {
-      console.error('Mermaid rendering error:', err);
     });
   });
   
   function initMermaidViewer() {
-    var mermaidElements = document.querySelectorAll('.mermaid');
-    mermaidElements.forEach(function(mermaidEl) {
-      if (mermaidEl.parentElement.classList.contains('mermaid-viewer')) {
-        return;
-      }
+    document.querySelectorAll('.mermaid').forEach(function(mermaidEl) {
+      if (mermaidEl.parentElement.classList.contains('mermaid-viewer')) return;
       
       var viewer = document.createElement('div');
       viewer.className = 'mermaid-viewer';
@@ -59,26 +42,12 @@ layout: default
       var toolbar = document.createElement('div');
       toolbar.className = 'mermaid-toolbar';
       
-      var zoomInBtn = document.createElement('button');
-      zoomInBtn.innerHTML = '🔍';
-      zoomInBtn.title = '放大';
-      
-      var zoomOutBtn = document.createElement('button');
-      zoomOutBtn.innerHTML = '🔎';
-      zoomOutBtn.title = '缩小';
-      
-      var resetBtn = document.createElement('button');
-      resetBtn.innerHTML = '↺';
-      resetBtn.title = '重置';
-      
-      var fullscreenBtn = document.createElement('button');
-      fullscreenBtn.innerHTML = '⛶';
-      fullscreenBtn.title = '全屏';
-      
-      toolbar.appendChild(zoomInBtn);
-      toolbar.appendChild(zoomOutBtn);
-      toolbar.appendChild(resetBtn);
-      toolbar.appendChild(fullscreenBtn);
+      ['🔍', '🔎', '↺', '⛶'].forEach(function(icon, i) {
+        var btn = document.createElement('button');
+        btn.innerHTML = icon;
+        btn.title = ['放大', '缩小', '重置', '全屏'][i];
+        toolbar.appendChild(btn);
+      });
       
       var zoomLevel = document.createElement('div');
       zoomLevel.className = 'mermaid-zoom-level';
@@ -86,7 +55,6 @@ layout: default
       
       var container = document.createElement('div');
       container.className = 'mermaid-container';
-      
       container.appendChild(mermaidEl);
       
       var hint = document.createElement('div');
@@ -111,38 +79,18 @@ layout: default
         zoomSpeed: 0.05,
         minZoom: 0.1,
         maxZoom: 10,
-        initialX: 0,
-        initialY: 0,
-        initialZoom: 1,
         onZoom: function(e) {
           zoomLevel.textContent = Math.round(e.getZoom() * 100) + '%';
         }
       });
       
-      zoomInBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        panzoom.zoomIn();
-      });
+      var btns = toolbar.querySelectorAll('button');
+      btns[0].addEventListener('click', function(e) { e.stopPropagation(); panzoom.zoomIn(); });
+      btns[1].addEventListener('click', function(e) { e.stopPropagation(); panzoom.zoomOut(); });
+      btns[2].addEventListener('click', function(e) { e.stopPropagation(); panzoom.reset(); });
+      btns[3].addEventListener('click', function(e) { e.stopPropagation(); toggleFullscreen(viewer, btns[3]); });
       
-      zoomOutBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        panzoom.zoomOut();
-      });
-      
-      resetBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        panzoom.reset();
-      });
-      
-      fullscreenBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        toggleFullscreen(viewer, fullscreenBtn);
-      });
-      
-      container.addEventListener('dblclick', function(e) {
-        panzoom.reset();
-      });
-      
+      container.addEventListener('dblclick', function() { panzoom.reset(); });
       viewer.panzoomInstance = panzoom;
     });
   }
@@ -152,31 +100,20 @@ layout: default
       viewer.classList.remove('fullscreen');
       btn.innerHTML = '⛶';
       btn.title = '全屏';
-      viewer.style.overflow = '';
-      
-      if (viewer.panzoomInstance) {
-        viewer.panzoomInstance.reset();
-      }
-      
       document.body.style.overflow = '';
+      if (viewer.panzoomInstance) viewer.panzoomInstance.reset();
     } else {
       viewer.classList.add('fullscreen');
       btn.innerHTML = '✕';
       btn.title = '退出全屏';
-      viewer.style.overflow = 'hidden';
-      
-      if (viewer.panzoomInstance) {
-        viewer.panzoomInstance.reset();
-      }
-      
       document.body.style.overflow = 'hidden';
+      if (viewer.panzoomInstance) viewer.panzoomInstance.reset();
     }
   }
   
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-      var fullscreenViewers = document.querySelectorAll('.mermaid-viewer.fullscreen');
-      fullscreenViewers.forEach(function(viewer) {
+      document.querySelectorAll('.mermaid-viewer.fullscreen').forEach(function(viewer) {
         var btn = viewer.querySelector('.mermaid-toolbar button:last-child');
         toggleFullscreen(viewer, btn);
       });
@@ -184,17 +121,7 @@ layout: default
   });
 </script>
 
-<!-- Mermaid 文字颜色 -->
 <style>
-.mermaid svg text,
-.mermaid svg tspan,
-.mermaid span,
-.mermaid .nodeLabel text,
-.mermaid .edgeLabel text {
-    fill: #000 !important;
-    color: #000 !important;
-}
-
 /* Mermaid 查看器样式 */
 .mermaid-viewer {
   position: relative;
