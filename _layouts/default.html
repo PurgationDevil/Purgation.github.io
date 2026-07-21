@@ -575,6 +575,48 @@ body {
   color: #0085a1 !important;
 }
 
+/* === 代码块复制按钮 === */
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-family: inherit;
+  color: #adbac7;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+  z-index: 10;
+  user-select: none;
+}
+
+pre:hover .copy-btn {
+  opacity: 1;
+}
+
+.copy-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.copy-btn.copied {
+  color: #57ab5a;
+  border-color: #57ab5a;
+}
+
+/* === medium-zoom 遮罩层 === */
+.medium-zoom-overlay {
+  z-index: 9998 !important;
+}
+
+.medium-zoom-image--opened {
+  z-index: 9999 !important;
+}
+
 .post-container :not(.mermaid) h1,
 .post-container :not(.mermaid) h2,
 .post-container :not(.mermaid) h3,
