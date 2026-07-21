@@ -24,8 +24,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 25px;
-  padding-left: 19px;
+  font-size: 22px;
   font-weight: bold;
   opacity: 0;
   visibility: hidden;
@@ -34,6 +33,7 @@
   box-shadow: 0 2px 12px rgba(0,0,0,0.15);
   text-decoration: none;
   border: none;
+  line-height: 1;
 }
 
 .go-top:hover {
@@ -60,7 +60,7 @@
 .toc-mobile-btn {
   position: fixed;
   right: 20px;
-  bottom: 80px;
+  bottom: 70px;
   width: 45px;
   height: 45px;
   background: #0085a1;
@@ -76,6 +76,7 @@
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
+  line-height: 1;
 }
 
 .toc-mobile-btn.show {
@@ -91,7 +92,7 @@
 @media (max-width: 768px) {
   .toc-mobile-btn {
     right: 15px;
-    bottom: 72px;
+    bottom: 62px;
     width: 42px;
     height: 42px;
     font-size: 16px;
@@ -153,6 +154,30 @@
   padding: 8px;
   border-radius: 4px;
   transition: all 0.2s;
+}
+
+.toc-mobile-content .toc-h2 {
+  padding-left: 0;
+}
+
+.toc-mobile-content .toc-h3 {
+  padding-left: 15px;
+  font-size: 13px;
+}
+
+.toc-mobile-content .toc-h4 {
+  padding-left: 30px;
+  font-size: 13px;
+}
+
+.toc-mobile-content .toc-h5 {
+  padding-left: 45px;
+  font-size: 12px;
+}
+
+.toc-mobile-content .toc-h6 {
+  padding-left: 60px;
+  font-size: 12px;
 }
 
 .toc-mobile-content a:hover,
@@ -239,7 +264,7 @@
     var article = document.querySelector('.post-container');
     if (!article) return;
     
-    var headers = article.querySelectorAll('h2, h3');
+    var headers = article.querySelectorAll('h2, h3, h4, h5, h6');
     if (headers.length === 0) return;
     
     // 显示目录按钮（只有文章页面才显示）
@@ -262,6 +287,7 @@
       var mobileA = document.createElement('a');
       mobileA.href = '#' + id;
       mobileA.textContent = header.textContent;
+      mobileA.className = 'toc-' + header.tagName.toLowerCase();
       mobileA.addEventListener('click', function(e) {
         e.preventDefault();
         document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
