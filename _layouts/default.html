@@ -501,6 +501,80 @@ body {
   color: var(--text-light) !important;
 }
 
+.mermaid p,
+.mermaid span,
+.mermaid li {
+  color: inherit !important;
+}
+
+.mermaid-wrapper {
+  position: relative;
+  margin: 20px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  background: #ffffff;
+  cursor: grab;
+}
+
+.mermaid-wrapper:active {
+  cursor: grabbing;
+}
+
+.mermaid-wrapper .mermaid {
+  width: 100%;
+  overflow: hidden;
+}
+
+.mermaid-wrapper .mermaid svg {
+  display: block;
+}
+
+.mermaid-wrapper .mermaid-zoom-info {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+.mermaid-wrapper svg {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.mermaid-wrapper .svg-pan-zoom-control-bar {
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 6px !important;
+  padding: 4px !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15) !important;
+}
+
+.mermaid-wrapper .svg-pan-zoom-control-bar button {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 4px !important;
+  width: 28px !important;
+  height: 28px !important;
+  margin: 2px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  color: #555 !important;
+}
+
+.mermaid-wrapper .svg-pan-zoom-control-bar button:hover {
+  background: #f0f0f0 !important;
+  color: #0085a1 !important;
+}
+
 .post-container :not(.mermaid) h1,
 .post-container :not(.mermaid) h2,
 .post-container :not(.mermaid) h3,
