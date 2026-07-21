@@ -3,6 +3,7 @@ layout: default
 ---
 <!-- Mermaid 支持 -->
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4/dist/panzoom.min.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     mermaid.initialize({
@@ -20,8 +21,147 @@ layout: default
           el.style.color = '#000';
           el.setAttribute('fill', '#000');
         });
+        
+        initMermaidViewer();
       }, 500);
     });
+  });
+  
+  function initMermaidViewer() {
+    var mermaidElements = document.querySelectorAll('.mermaid');
+    mermaidElements.forEach(function(mermaidEl) {
+      if (mermaidEl.parentElement.classList.contains('mermaid-viewer')) {
+        return;
+      }
+      
+      var viewer = document.createElement('div');
+      viewer.className = 'mermaid-viewer';
+      
+      var toolbar = document.createElement('div');
+      toolbar.className = 'mermaid-toolbar';
+      
+      var zoomInBtn = document.createElement('button');
+      zoomInBtn.innerHTML = '🔍';
+      zoomInBtn.title = '放大';
+      
+      var zoomOutBtn = document.createElement('button');
+      zoomOutBtn.innerHTML = '🔎';
+      zoomOutBtn.title = '缩小';
+      
+      var resetBtn = document.createElement('button');
+      resetBtn.innerHTML = '↺';
+      resetBtn.title = '重置';
+      
+      var fullscreenBtn = document.createElement('button');
+      fullscreenBtn.innerHTML = '⛶';
+      fullscreenBtn.title = '全屏';
+      
+      toolbar.appendChild(zoomInBtn);
+      toolbar.appendChild(zoomOutBtn);
+      toolbar.appendChild(resetBtn);
+      toolbar.appendChild(fullscreenBtn);
+      
+      var zoomLevel = document.createElement('div');
+      zoomLevel.className = 'mermaid-zoom-level';
+      zoomLevel.textContent = '100%';
+      
+      var container = document.createElement('div');
+      container.className = 'mermaid-container';
+      
+      var svg = mermaidEl.querySelector('svg');
+      if (svg) {
+        svg.style.maxWidth = 'none';
+        svg.style.maxHeight = 'none';
+        container.appendChild(svg);
+      } else {
+        container.appendChild(mermaidEl.cloneNode(true));
+      }
+      
+      var hint = document.createElement('div');
+      hint.className = 'mermaid-hint';
+      hint.textContent = '滚轮缩放 · 拖拽移动 · 双击重置';
+      
+      viewer.appendChild(toolbar);
+      viewer.appendChild(zoomLevel);
+      viewer.appendChild(container);
+      viewer.appendChild(hint);
+      
+      mermaidEl.parentNode.replaceChild(viewer, mermaidEl);
+      
+      var panzoom = panzoom(container, {
+        zoomSpeed: 0.05,
+        minZoom: 0.1,
+        maxZoom: 10,
+        initialX: 0,
+        initialY: 0,
+        initialZoom: 1,
+        onZoom: function(e) {
+          zoomLevel.textContent = Math.round(e.getZoom() * 100) + '%';
+        }
+      });
+      
+      zoomInBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        panzoom.zoomIn();
+      });
+      
+      zoomOutBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        panzoom.zoomOut();
+      });
+      
+      resetBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        panzoom.reset();
+      });
+      
+      fullscreenBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleFullscreen(viewer, fullscreenBtn);
+      });
+      
+      container.addEventListener('dblclick', function(e) {
+        panzoom.reset();
+      });
+      
+      viewer.panzoomInstance = panzoom;
+    });
+  }
+  
+  function toggleFullscreen(viewer, btn) {
+    if (viewer.classList.contains('fullscreen')) {
+      viewer.classList.remove('fullscreen');
+      btn.innerHTML = '⛶';
+      btn.title = '全屏';
+      viewer.style.overflow = '';
+      
+      if (viewer.panzoomInstance) {
+        viewer.panzoomInstance.reset();
+      }
+      
+      document.body.style.overflow = '';
+    } else {
+      viewer.classList.add('fullscreen');
+      btn.innerHTML = '✕';
+      btn.title = '退出全屏';
+      viewer.style.overflow = 'hidden';
+      
+      if (viewer.panzoomInstance) {
+        viewer.panzoomInstance.reset();
+      }
+      
+      document.body.style.overflow = 'hidden';
+    }
+  }
+  
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var fullscreenViewers = document.querySelectorAll('.mermaid-viewer.fullscreen');
+      fullscreenViewers.forEach(function(viewer) {
+        var btn = viewer.querySelector('.mermaid-toolbar button:last-child');
+        toggleFullscreen(viewer, btn);
+      });
+    }
   });
 </script>
 
@@ -34,6 +174,139 @@ layout: default
 .mermaid .edgeLabel text {
     fill: #000 !important;
     color: #000 !important;
+}
+
+/* Mermaid 查看器样式 */
+.mermaid-viewer {
+  position: relative;
+  margin: 20px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  background: #fff;
+}
+
+.mermaid-viewer.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  margin: 0;
+  border-radius: 0;
+}
+
+.mermaid-viewer .mermaid-toolbar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  z-index: 10;
+}
+
+.mermaid-viewer.fullscreen .mermaid-toolbar {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.mermaid-viewer .mermaid-toolbar button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: #555;
+}
+
+.mermaid-viewer .mermaid-toolbar button:hover {
+  background: #f0f0f0;
+  color: #0085a1;
+}
+
+.mermaid-viewer .mermaid-toolbar button:active {
+  transform: scale(0.95);
+}
+
+.mermaid-viewer .mermaid-zoom-level {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+  z-index: 10;
+}
+
+.mermaid-viewer .mermaid-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mermaid-viewer .mermaid-container svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.mermaid-viewer .mermaid-hint {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.mermaid-viewer.fullscreen .mermaid-hint {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .mermaid-viewer {
+    background: #1a1a2e;
+  }
+  
+  .mermaid-viewer .mermaid-toolbar {
+    background: rgba(20, 30, 40, 0.95);
+  }
+  
+  .mermaid-viewer .mermaid-toolbar button {
+    color: #d4d4d4;
+  }
+  
+  .mermaid-viewer .mermaid-toolbar button:hover {
+    background: #2a3a4e;
+    color: #00d4ff;
+  }
+  
+  .mermaid-viewer .mermaid-zoom-level {
+    background: rgba(20, 30, 40, 0.95);
+    color: #d4d4d4;
+  }
 }
 </style>
 
