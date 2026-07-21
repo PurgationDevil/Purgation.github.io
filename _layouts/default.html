@@ -34,13 +34,12 @@
   border: none;
 }
 
-.go-top::after {
-  content: '';
+.go-top span {
   width: 0;
   height: 0;
   border-left: 9px solid transparent;
   border-right: 9px solid transparent;
-  border-top: 14px solid #fff;
+  border-bottom: 14px solid #fff;
 }
 
 .go-top:hover {
@@ -73,17 +72,12 @@
   transition: all 0.3s ease;
 }
 
-.toc-mobile-btn::before,
-.toc-mobile-btn::after {
-  content: '';
-  position: absolute;
+.toc-mobile-btn span {
+  display: block;
   width: 16px;
   height: 2px;
   background: #fff;
   border-radius: 1px;
-}
-
-.toc-mobile-btn::before {
   box-shadow: 0 5px 0 #fff, 0 -5px 0 #fff;
 }
 
@@ -222,10 +216,10 @@
 }
 </style>
 
-<div class="go-top" id="goTopBtn"></div>
+<div class="go-top" id="goTopBtn"><span></span></div>
 
 <!-- 目录按钮 -->
-<div class="toc-mobile-btn" id="tocMobileBtn"></div>
+<div class="toc-mobile-btn" id="tocMobileBtn"><span></span></div>
 
 <!-- 手机端目录面板 -->
 <div class="toc-mobile-panel" id="tocMobilePanel">
