@@ -230,8 +230,22 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.textContent = 'Copy';
             btn.setAttribute('aria-label', '复制代码');
 
-            btn.addEventListener('click', function() {
-                var text = code.textContent;
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var text = '';
+                var rougeCode = pre.querySelector('.rouge-code');
+                if (rougeCode) {
+                    var codeElements = rougeCode.querySelectorAll('pre, code');
+                    if (codeElements.length > 0) {
+                        text = codeElements[codeElements.length - 1].textContent;
+                    }
+                }
+                if (!text) {
+                    text = code.textContent;
+                }
+                text = text.replace(/^\s+|\s+$/g, '');
+                
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(text).then(function() {
                         btn.textContent = '\u2713 已复制';
@@ -240,6 +254,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             btn.textContent = 'Copy';
                             btn.classList.remove('copied');
                         }, 2000);
+                        if (typeof showMessage === 'function') {
+                            showMessage('代码拿走可以，转载要记得加上出处哦~', 3000, true);
+                        }
                     }).catch(function() {
                         fallbackCopy(text, btn);
                     });
