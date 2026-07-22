@@ -138,20 +138,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (allClasses) {
-                var langMatch = allClasses.match(/language-([a-z0-9]+)/i);
+                var langMatch = allClasses.match(/language-([a-z0-9+#_-]+)/i);
                 if (!langMatch) {
-                    langMatch = allClasses.match(/lang-([a-z0-9]+)/i);
+                    langMatch = allClasses.match(/lang-([a-z0-9+#_-]+)/i);
                 }
                 if (!langMatch) {
-                    langMatch = allClasses.match(/highlight-([a-z0-9]+)/i);
+                    langMatch = allClasses.match(/highlight-([a-z0-9+#_-]+)/i);
                 }
                 if (langMatch) {
-                    lang = langMatch[1].toUpperCase();
+                    lang = langMatch[1];
                 }
-            }
-            
-            if (lang === 'ASM') {
-                lang = 'Assembly';
             }
 
             var langBadge = document.createElement('span');
