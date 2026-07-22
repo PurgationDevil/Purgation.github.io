@@ -608,19 +608,33 @@ pre:hover .copy-btn {
   border-color: #57ab5a;
 }
 
-/* === medium-zoom 遮罩层 === */
-.medium-zoom-overlay {
-  z-index: 10000 !important;
-  background: rgba(0, 0, 0, 0.85) !important;
+/* === 图片放大遮罩层 === */
+#img-zoom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  cursor: zoom-out;
 }
 
-.medium-zoom-image--opened {
-  z-index: 10001 !important;
-  max-width: none !important;
-  max-height: none !important;
-  width: auto !important;
-  height: auto !important;
-  margin: 0 !important;
+#img-zoom-overlay.active {
+  display: flex;
+}
+
+#img-zoom-target {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  cursor: grab;
+  transition: transform 0.1s ease;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .post-container :not(.mermaid) h1,
