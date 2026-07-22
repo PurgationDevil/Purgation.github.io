@@ -646,7 +646,7 @@ body {
 
 .mermaid-fullscreen-content {
   flex: 1;
-  overflow: auto;
+  overflow: hidden;
   background: #ffffff;
   padding: 0;
 }
@@ -661,9 +661,16 @@ body {
   flex-direction: column;
 }
 
+.mermaid-card-fullscreen .mermaid-header {
+  display: none;
+}
+
 .mermaid-card-fullscreen .mermaid-wrapper {
   flex: 1;
-  overflow: auto;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .mermaid-card-fullscreen .mermaid-hint {
