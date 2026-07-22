@@ -653,29 +653,20 @@ body {
   background: rgba(255, 255, 255, 0.2);
 }
 
-.mermaid-fullscreen-wrapper {
+.mermaid-fullscreen-content {
   flex: 1;
   overflow: auto;
-  padding: 24px;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.mermaid-fullscreen-card {
   background: #ffffff;
-  border-radius: 12px;
-  overflow: hidden;
-  max-width: 90vw;
-  max-height: 90vh;
+  padding: 16px;
 }
 
-.mermaid-fullscreen-card .mermaid-header {
-  background: #f9fafb;
-}
-
-.mermaid-fullscreen-card .mermaid-wrapper {
-  max-height: 70vh;
+.mermaid-fullscreen-content svg {
+  max-width: 100%;
+  max-height: 100%;
+  cursor: grab;
 }
 
 /* === 代码块复制按钮 === */
