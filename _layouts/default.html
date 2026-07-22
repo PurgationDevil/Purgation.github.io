@@ -507,72 +507,175 @@ body {
   color: inherit !important;
 }
 
-.mermaid-wrapper {
-  position: relative;
-  margin: 20px 0;
+/* === Mermaid Diagram Card === */
+.mermaid-card {
+  margin: 24px 0;
+  background: #ffffff;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  background: #ffffff;
-  cursor: grab;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
 
-.mermaid-wrapper:active {
-  cursor: grabbing;
+.mermaid-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.mermaid-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.mermaid-icon {
+  font-size: 16px;
+}
+
+.mermaid-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.mermaid-action-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.mermaid-action-btn:hover {
+  background: #e5e7eb;
+}
+
+.mermaid-wrapper {
+  overflow: auto;
+  padding: 20px;
+  max-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .mermaid-wrapper .mermaid {
-  width: 100%;
-  overflow: hidden;
-}
-
-.mermaid-wrapper .mermaid svg {
-  display: block;
-}
-
-.mermaid-wrapper .mermaid-zoom-info {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.5);
-  color: #ffffff;
-  font-size: 11px;
-  padding: 3px 10px;
-  border-radius: 10px;
-  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .mermaid-wrapper svg {
   max-width: none !important;
   max-height: none !important;
+  cursor: grab;
 }
 
-.mermaid-wrapper .svg-pan-zoom-control-bar {
-  position: absolute !important;
-  top: 8px !important;
-  right: 8px !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-radius: 6px !important;
-  padding: 4px !important;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15) !important;
+.mermaid-wrapper svg:active {
+  cursor: grabbing;
 }
 
-.mermaid-wrapper .svg-pan-zoom-control-bar button {
-  background: transparent !important;
-  border: none !important;
-  border-radius: 4px !important;
-  width: 28px !important;
-  height: 28px !important;
-  margin: 2px !important;
-  padding: 0 !important;
-  cursor: pointer !important;
-  color: #555 !important;
+.mermaid-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #fffbeb;
+  border-top: 1px solid #fef3c7;
+  font-size: 12px;
+  color: #92400e;
+  opacity: 1;
+  transition: opacity 0.5s ease;
 }
 
-.mermaid-wrapper .svg-pan-zoom-control-bar button:hover {
-  background: #f0f0f0 !important;
-  color: #0085a1 !important;
+/* === Mermaid Fullscreen === */
+.mermaid-fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mermaid-fullscreen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mermaid-fullscreen-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.mermaid-fullscreen-close {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.mermaid-fullscreen-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-wrapper {
+  flex: 1;
+  overflow: auto;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mermaid-fullscreen-card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.mermaid-fullscreen-card .mermaid-header {
+  background: #f9fafb;
+}
+
+.mermaid-fullscreen-card .mermaid-wrapper {
+  max-height: 70vh;
 }
 
 /* === 代码块复制按钮 === */
