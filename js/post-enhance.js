@@ -11,35 +11,110 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // === 2. 图片点击放大 (medium-zoom) ===
-    if (typeof mediumZoom !== 'undefined') {
-        var zoomImgs = [];
-        postImgs.forEach(function(img) {
-            // 排除 Mermaid 内部的图片
-            if (img.closest('.mermaid-wrapper')) return;
-            // 排除标记为 no-zoom 的图片
-            if (img.classList.contains('no-zoom')) return;
-            // 排除太小的图片（如图标）
-            if (img.width > 0 && img.width < 50) return;
-            zoomImgs.push(img);
+    // === 2. 图片点击放大（自定义实现） ===
+    var overlay = document.createElement('div');
+    overlay.id = 'img-zoom-overlay';
+    overlay.innerHTML = '<img id="img-zoom-target" />';
+    document.body.appendChild(overlay);
+
+    var zoomImg = overlay.querySelector('#img-zoom-target');
+    var scale = 1;
+    var isDragging = false;
+    var startX = 0, startY = 0;
+    var translateX = 0, translateY = 0;
+
+    postImgs.forEach(function(img) {
+        if (img.closest('.mermaid-wrapper')) return;
+        if (img.classList.contains('no-zoom')) return;
+        if (img.width > 0 && img.width < 50) return;
+
+        img.style.cursor = 'zoom-in';
+        img.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            openZoom(img);
         });
-        if (zoomImgs.length > 0) {
-            mediumZoom(zoomImgs, {
-                margin: 24,
-                background: 'rgba(0, 0, 0, 0.85)',
-                scrollOffset: 0
-            });
-        }
+    });
+
+    function openZoom(img) {
+        zoomImg.src = img.src;
+        scale = 1;
+        translateX = 0;
+        translateY = 0;
+        updateTransform();
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
 
+    function closeZoom() {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function updateTransform() {
+        zoomImg.style.transform = 'translate(' + translateX + 'px, ' + translateY + 'px) scale(' + scale + ')';
+    }
+
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay || e.target === zoomImg && scale === 1) {
+            closeZoom();
+        }
+    });
+
+    zoomImg.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (scale === 1) closeZoom();
+    });
+
+    // 滚轮缩放
+    overlay.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        var delta = e.deltaY > 0 ? 0.9 : 1.1;
+        scale = Math.max(0.5, Math.min(10, scale * delta));
+        if (scale < 1) {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+        }
+        updateTransform();
+    }, { passive: false });
+
+    // 拖拽
+    zoomImg.addEventListener('mousedown', function(e) {
+        if (scale <= 1) return;
+        e.preventDefault();
+        isDragging = true;
+        startX = e.clientX - translateX;
+        startY = e.clientY - translateY;
+        zoomImg.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        translateX = e.clientX - startX;
+        translateY = e.clientY - startY;
+        updateTransform();
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (isDragging) {
+            isDragging = false;
+            zoomImg.style.cursor = 'grab';
+        }
+    });
+
+    // ESC 关闭
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) {
+            closeZoom();
+        }
+    });
+
     // === 3. 代码块复制按钮 ===
-    // 延迟执行，等 Mermaid 渲染完成
     setTimeout(function() {
         document.querySelectorAll('.post-container pre').forEach(function(pre) {
-            // 跳过 Mermaid 块
             if (pre.closest('.mermaid-wrapper')) return;
             if (pre.querySelector('.mermaid')) return;
-            // 跳过已添加按钮的
             if (pre.querySelector('.copy-btn')) return;
 
             var code = pre.querySelector('code');
