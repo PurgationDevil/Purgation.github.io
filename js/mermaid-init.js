@@ -90,14 +90,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.appendChild(hint);
         wrapper.appendChild(mermaidEl);
 
+        var panZoom = svgPanZoom(svg, {
+            zoomEnabled: true,
+            controlIconsEnabled: false,
+            fit: false,
+            center: false,
+            minZoom: 0.25,
+            maxZoom: 10,
+            zoomScaleSensitivity: 0.2
+        });
+
+        svg.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+            panZoom.reset();
+        });
+
         zoomBtn.addEventListener('click', function() {
-            var svg = card.querySelector('svg');
-            svg.style.transform = 'scale(1)';
-            svg.style.transformOrigin = 'center center';
+            panZoom.reset();
         });
 
         fullscreenBtn.addEventListener('click', function() {
-            enterFullscreen(card);
+            enterFullscreen(card, panZoom);
         });
 
         setTimeout(function() {
@@ -106,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3000);
     });
 
-    function enterFullscreen(card) {
+    function enterFullscreen(card, panZoom) {
         var fullscreenOverlay = document.createElement('div');
         fullscreenOverlay.className = 'mermaid-fullscreen-overlay';
         fullscreenOverlay.innerHTML = '<div class="mermaid-fullscreen-header"><div class="mermaid-fullscreen-title">📊 Mermaid Diagram</div><button class="mermaid-fullscreen-close">×</button></div><div class="mermaid-fullscreen-content"></div>';
@@ -147,25 +160,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         svg.style.maxHeight = 'none';
 
         setTimeout(function() {
-            var fullscreenPanZoom = svgPanZoom(svg, {
-                zoomEnabled: true,
-                controlIconsEnabled: false,
-                fit: true,
-                center: true,
-                contain: true,
-                minZoom: 0.1,
-                maxZoom: 20,
-                zoomScaleSensitivity: 0.2
-            });
-
-            fullscreenPanZoom.resize();
-            fullscreenPanZoom.fit();
-            fullscreenPanZoom.center();
-
-            svg.addEventListener('dblclick', function(e) {
-                e.preventDefault();
-                fullscreenPanZoom.reset();
-            });
+            panZoom.resize();
+            panZoom.fit();
+            panZoom.center();
         }, 300);
 
         function exitFullscreen() {
@@ -185,6 +182,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             var svg = card.querySelector('svg');
             svg.removeAttribute('style');
+            
+            panZoom.reset();
             
             document.body.removeChild(fullscreenOverlay);
             document.body.style.overflow = '';
