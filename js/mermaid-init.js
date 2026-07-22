@@ -127,6 +127,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.style.boxShadow = 'none';
         card.style.borderRadius = '0';
         card.style.height = '100%';
+        card.style.width = '100vw';
+        card.style.height = '100vh';
         card.style.display = 'flex';
         card.style.flexDirection = 'column';
         card.querySelector('.mermaid-header').style.display = 'none';
@@ -135,26 +137,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         var wrapper = card.querySelector('.mermaid-wrapper');
         wrapper.style.flex = '1';
         wrapper.style.overflow = 'hidden';
-        wrapper.style.display = 'flex';
-        wrapper.style.justifyContent = 'center';
-        wrapper.style.alignItems = 'center';
+        wrapper.style.display = 'block';
         wrapper.style.padding = '0';
 
         var svg = card.querySelector('svg');
-        svg.style.maxWidth = '90vw';
-        svg.style.maxHeight = '80vh';
+        svg.style.width = '100%';
+        svg.style.height = '100%';
+        svg.style.maxWidth = 'none';
+        svg.style.maxHeight = 'none';
 
         setTimeout(function() {
-            svg.style.width = '100%';
-            svg.style.height = '100%';
-
             var fullscreenPanZoom = svgPanZoom(svg, {
                 zoomEnabled: true,
                 controlIconsEnabled: false,
                 fit: true,
                 center: true,
-                minZoom: 0.25,
-                maxZoom: 10,
+                contain: true,
+                minZoom: 0.1,
+                maxZoom: 20,
                 zoomScaleSensitivity: 0.2
             });
 
