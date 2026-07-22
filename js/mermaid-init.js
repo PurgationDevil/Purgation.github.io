@@ -141,10 +141,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         wrapper.style.padding = '0';
 
         var svg = card.querySelector('svg');
-        svg.style.maxWidth = 'none';
-        svg.style.maxHeight = 'none';
+        svg.style.maxWidth = '90vw';
+        svg.style.maxHeight = '80vh';
 
         setTimeout(function() {
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+
             var fullscreenPanZoom = svgPanZoom(svg, {
                 zoomEnabled: true,
                 controlIconsEnabled: false,
@@ -154,6 +157,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 maxZoom: 10,
                 zoomScaleSensitivity: 0.2
             });
+
+            fullscreenPanZoom.resize();
+            fullscreenPanZoom.fit();
+            fullscreenPanZoom.center();
 
             svg.addEventListener('dblclick', function(e) {
                 e.preventDefault();
@@ -174,10 +181,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             card.querySelector('.mermaid-hint').style.display = '';
             
             var wrapper = card.querySelector('.mermaid-wrapper');
-            wrapper.style = '';
+            wrapper.removeAttribute('style');
             
             var svg = card.querySelector('svg');
-            svg.style = '';
+            svg.removeAttribute('style');
             
             document.body.removeChild(fullscreenOverlay);
             document.body.style.overflow = '';
