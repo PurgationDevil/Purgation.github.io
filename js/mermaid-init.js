@@ -127,31 +127,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         var closeBtn = fullscreenOverlay.querySelector('.mermaid-fullscreen-close');
         var content = fullscreenOverlay.querySelector('.mermaid-fullscreen-content');
 
-        var svg = card.querySelector('svg');
-        var svgClone = svg.cloneNode(true);
-        content.appendChild(svgClone);
+        var originalParent = card.parentNode;
+        var originalNextSibling = card.nextSibling;
+
+        content.appendChild(card);
 
         document.body.appendChild(fullscreenOverlay);
         document.body.style.overflow = 'hidden';
 
-        var fullscreenPanZoom = svgPanZoom(svgClone, {
-            zoomEnabled: true,
-            controlIconsEnabled: false,
-            fit: false,
-            center: false,
-            minZoom: 0.25,
-            maxZoom: 10,
-            zoomScaleSensitivity: 0.2
-        });
-
-        svgClone.addEventListener('dblclick', function(e) {
-            e.preventDefault();
-            fullscreenPanZoom.reset();
-        });
+        card.classList.add('mermaid-card-fullscreen');
 
         function exitFullscreen() {
+            content.removeChild(card);
+            if (originalNextSibling) {
+                originalParent.insertBefore(card, originalNextSibling);
+            } else {
+                originalParent.appendChild(card);
+            }
+            card.classList.remove('mermaid-card-fullscreen');
             document.body.removeChild(fullscreenOverlay);
             document.body.style.overflow = '';
+            panZoom.reset();
         }
 
         closeBtn.addEventListener('click', exitFullscreen);
