@@ -127,43 +127,76 @@ document.addEventListener('DOMContentLoaded', async () => {
         var closeBtn = fullscreenOverlay.querySelector('.mermaid-fullscreen-close');
         var content = fullscreenOverlay.querySelector('.mermaid-fullscreen-content');
 
-        var svg = card.querySelector('svg');
-        var svgClone = svg.cloneNode(true);
-        
-        for (var i = 0; i < svg.attributes.length; i++) {
-            var attr = svg.attributes[i];
-            svgClone.setAttribute(attr.name, attr.value);
-        }
-        
-        svgClone.style.cssText = svg.style.cssText;
-        svgClone.style.maxWidth = 'none';
-        svgClone.style.maxHeight = 'none';
+        var originalParent = card.parentNode;
+        var originalNextSibling = card.nextSibling;
 
-        content.appendChild(svgClone);
+        content.appendChild(card);
 
         document.body.appendChild(fullscreenOverlay);
         document.body.style.overflow = 'hidden';
 
-        setTimeout(function() {
-            var fullscreenPanZoom = svgPanZoom(svgClone, {
-                zoomEnabled: true,
-                controlIconsEnabled: false,
-                fit: true,
-                center: true,
-                minZoom: 0.25,
-                maxZoom: 10,
-                zoomScaleSensitivity: 0.2
-            });
+        card.style.margin = '0';
+        card.style.border = 'none';
+        card.style.boxShadow = 'none';
+        card.style.borderRadius = '0';
+        card.style.height = '100%';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.querySelector('.mermaid-header').style.display = 'none';
+        card.querySelector('.mermaid-hint').style.display = 'none';
 
-            svgClone.addEventListener('dblclick', function(e) {
-                e.preventDefault();
-                fullscreenPanZoom.reset();
-            });
-        }, 100);
+        var wrapper = card.querySelector('.mermaid-wrapper');
+        wrapper.style.flex = '1';
+        wrapper.style.overflow = 'hidden';
+        wrapper.style.display = 'flex';
+        wrapper.style.justifyContent = 'center';
+        wrapper.style.alignItems = 'center';
+        wrapper.style.padding = '0';
+
+        var svg = card.querySelector('svg');
+        svg.style.maxWidth = 'none';
+        svg.style.maxHeight = 'none';
+
+        setTimeout(function() {
+            var svgRect = svg.getBoundingClientRect();
+            var containerW = wrapper.clientWidth;
+            var containerH = wrapper.clientHeight;
+            
+            if (svgRect.width > 0 && svgRect.height > 0) {
+                var scaleX = containerW / svgRect.width;
+                var scaleY = containerH / svgRect.height;
+                var scale = Math.min(scaleX, scaleY, 3);
+                
+                panZoom.reset();
+                panZoom.zoom(scale);
+                
+                var offsetX = (containerW - svgRect.width * scale) / 2;
+                var offsetY = (containerH - svgRect.height * scale) / 2;
+                panZoom.pan({ x: offsetX, y: offsetY });
+            }
+        }, 200);
 
         function exitFullscreen() {
+            content.removeChild(card);
+            if (originalNextSibling) {
+                originalParent.insertBefore(card, originalNextSibling);
+            } else {
+                originalParent.appendChild(card);
+            }
+            
+            card.style = '';
+            card.querySelector('.mermaid-header').style.display = '';
+            card.querySelector('.mermaid-hint').style.display = '';
+            
+            var wrapper = card.querySelector('.mermaid-wrapper');
+            wrapper.style = '';
+            
+            var svg = card.querySelector('svg');
+            svg.style = '';
+            
             document.body.removeChild(fullscreenOverlay);
             document.body.style.overflow = '';
+            panZoom.reset();
         }
 
         closeBtn.addEventListener('click', exitFullscreen);
