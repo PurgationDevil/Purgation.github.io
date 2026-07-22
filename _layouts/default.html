@@ -648,14 +648,14 @@ body {
   flex: 1;
   overflow: auto;
   background: #ffffff;
+  position: relative;
 }
 
 .mermaid-fullscreen-content svg {
-  display: block;
-  max-width: 100%;
-  max-height: calc(100vh - 50px);
   cursor: grab;
-  margin: 0 auto;
+  max-width: none !important;
+  max-height: none !important;
+  display: block;
 }
 
 /* === 代码块复制按钮 === */
