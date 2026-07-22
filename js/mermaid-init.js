@@ -90,6 +90,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.appendChild(hint);
         wrapper.appendChild(mermaidEl);
 
+        svg.style.maxWidth = 'none';
+        svg.style.maxHeight = 'none';
+
         var panZoom = svgPanZoom(svg, {
             zoomEnabled: true,
             controlIconsEnabled: false,
@@ -110,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         fullscreenBtn.addEventListener('click', function() {
-            enterFullscreen(card, panZoom);
+            enterFullscreen(svg);
         });
 
         setTimeout(function() {
@@ -119,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3000);
     });
 
-    function enterFullscreen(card, panZoom) {
+    function enterFullscreen(svg) {
         var fullscreenOverlay = document.createElement('div');
         fullscreenOverlay.className = 'mermaid-fullscreen-overlay';
         fullscreenOverlay.innerHTML = '<div class="mermaid-fullscreen-header"><div class="mermaid-fullscreen-title">📊 Mermaid Diagram</div><button class="mermaid-fullscreen-close">×</button></div><div class="mermaid-fullscreen-content"></div>';
@@ -127,7 +130,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         var closeBtn = fullscreenOverlay.querySelector('.mermaid-fullscreen-close');
         var content = fullscreenOverlay.querySelector('.mermaid-fullscreen-content');
 
-        var svg = card.querySelector('svg');
         var svgClone = svg.cloneNode(true);
         content.appendChild(svgClone);
 
@@ -138,10 +140,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             var containerRect = content.getBoundingClientRect();
             var svgRect = svgClone.getBoundingClientRect();
             
-            var scaleX = (containerRect.width - 40) / svgRect.width;
-            var scaleY = (containerRect.height - 40) / svgRect.height;
-            var fitScale = Math.min(scaleX, scaleY, 1);
-            
+            var scaleX = (containerRect.width - 60) / svgRect.width;
+            var scaleY = (containerRect.height - 60) / svgRect.height;
+            var fitScale = Math.max(0.5, Math.min(scaleX, scaleY));
+
             var fullscreenPanZoom = svgPanZoom(svgClone, {
                 zoomEnabled: true,
                 controlIconsEnabled: false,
@@ -151,17 +153,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 maxZoom: 10,
                 zoomScaleSensitivity: 0.2
             });
-            
+
             fullscreenPanZoom.zoom(fitScale);
-            fullscreenPanZoom.center();
+            var centerX = containerRect.width / 2;
+            var centerY = containerRect.height / 2;
+            fullscreenPanZoom.pan({ x: centerX - svgRect.width * fitScale / 2, y: centerY - svgRect.height * fitScale / 2 });
 
             svgClone.addEventListener('dblclick', function(e) {
                 e.preventDefault();
                 fullscreenPanZoom.reset();
                 fullscreenPanZoom.zoom(fitScale);
-                fullscreenPanZoom.center();
+                fullscreenPanZoom.pan({ x: centerX - svgRect.width * fitScale / 2, y: centerY - svgRect.height * fitScale / 2 });
             });
-        }, 200);
+        }, 100);
 
         function exitFullscreen() {
             document.body.removeChild(fullscreenOverlay);
