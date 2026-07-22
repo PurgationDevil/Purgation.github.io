@@ -26,7 +26,11 @@ re.toString = function() {
     return '';
 };
 
-$(document).on('copy', function (){
+$(document).on('copy', function (e){
+    var target = e.target || e.srcElement;
+    if (target && (target.closest('.copy-btn') || target.closest('.highlight'))) {
+        return;
+    }
     showMessage('你都复制了些什么呀，转载要记得加上出处哦', 5000, true);
 });
 
