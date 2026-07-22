@@ -611,10 +611,16 @@ pre:hover .copy-btn {
 /* === medium-zoom 遮罩层 === */
 .medium-zoom-overlay {
   z-index: 9998 !important;
+  background: rgba(0, 0, 0, 0.85) !important;
 }
 
 .medium-zoom-image--opened {
   z-index: 9999 !important;
+  max-width: none !important;
+  max-height: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
 }
 
 .post-container :not(.mermaid) h1,
