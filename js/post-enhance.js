@@ -1,7 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+    console.log('post-enhance.js loaded');
+
     // === 1. 图片懒加载 ===
     var postImgs = document.querySelectorAll('.post-container img');
+    console.log('Found', postImgs.length, 'images');
+
     postImgs.forEach(function(img) {
         if (!img.hasAttribute('loading')) {
             img.setAttribute('loading', 'lazy');
@@ -26,14 +30,23 @@ document.addEventListener('DOMContentLoaded', function() {
     postImgs.forEach(function(img) {
         if (img.closest('.mermaid-wrapper')) return;
         if (img.classList.contains('no-zoom')) return;
-        if (img.width > 0 && img.width < 50) return;
+
+        var parentAnchor = img.closest('a');
 
         img.style.cursor = 'zoom-in';
-        img.addEventListener('click', function(e) {
+
+        function handleZoom(e) {
             e.preventDefault();
             e.stopPropagation();
+            console.log('Image clicked:', img.src);
             openZoom(img);
-        });
+        }
+
+        img.addEventListener('click', handleZoom);
+
+        if (parentAnchor) {
+            parentAnchor.addEventListener('click', handleZoom);
+        }
     });
 
     function openZoom(img) {
@@ -44,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTransform();
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+        console.log('Overlay opened');
     }
 
     function closeZoom() {
@@ -66,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (scale === 1) closeZoom();
     });
 
-    // 滚轮缩放
     overlay.addEventListener('wheel', function(e) {
         e.preventDefault();
         var delta = e.deltaY > 0 ? 0.9 : 1.1;
@@ -79,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTransform();
     }, { passive: false });
 
-    // 拖拽
     zoomImg.addEventListener('mousedown', function(e) {
         if (scale <= 1) return;
         e.preventDefault();
@@ -103,7 +115,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // ESC 关闭
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && overlay.classList.contains('active')) {
             closeZoom();
