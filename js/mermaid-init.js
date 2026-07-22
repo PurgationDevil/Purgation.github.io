@@ -135,21 +135,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.style.overflow = 'hidden';
 
         setTimeout(function() {
+            var containerRect = content.getBoundingClientRect();
+            var svgRect = svgClone.getBoundingClientRect();
+            
+            var scaleX = (containerRect.width - 40) / svgRect.width;
+            var scaleY = (containerRect.height - 40) / svgRect.height;
+            var fitScale = Math.min(scaleX, scaleY, 1);
+            
             var fullscreenPanZoom = svgPanZoom(svgClone, {
                 zoomEnabled: true,
                 controlIconsEnabled: false,
-                fit: true,
-                center: true,
+                fit: false,
+                center: false,
                 minZoom: 0.25,
                 maxZoom: 10,
                 zoomScaleSensitivity: 0.2
             });
+            
+            fullscreenPanZoom.zoom(fitScale);
+            fullscreenPanZoom.center();
 
             svgClone.addEventListener('dblclick', function(e) {
                 e.preventDefault();
                 fullscreenPanZoom.reset();
+                fullscreenPanZoom.zoom(fitScale);
+                fullscreenPanZoom.center();
             });
-        }, 50);
+        }, 200);
 
         function exitFullscreen() {
             document.body.removeChild(fullscreenOverlay);
