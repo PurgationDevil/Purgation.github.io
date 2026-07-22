@@ -563,17 +563,18 @@ body {
 }
 
 .mermaid-wrapper {
-  overflow-x: auto;
-  overflow-y: auto;
+  overflow: auto;
   padding: 16px;
-  max-height: 80vh;
 }
 
 .mermaid-wrapper .mermaid {
-  display: inline-block;
+  display: block;
+  text-align: center;
 }
 
 .mermaid-wrapper svg {
+  max-width: 100%;
+  height: auto;
   cursor: grab;
 }
 
@@ -645,7 +646,7 @@ body {
 
 .mermaid-fullscreen-content {
   flex: 1;
-  overflow: hidden;
+  overflow: auto;
   background: #ffffff;
   position: relative;
 }
@@ -654,9 +655,7 @@ body {
   cursor: grab;
   max-width: none !important;
   max-height: none !important;
-  position: absolute;
-  top: 0;
-  left: 0;
+  display: block;
 }
 
 /* === 代码块复制按钮 === */
