@@ -1,11 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    console.log('post-enhance.js loaded');
-
     // === 1. 图片懒加载 ===
     var postImgs = document.querySelectorAll('.post-container img');
-    console.log('Found', postImgs.length, 'images');
-
     postImgs.forEach(function(img) {
         if (!img.hasAttribute('loading')) {
             img.setAttribute('loading', 'lazy');
@@ -15,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // === 2. 图片点击放大（自定义实现） ===
+    // === 2. 图片点击放大 ===
     var overlay = document.createElement('div');
     overlay.id = 'img-zoom-overlay';
     overlay.innerHTML = '<img id="img-zoom-target" />';
@@ -38,12 +34,10 @@ document.addEventListener('DOMContentLoaded', function() {
         function handleZoom(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Image clicked:', img.src);
             openZoom(img);
         }
 
         img.addEventListener('click', handleZoom);
-
         if (parentAnchor) {
             parentAnchor.addEventListener('click', handleZoom);
         }
@@ -57,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTransform();
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
-        console.log('Overlay opened');
     }
 
     function closeZoom() {
