@@ -127,15 +127,30 @@ document.addEventListener('DOMContentLoaded', function() {
             pre.style.position = 'relative';
 
             var lang = '';
-            var langMatch = code.className.match(/language-([a-z0-9]+)/i);
-            if (!langMatch) {
-                langMatch = code.className.match(/lang-([a-z0-9]+)/i);
+            var highlightDiv = pre.closest('.highlight');
+            var highlighterDiv = pre.closest('.highlighter-rouge');
+            
+            if (highlightDiv && highlightDiv.className) {
+                var langMatch = highlightDiv.className.match(/language-([a-z0-9]+)/i);
+                if (!langMatch) {
+                    langMatch = highlightDiv.className.match(/lang-([a-z0-9]+)/i);
+                }
+                if (langMatch) {
+                    lang = langMatch[1].toUpperCase();
+                }
             }
-            if (!langMatch) {
-                langMatch = code.className.match(/highlight-([a-z0-9]+)/i);
-            }
-            if (langMatch) {
-                lang = langMatch[1].toUpperCase();
+            
+            if (!lang && code.className) {
+                var langMatch = code.className.match(/language-([a-z0-9]+)/i);
+                if (!langMatch) {
+                    langMatch = code.className.match(/lang-([a-z0-9]+)/i);
+                }
+                if (!langMatch) {
+                    langMatch = code.className.match(/highlight-([a-z0-9]+)/i);
+                }
+                if (langMatch) {
+                    lang = langMatch[1].toUpperCase();
+                }
             }
 
             var langBadge = document.createElement('span');
