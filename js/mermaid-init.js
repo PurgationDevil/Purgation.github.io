@@ -125,21 +125,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     function enterFullscreen(card, panZoom) {
         var fullscreenOverlay = document.createElement('div');
         fullscreenOverlay.className = 'mermaid-fullscreen-overlay';
-        fullscreenOverlay.innerHTML = '<div class="mermaid-fullscreen-header"><div class="mermaid-fullscreen-title">📊 Mermaid Diagram</div><button class="mermaid-fullscreen-close">×</button></div><div class="mermaid-fullscreen-wrapper"></div>';
+        fullscreenOverlay.innerHTML = '<div class="mermaid-fullscreen-header"><div class="mermaid-fullscreen-title">📊 Mermaid Diagram</div><button class="mermaid-fullscreen-close">×</button></div><div class="mermaid-fullscreen-content"></div>';
 
         var closeBtn = fullscreenOverlay.querySelector('.mermaid-fullscreen-close');
-        var wrapper = fullscreenOverlay.querySelector('.mermaid-fullscreen-wrapper');
+        var content = fullscreenOverlay.querySelector('.mermaid-fullscreen-content');
 
-        var clone = card.cloneNode(true);
-        clone.classList.add('mermaid-fullscreen-card');
-        wrapper.appendChild(clone);
+        var svg = card.querySelector('svg');
+        var svgClone = svg.cloneNode(true);
+        content.appendChild(svgClone);
 
         document.body.appendChild(fullscreenOverlay);
         document.body.style.overflow = 'hidden';
 
-        var newSvg = clone.querySelector('svg');
-        if (newSvg) {
-            var fullscreenPanZoom = svgPanZoom(newSvg, {
+        setTimeout(function() {
+            var fullscreenPanZoom = svgPanZoom(svgClone, {
                 zoomEnabled: true,
                 controlIconsEnabled: false,
                 fit: true,
@@ -149,11 +148,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 zoomScaleSensitivity: 0.2
             });
 
-            newSvg.addEventListener('dblclick', function(e) {
+            svgClone.addEventListener('dblclick', function(e) {
                 e.preventDefault();
                 fullscreenPanZoom.reset();
             });
-        }
+        }, 50);
 
         function exitFullscreen() {
             document.body.removeChild(fullscreenOverlay);
