@@ -90,14 +90,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.appendChild(hint);
         wrapper.appendChild(mermaidEl);
 
-        svg.style.maxWidth = 'none';
-        svg.style.maxHeight = 'none';
-
         var panZoom = svgPanZoom(svg, {
             zoomEnabled: true,
             controlIconsEnabled: false,
-            fit: true,
-            center: true,
+            fit: false,
+            center: false,
             minZoom: 0.25,
             maxZoom: 10,
             zoomScaleSensitivity: 0.2
