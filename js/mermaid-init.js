@@ -141,22 +141,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             var svg = card.querySelector('svg');
             var wrapper = card.querySelector('.mermaid-wrapper');
             
-            panZoom.reset();
+            svg.style.maxWidth = 'none';
+            svg.style.maxHeight = 'none';
             
-            var containerWidth = wrapper.clientWidth;
-            var containerHeight = wrapper.clientHeight;
-            var svgWidth = svg.width.baseVal.value;
-            var svgHeight = svg.height.baseVal.value;
+            var containerW = wrapper.clientWidth;
+            var containerH = wrapper.clientHeight;
+            var svgW = svg.getBoundingClientRect().width;
+            var svgH = svg.getBoundingClientRect().height;
             
-            if (svgWidth > 0 && svgHeight > 0) {
-                var scaleX = containerWidth / svgWidth;
-                var scaleY = containerHeight / svgHeight;
-                var scale = Math.min(scaleX, scaleY);
+            if (svgW > 0 && svgH > 0) {
+                var scale = Math.min(containerW / svgW, containerH / svgH, 3);
                 
+                panZoom.reset();
                 panZoom.zoom(scale);
-                panZoom.center();
+                
+                var cx = containerW / 2;
+                var cy = containerH / 2;
+                panZoom.pan({ x: cx - svgW * scale / 2, y: cy - svgH * scale / 2 });
             }
-        }, 200);
+        }, 300);
 
         function exitFullscreen() {
             content.removeChild(card);
