@@ -150,75 +150,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            var langMap = {
-                'CPP': 'C++',
-                'CXX': 'C++',
-                'CC': 'C++',
-                'PY': 'Python',
-                'PYTHON': 'Python',
-                'JS': 'JavaScript',
-                'JAVASCRIPT': 'JavaScript',
-                'TS': 'TypeScript',
-                'TYPESCRIPT': 'TypeScript',
-                'HTML': 'HTML',
-                'CSS': 'CSS',
-                'SHELL': 'Shell',
-                'BASH': 'Bash',
-                'SH': 'Shell',
-                'MAKEFILE': 'Makefile',
-                'JSON': 'JSON',
-                'XML': 'XML',
-                'YAML': 'YAML',
-                'SQL': 'SQL',
-                'GO': 'Go',
-                'RUST': 'Rust',
-                'JAVA': 'Java',
-                'PHP': 'PHP',
-                'RUBY': 'Ruby',
-                'SWIFT': 'Swift',
-                'KOTLIN': 'Kotlin',
-                'DART': 'Dart',
-                'R': 'R',
-                'MATLAB': 'MATLAB',
-                'ASM': 'Assembly',
-                'ASSEMBLY': 'Assembly',
-                'NASM': 'Assembly',
-                'PERL': 'Perl',
-                'SCALA': 'Scala',
-                'HASKELL': 'Haskell',
-                'OCAML': 'OCaml',
-                'LUA': 'Lua',
-                'PERL': 'Perl',
-                'MARKDOWN': 'Markdown',
-                'MD': 'Markdown',
-                'DIFF': 'Diff',
-                'PATCH': 'Diff',
-                'CONFIG': 'Config',
-                'CONF': 'Config',
-                'INI': 'Config',
-                'LOG': 'Log',
-                'TOML': 'TOML',
-                'PROTO': 'Protocol',
-                'GRPC': 'Protocol',
-                'VUE': 'Vue',
-                'REACT': 'React',
-                'ANGULAR': 'Angular',
-                'NODE': 'Node.js',
-                'NODEJS': 'Node.js',
-                'DOCKER': 'Docker',
-                'DOCKERFILE': 'Docker',
-                'KUBERNETES': 'Kubernetes',
-                'YAML': 'YAML',
-                'K8S': 'Kubernetes',
-                'LINUX': 'Linux',
-                'WIN': 'Windows',
-                'CMD': 'Command',
-                'POWERSHELL': 'PowerShell',
-                'PS1': 'PowerShell'
-            };
-            
-            if (lang && langMap[lang]) {
-                lang = langMap[lang];
+            if (lang === 'ASM') {
+                lang = 'Assembly';
             }
 
             var langBadge = document.createElement('span');
