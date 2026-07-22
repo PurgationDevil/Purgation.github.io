@@ -137,6 +137,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         card.classList.add('mermaid-card-fullscreen');
 
+        setTimeout(function() {
+            panZoom.resize();
+            panZoom.fit();
+            panZoom.center();
+        }, 100);
+
         function exitFullscreen() {
             content.removeChild(card);
             if (originalNextSibling) {
