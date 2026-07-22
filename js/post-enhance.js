@@ -138,12 +138,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (allClasses) {
-                var langMatch = allClasses.match(/language-([a-z0-9+#_-]+)/i);
+                var langMatch = allClasses.match(/language-([^ ]+)/i);
                 if (!langMatch) {
-                    langMatch = allClasses.match(/lang-([a-z0-9+#_-]+)/i);
+                    langMatch = allClasses.match(/lang-([^ ]+)/i);
                 }
                 if (!langMatch) {
-                    langMatch = allClasses.match(/highlight-([a-z0-9+#_-]+)/i);
+                    langMatch = allClasses.match(/highlight-([^ ]+)/i);
                 }
                 if (langMatch) {
                     lang = langMatch[1];
