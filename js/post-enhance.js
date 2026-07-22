@@ -126,6 +126,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
             pre.style.position = 'relative';
 
+            var lang = '';
+            var langMatch = code.className.match(/language-([a-z0-9]+)/i);
+            if (!langMatch) {
+                langMatch = code.className.match(/lang-([a-z0-9]+)/i);
+            }
+            if (!langMatch) {
+                langMatch = code.className.match(/highlight-([a-z0-9]+)/i);
+            }
+            if (langMatch) {
+                lang = langMatch[1].toUpperCase();
+            }
+
+            var langBadge = document.createElement('span');
+            langBadge.className = 'code-lang';
+            langBadge.textContent = lang || 'CODE';
+
             var btn = document.createElement('button');
             btn.className = 'copy-btn';
             btn.textContent = 'Copy';
@@ -149,6 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
+            pre.appendChild(langBadge);
             pre.appendChild(btn);
         });
     }, 1500);
