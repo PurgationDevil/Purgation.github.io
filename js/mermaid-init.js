@@ -127,51 +127,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         var closeBtn = fullscreenOverlay.querySelector('.mermaid-fullscreen-close');
         var content = fullscreenOverlay.querySelector('.mermaid-fullscreen-content');
 
-        var originalParent = card.parentNode;
-        var originalNextSibling = card.nextSibling;
+        var svg = card.querySelector('svg');
+        var svgClone = svg.cloneNode(true);
+        
+        for (var i = 0; i < svg.attributes.length; i++) {
+            var attr = svg.attributes[i];
+            svgClone.setAttribute(attr.name, attr.value);
+        }
+        
+        svgClone.style.cssText = svg.style.cssText;
+        svgClone.style.maxWidth = 'none';
+        svgClone.style.maxHeight = 'none';
 
-        content.appendChild(card);
+        content.appendChild(svgClone);
 
         document.body.appendChild(fullscreenOverlay);
         document.body.style.overflow = 'hidden';
 
-        card.classList.add('mermaid-card-fullscreen');
-
         setTimeout(function() {
-            var svg = card.querySelector('svg');
-            var wrapper = card.querySelector('.mermaid-wrapper');
-            
-            svg.style.maxWidth = 'none';
-            svg.style.maxHeight = 'none';
-            
-            var containerW = wrapper.clientWidth;
-            var containerH = wrapper.clientHeight;
-            var svgW = svg.getBoundingClientRect().width;
-            var svgH = svg.getBoundingClientRect().height;
-            
-            if (svgW > 0 && svgH > 0) {
-                var scale = Math.min(containerW / svgW, containerH / svgH, 3);
-                
-                panZoom.reset();
-                panZoom.zoom(scale);
-                
-                var cx = containerW / 2;
-                var cy = containerH / 2;
-                panZoom.pan({ x: cx - svgW * scale / 2, y: cy - svgH * scale / 2 });
-            }
-        }, 300);
+            var fullscreenPanZoom = svgPanZoom(svgClone, {
+                zoomEnabled: true,
+                controlIconsEnabled: false,
+                fit: true,
+                center: true,
+                minZoom: 0.25,
+                maxZoom: 10,
+                zoomScaleSensitivity: 0.2
+            });
+
+            svgClone.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+                fullscreenPanZoom.reset();
+            });
+        }, 100);
 
         function exitFullscreen() {
-            content.removeChild(card);
-            if (originalNextSibling) {
-                originalParent.insertBefore(card, originalNextSibling);
-            } else {
-                originalParent.appendChild(card);
-            }
-            card.classList.remove('mermaid-card-fullscreen');
             document.body.removeChild(fullscreenOverlay);
             document.body.style.overflow = '';
-            panZoom.reset();
         }
 
         closeBtn.addEventListener('click', exitFullscreen);
