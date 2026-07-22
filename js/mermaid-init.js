@@ -7,17 +7,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             background: '#ffffff',
             primaryColor: '#ffffff',
             primaryBorderColor: '#4f46e5',
-            primaryTextColor: '#111827',
+            primaryTextColor: '#000000',
             lineColor: '#374151',
-            textColor: '#111827',
-            secondaryColor: '#f3f4f6',
-            secondaryTextColor: '#374151',
-            tertiaryColor: '#fef3c7',
+            textColor: '#000000',
+            secondaryColor: '#ffffff',
+            secondaryTextColor: '#000000',
+            tertiaryColor: '#ffffff',
             fontFamily: 'JetBrains Mono, Cascadia Code, Consolas, monospace',
             fontSize: '16px',
             mainBkg: '#ffffff',
             nodeBorder: '#d1d5db',
-            nodeTextColor: '#111827',
+            nodeTextColor: '#000000',
             clusterBkg: '#f9fafb',
             clusterBorder: '#e5e7eb',
             edgeLabelBackground: '#ffffff',
@@ -43,6 +43,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     await mermaid.run();
+
+    document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+        svg.querySelectorAll('text, tspan').forEach(function(el) {
+            el.style.fill = '#000000';
+            el.style.color = '#000000';
+        });
+        svg.querySelectorAll('.nodeLabel, .edgeLabel').forEach(function(el) {
+            el.style.color = '#000000';
+            el.style.fill = '#000000';
+        });
+    });
 
     document.querySelectorAll('.mermaid').forEach(function(mermaidEl, index) {
         var svg = mermaidEl.querySelector('svg');
