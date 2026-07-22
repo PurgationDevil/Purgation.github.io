@@ -90,27 +90,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.appendChild(hint);
         wrapper.appendChild(mermaidEl);
 
-        var panZoom = svgPanZoom(svg, {
-            zoomEnabled: true,
-            controlIconsEnabled: false,
-            fit: false,
-            center: false,
-            minZoom: 0.25,
-            maxZoom: 10,
-            zoomScaleSensitivity: 0.2
-        });
-
-        svg.addEventListener('dblclick', function(e) {
-            e.preventDefault();
-            panZoom.reset();
-        });
-
         zoomBtn.addEventListener('click', function() {
-            panZoom.reset();
+            var svg = card.querySelector('svg');
+            svg.style.transform = 'scale(1)';
+            svg.style.transformOrigin = 'center center';
         });
 
         fullscreenBtn.addEventListener('click', function() {
-            enterFullscreen(card, panZoom);
+            enterFullscreen(card);
         });
 
         setTimeout(function() {
@@ -119,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3000);
     });
 
-    function enterFullscreen(card, panZoom) {
+    function enterFullscreen(card) {
         var fullscreenOverlay = document.createElement('div');
         fullscreenOverlay.className = 'mermaid-fullscreen-overlay';
         fullscreenOverlay.innerHTML = '<div class="mermaid-fullscreen-header"><div class="mermaid-fullscreen-title">📊 Mermaid Diagram</div><button class="mermaid-fullscreen-close">×</button></div><div class="mermaid-fullscreen-content"></div>';
@@ -158,23 +145,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         svg.style.maxHeight = 'none';
 
         setTimeout(function() {
-            var svgRect = svg.getBoundingClientRect();
-            var containerW = wrapper.clientWidth;
-            var containerH = wrapper.clientHeight;
-            
-            if (svgRect.width > 0 && svgRect.height > 0) {
-                var scaleX = containerW / svgRect.width;
-                var scaleY = containerH / svgRect.height;
-                var scale = Math.min(scaleX, scaleY, 3);
-                
-                panZoom.reset();
-                panZoom.zoom(scale);
-                
-                var offsetX = (containerW - svgRect.width * scale) / 2;
-                var offsetY = (containerH - svgRect.height * scale) / 2;
-                panZoom.pan({ x: offsetX, y: offsetY });
-            }
-        }, 200);
+            var fullscreenPanZoom = svgPanZoom(svg, {
+                zoomEnabled: true,
+                controlIconsEnabled: false,
+                fit: true,
+                center: true,
+                minZoom: 0.25,
+                maxZoom: 10,
+                zoomScaleSensitivity: 0.2
+            });
+
+            svg.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+                fullscreenPanZoom.reset();
+            });
+        }, 300);
 
         function exitFullscreen() {
             content.removeChild(card);
@@ -196,7 +181,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             document.body.removeChild(fullscreenOverlay);
             document.body.style.overflow = '';
-            panZoom.reset();
         }
 
         closeBtn.addEventListener('click', exitFullscreen);
