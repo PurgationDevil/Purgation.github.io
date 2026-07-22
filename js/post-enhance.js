@@ -127,30 +127,98 @@ document.addEventListener('DOMContentLoaded', function() {
             pre.style.position = 'relative';
 
             var lang = '';
-            var highlightDiv = pre.closest('.highlight');
-            var highlighterDiv = pre.closest('.highlighter-rouge');
+            var parent = pre.parentNode;
+            var allClasses = '';
             
-            if (highlightDiv && highlightDiv.className) {
-                var langMatch = highlightDiv.className.match(/language-([a-z0-9]+)/i);
+            while (parent && parent !== document.body) {
+                if (parent.className) {
+                    allClasses += ' ' + parent.className;
+                }
+                parent = parent.parentNode;
+            }
+            
+            if (allClasses) {
+                var langMatch = allClasses.match(/language-([a-z0-9]+)/i);
                 if (!langMatch) {
-                    langMatch = highlightDiv.className.match(/lang-([a-z0-9]+)/i);
+                    langMatch = allClasses.match(/lang-([a-z0-9]+)/i);
+                }
+                if (!langMatch) {
+                    langMatch = allClasses.match(/highlight-([a-z0-9]+)/i);
                 }
                 if (langMatch) {
                     lang = langMatch[1].toUpperCase();
                 }
             }
             
-            if (!lang && code.className) {
-                var langMatch = code.className.match(/language-([a-z0-9]+)/i);
-                if (!langMatch) {
-                    langMatch = code.className.match(/lang-([a-z0-9]+)/i);
-                }
-                if (!langMatch) {
-                    langMatch = code.className.match(/highlight-([a-z0-9]+)/i);
-                }
-                if (langMatch) {
-                    lang = langMatch[1].toUpperCase();
-                }
+            var langMap = {
+                'CPP': 'C++',
+                'CXX': 'C++',
+                'CC': 'C++',
+                'PY': 'Python',
+                'PYTHON': 'Python',
+                'JS': 'JavaScript',
+                'JAVASCRIPT': 'JavaScript',
+                'TS': 'TypeScript',
+                'TYPESCRIPT': 'TypeScript',
+                'HTML': 'HTML',
+                'CSS': 'CSS',
+                'SHELL': 'Shell',
+                'BASH': 'Bash',
+                'SH': 'Shell',
+                'MAKEFILE': 'Makefile',
+                'JSON': 'JSON',
+                'XML': 'XML',
+                'YAML': 'YAML',
+                'SQL': 'SQL',
+                'GO': 'Go',
+                'RUST': 'Rust',
+                'JAVA': 'Java',
+                'PHP': 'PHP',
+                'RUBY': 'Ruby',
+                'SWIFT': 'Swift',
+                'KOTLIN': 'Kotlin',
+                'DART': 'Dart',
+                'R': 'R',
+                'MATLAB': 'MATLAB',
+                'ASM': 'Assembly',
+                'ASSEMBLY': 'Assembly',
+                'NASM': 'Assembly',
+                'PERL': 'Perl',
+                'SCALA': 'Scala',
+                'HASKELL': 'Haskell',
+                'OCAML': 'OCaml',
+                'LUA': 'Lua',
+                'PERL': 'Perl',
+                'MARKDOWN': 'Markdown',
+                'MD': 'Markdown',
+                'DIFF': 'Diff',
+                'PATCH': 'Diff',
+                'CONFIG': 'Config',
+                'CONF': 'Config',
+                'INI': 'Config',
+                'LOG': 'Log',
+                'TOML': 'TOML',
+                'PROTO': 'Protocol',
+                'GRPC': 'Protocol',
+                'VUE': 'Vue',
+                'REACT': 'React',
+                'ANGULAR': 'Angular',
+                'NODE': 'Node.js',
+                'NODEJS': 'Node.js',
+                'DOCKER': 'Docker',
+                'DOCKERFILE': 'Docker',
+                'KUBERNETES': 'Kubernetes',
+                'YAML': 'YAML',
+                'K8S': 'Kubernetes',
+                'LINUX': 'Linux',
+                'WIN': 'Windows',
+                'CMD': 'Command',
+                'POWERSHELL': 'PowerShell',
+                'PS1': 'PowerShell'
+            };
+            
+            if (lang && langMap[lang]) {
+                lang = langMap[lang];
             }
 
             var langBadge = document.createElement('span');
