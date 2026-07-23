@@ -2745,7 +2745,7 @@ zsh vs bash 对比
 
 速查 Linux 命令请看我的另一篇文章《Linux 命令》
 
-### 3.9包管理器（Package Manager）
+### 3.9 包管理器（Package Manager）
 
 **包管理器是 Linux 发行版中用于安装、升级、配置和删除软件的工具**。
 
