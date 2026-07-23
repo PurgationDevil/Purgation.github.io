@@ -101,27 +101,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.appendChild(hint);
         wrapper.appendChild(mermaidEl);
 
-        var panZoom = svgPanZoom(svg, {
-            zoomEnabled: true,
-            controlIconsEnabled: false,
-            fit: false,
-            center: false,
-            minZoom: 0.25,
-            maxZoom: 10,
-            zoomScaleSensitivity: 0.2
-        });
-
         svg.addEventListener('dblclick', function(e) {
             e.preventDefault();
-            panZoom.reset();
         });
 
         zoomBtn.addEventListener('click', function() {
-            panZoom.reset();
+            svg.style.transform = 'scale(1)';
+            svg.style.transformOrigin = 'center center';
         });
 
         fullscreenBtn.addEventListener('click', function() {
-            enterFullscreen(card, panZoom);
+            enterFullscreen(card);
         });
 
         setTimeout(function() {
@@ -130,7 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3000);
     });
 
-    function enterFullscreen(card, panZoom) {
+    function enterFullscreen(card) {
         var fullscreenOverlay = document.createElement('div');
         fullscreenOverlay.className = 'mermaid-fullscreen-overlay';
         fullscreenOverlay.innerHTML = '<div class="mermaid-fullscreen-header"><div class="mermaid-fullscreen-title">📊 Mermaid Diagram</div><button class="mermaid-fullscreen-close">×</button></div><div class="mermaid-fullscreen-content"></div>';
@@ -138,64 +128,58 @@ document.addEventListener('DOMContentLoaded', async () => {
         var closeBtn = fullscreenOverlay.querySelector('.mermaid-fullscreen-close');
         var content = fullscreenOverlay.querySelector('.mermaid-fullscreen-content');
 
-        var originalParent = card.parentNode;
-        var originalNextSibling = card.nextSibling;
+        var clone = card.cloneNode(true);
+        clone.style.margin = '0';
+        clone.style.border = 'none';
+        clone.style.boxShadow = 'none';
+        clone.style.borderRadius = '0';
+        clone.style.height = '100%';
+        clone.style.width = '100vw';
+        clone.style.height = '100vh';
+        clone.style.display = 'flex';
+        clone.style.flexDirection = 'column';
+        clone.querySelector('.mermaid-header').style.display = 'none';
+        clone.querySelector('.mermaid-hint').style.display = 'none';
 
-        content.appendChild(card);
-
-        document.body.appendChild(fullscreenOverlay);
-        document.body.style.overflow = 'hidden';
-
-        card.style.margin = '0';
-        card.style.border = 'none';
-        card.style.boxShadow = 'none';
-        card.style.borderRadius = '0';
-        card.style.height = '100%';
-        card.style.width = '100vw';
-        card.style.height = '100vh';
-        card.style.display = 'flex';
-        card.style.flexDirection = 'column';
-        card.querySelector('.mermaid-header').style.display = 'none';
-        card.querySelector('.mermaid-hint').style.display = 'none';
-
-        var wrapper = card.querySelector('.mermaid-wrapper');
+        var wrapper = clone.querySelector('.mermaid-wrapper');
         wrapper.style.flex = '1';
         wrapper.style.overflow = 'hidden';
         wrapper.style.display = 'block';
         wrapper.style.padding = '0';
 
-        var svg = card.querySelector('svg');
+        var svg = clone.querySelector('svg');
         svg.style.width = '100%';
         svg.style.height = '100%';
         svg.style.maxWidth = 'none';
         svg.style.maxHeight = 'none';
 
+        content.appendChild(clone);
+        document.body.appendChild(fullscreenOverlay);
+        document.body.style.overflow = 'hidden';
+
         setTimeout(function() {
-            panZoom.resize();
-            panZoom.fit();
-            panZoom.center();
+            var fullscreenPanZoom = svgPanZoom(svg, {
+                zoomEnabled: true,
+                controlIconsEnabled: false,
+                fit: true,
+                center: true,
+                contain: true,
+                minZoom: 0.1,
+                maxZoom: 20,
+                zoomScaleSensitivity: 0.2
+            });
+
+            fullscreenPanZoom.resize();
+            fullscreenPanZoom.fit();
+            fullscreenPanZoom.center();
+
+            svg.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+                fullscreenPanZoom.reset();
+            });
         }, 300);
 
         function exitFullscreen() {
-            content.removeChild(card);
-            if (originalNextSibling) {
-                originalParent.insertBefore(card, originalNextSibling);
-            } else {
-                originalParent.appendChild(card);
-            }
-            
-            card.style = '';
-            card.querySelector('.mermaid-header').style.display = '';
-            card.querySelector('.mermaid-hint').style.display = '';
-            
-            var wrapper = card.querySelector('.mermaid-wrapper');
-            wrapper.removeAttribute('style');
-            
-            var svg = card.querySelector('svg');
-            svg.removeAttribute('style');
-            
-            panZoom.reset();
-            
             document.body.removeChild(fullscreenOverlay);
             document.body.style.overflow = '';
         }
