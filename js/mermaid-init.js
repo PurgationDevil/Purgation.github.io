@@ -73,17 +73,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         var actions = document.createElement('div');
         actions.className = 'mermaid-actions';
 
-        var zoomBtn = document.createElement('button');
-        zoomBtn.className = 'mermaid-action-btn';
-        zoomBtn.innerHTML = '🔍';
-        zoomBtn.title = '重置缩放';
-
         var fullscreenBtn = document.createElement('button');
         fullscreenBtn.className = 'mermaid-action-btn';
         fullscreenBtn.innerHTML = '⛶';
         fullscreenBtn.title = '全屏查看';
 
-        actions.appendChild(zoomBtn);
         actions.appendChild(fullscreenBtn);
         header.appendChild(title);
         header.appendChild(actions);
@@ -101,15 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.appendChild(hint);
         wrapper.appendChild(mermaidEl);
 
-        svg.addEventListener('dblclick', function(e) {
-            e.preventDefault();
-        });
-
-        zoomBtn.addEventListener('click', function() {
-            svg.style.transform = 'scale(1)';
-            svg.style.transformOrigin = 'center center';
-        });
-
         fullscreenBtn.addEventListener('click', function() {
             enterFullscreen(card);
         });
@@ -123,8 +108,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     function enterFullscreen(card) {
         var fullscreenOverlay = document.createElement('div');
         fullscreenOverlay.className = 'mermaid-fullscreen-overlay';
-        fullscreenOverlay.innerHTML = '<div class="mermaid-fullscreen-header"><div class="mermaid-fullscreen-title">📊 Mermaid Diagram</div><button class="mermaid-fullscreen-close">×</button></div><div class="mermaid-fullscreen-content"></div>';
+        fullscreenOverlay.innerHTML = '<div class="mermaid-fullscreen-header"><div class="mermaid-fullscreen-title">📊 Mermaid Diagram</div><button class="mermaid-fullscreen-reset">复原</button><button class="mermaid-fullscreen-close">×</button></div><div class="mermaid-fullscreen-content"></div>';
 
+        var resetBtn = fullscreenOverlay.querySelector('.mermaid-fullscreen-reset');
         var closeBtn = fullscreenOverlay.querySelector('.mermaid-fullscreen-close');
         var content = fullscreenOverlay.querySelector('.mermaid-fullscreen-content');
 
@@ -157,8 +143,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.appendChild(fullscreenOverlay);
         document.body.style.overflow = 'hidden';
 
+        var fullscreenPanZoom;
         setTimeout(function() {
-            var fullscreenPanZoom = svgPanZoom(svg, {
+            fullscreenPanZoom = svgPanZoom(svg, {
                 zoomEnabled: true,
                 controlIconsEnabled: false,
                 fit: true,
@@ -183,6 +170,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.body.removeChild(fullscreenOverlay);
             document.body.style.overflow = '';
         }
+
+        resetBtn.addEventListener('click', function() {
+            if (fullscreenPanZoom) {
+                fullscreenPanZoom.reset();
+            }
+        });
 
         closeBtn.addEventListener('click', exitFullscreen);
         fullscreenOverlay.addEventListener('click', function(e) {
