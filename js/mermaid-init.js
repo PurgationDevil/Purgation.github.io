@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         var hint = document.createElement('div');
         hint.className = 'mermaid-hint';
-        hint.innerHTML = '<span>💡</span> Ctrl+滚轮缩放 · 左键拖动 · 双击恢复';
+        hint.innerHTML = '<span>💡</span> 放大时：滚轮缩放 · 左键拖动 · 双击恢复';
 
         mermaidEl.parentNode.insertBefore(card, mermaidEl);
         card.appendChild(header);
