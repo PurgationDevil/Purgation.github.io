@@ -61,4 +61,8 @@
 
     <!-- ga & ba script hoook -->
     <script></script>
+
+    {% if page.layout == 'post' and page.mathjax != false %}
+    {% include mathjax_support.html %}
+    {% endif %}
 </head>
