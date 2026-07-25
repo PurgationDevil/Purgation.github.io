@@ -48,6 +48,7 @@ plugins: [jekyll-paginate]
 markdown: kramdown
 kramdown:
   input: GFM # use Github Flavored Markdown !important
+  math_engine: mathjax
   syntax_highlighter_opts:
     span:
       line_numbers: false
@@ -90,7 +91,7 @@ announcement:
   enabled: true
   title: 📢 公告
   items:
-    - "娱乐几天"
+    - "正在学习安全逆向 (^_^)"
 
 # Friends
 friends:
