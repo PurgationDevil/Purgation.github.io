@@ -1,8 +1,8 @@
----
+﻿---
 layout: post
 title: "攻防世界 reverse"
 toc: true
-date: 2026-06-29
+date: 2026-07-27
 categories: 分类名称
 tags: [逆向工程]
 ---
@@ -1698,7 +1698,7 @@ __ROL4__(v12 + v15, 7)
 
 或者：
 
-```assembly
+```asm
 rol eax, 7
 rol eax, 12
 rol eax, 17
@@ -1982,7 +1982,7 @@ IDA 无法反编译的原因，并不是函数真的损坏，而是入口处存�
 
 观察入口：
 
-```assembly
+```asm
 mov eax, offset sub_4116CE
 mov ebx, offset byte_4116E3
 ...
@@ -1994,7 +1994,7 @@ retn
 
 这里最关键的是
 
-```assembly
+```asm
 push ebx
 retn
 ```
@@ -2005,7 +2005,7 @@ retn
 
 实际上等价于
 
-```assembly
+```asm
 jmp 0x4116E4
 ```
 
@@ -2242,7 +2242,7 @@ __int64 sub_E23()
 
 而 `dword_202020` 是一个迷宫！
 
-```assembly
+```asm
 dd 5 dup(1), 3 dup(0), 1, 6 dup(0), 5 dup(1), 3 dup(0)
 dd 1, 6 dup(0), 5 dup(1), 3 dup(0), 5 dup(1), 2 dup(0)
 dd 5 dup(1), 7 dup(0), 1, 2 dup(0), 5 dup(1), 7 dup(0)
@@ -2299,6 +2299,71 @@ md5加密。
 
 ```text
 flag{aeea66fcac7fa80ed8f79f38ad5bb953}
+```
+
+------
+
+## reverse_re4
+
+打开程序后发现 IDA 出现大量红色区域，说明控制流分析存在异常。
+
+```assembly
+.text:0040113B loc_40113B:
+.text:0040113B jmp near ptr 44CB2Dh
+```
+
+跟随跳转目标发现 `0x44CB2D` 并不存在于程序有效地址范围内，因此判断该跳转并非真实逻辑，而是人为构造的控制流混淆。
+
+理论上 `jmp` 和 `0x44CB2D` CPU 会无条件跳转过去。但是地址不存在，且程序却能够正常运行，这就说明这里的跳转目标只是为了欺骗静态分析工具。
+
+IDA 根据汇编指令建立 CFG（控制流图）时，被这个错误跳转破坏，因此出现大量异常区域。下面分析后都是同样的道理。由于这些跳转指令没有参与实际执行流程，只是破坏 IDA 分析，因此直接将其填充为 NOP，使控制流恢复正常。
+
+修复完成后就可以看伪代码了。分析加密函数。
+
+TEA 经典的结构：$v0+=((v1<<4)+k0)⊕(v1+sum)⊕((v1>>5)+k1)$
+
+因此确认算法为 TEA。
+
+```python
+def tea_encrypt(v0, v1, key):
+    delta = 0x9E3779B9
+    s = 0
+    for _ in range(32):
+        s = (s + delta) & 0xFFFFFFFF
+        v0 = (v0 + (((v1 << 4) + key[0]) ^ (v1 + s) ^ ((v1 >> 5) + key[1]))) & 0xFFFFFFFF
+        v1 = (v1 + (((v0 << 4) + key[2]) ^ (v0 + s) ^ ((v0 >> 5) + key[3]))) & 0xFFFFFFFF
+    return v0, v1
+
+key = [57315, 4414, 22679, 13908]
+target = [-2052683475, -1585989955, -1992153835, 362473584, 
+          1539350109, -1052825282, 632752207, -1380898228]
+
+# 转为无符号
+target = [x & 0xFFFFFFFF for x in target]
+
+s = input("输入32字符: ")
+
+# 每4字符转数字
+arr = []
+for i in range(8):
+    chunk = s[i*4:i*4+4]
+    n = chunk[3]<<24 | chunk[2]<<16 | chunk[1]<<8 | chunk[0]
+    arr.append(n)
+
+# 加密4组
+for i in range(4):
+    arr[2*i], arr[2*i+1] = tea_encrypt(arr[2*i], arr[2*i+1], key)
+
+if arr == target:
+    print("Correct")
+else:
+    print("Wrong")
+```
+
+找TEA解密脚本就可以出来了。这道题没有那么难。
+
+```text
+flag{fcf64fc9cc0e0fe70971fd6fc6fff602}
 ```
 
 ------
