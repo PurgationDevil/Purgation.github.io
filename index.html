@@ -4,6 +4,18 @@ description: "「代码即利刃，逆向即真相」"
 ---
 
 <style>
+a.post-card-link {
+  display: block !important;
+  text-decoration: none !important;
+  color: inherit !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
+}
+
+a.post-card-link:hover {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
 .post-card {
   display: flex !important;
   gap: 30px !important;
@@ -49,11 +61,7 @@ description: "「代码即利刃，逆向即真相」"
   margin: 0 0 12px 0 !important;
   font-size: 22px !important;
   font-weight: 600 !important;
-}
-
-.post-card-title a {
   color: #333 !important;
-  text-decoration: none !important;
 }
 
 .post-card-excerpt {
@@ -81,90 +89,103 @@ description: "「代码即利刃，逆向即真相」"
 
 {% for post in paginator.posts %}
   {% assign cycle_index = forloop.index | modulo: 6 %}
+  {% assign post_href = post.url | prepend: site.baseurl %}
   
   <!-- 第1篇：图1在左 -->
   {% if cycle_index == 1 %}
-  <div class="post-card post-card-left">
-    <div class="post-card-image">
-      <img src="/img/posts/1.jpg" alt="{{ post.title }}" loading="lazy">
+  <a href="{{ post_href }}" class="post-card-link">
+    <div class="post-card post-card-left">
+      <div class="post-card-image">
+        <img src="/img/posts/1.jpg" alt="{{ post.title }}" loading="lazy">
+      </div>
+      <div class="post-card-content">
+        <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
+        <h2 class="post-card-title">{{ post.title }}</h2>
+        <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
+        <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
+      </div>
     </div>
-    <div class="post-card-content">
-      <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
-      <h2 class="post-card-title"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
-      <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
-      <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
-    </div>
-  </div>
+  </a>
   
   <!-- 第2篇：图2在右 -->
   {% elsif cycle_index == 2 %}
-  <div class="post-card post-card-right">
-    <div class="post-card-content">
-      <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
-      <h2 class="post-card-title"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
-      <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
-      <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
+  <a href="{{ post_href }}" class="post-card-link">
+    <div class="post-card post-card-right">
+      <div class="post-card-content">
+        <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
+        <h2 class="post-card-title">{{ post.title }}</h2>
+        <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
+        <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
+      </div>
+      <div class="post-card-image">
+        <img src="/img/posts/2.jpg" alt="{{ post.title }}" loading="lazy">
+      </div>
     </div>
-    <div class="post-card-image">
-      <img src="/img/posts/2.jpg" alt="{{ post.title }}" loading="lazy">
-    </div>
-  </div>
+  </a>
   
   <!-- 第3篇：图3在左 -->
   {% elsif cycle_index == 3 %}
-  <div class="post-card post-card-left">
-    <div class="post-card-image">
-      <img src="/img/posts/3.jpg" alt="{{ post.title }}" loading="lazy">
+  <a href="{{ post_href }}" class="post-card-link">
+    <div class="post-card post-card-left">
+      <div class="post-card-image">
+        <img src="/img/posts/3.jpg" alt="{{ post.title }}" loading="lazy">
+      </div>
+      <div class="post-card-content">
+        <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
+        <h2 class="post-card-title">{{ post.title }}</h2>
+        <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
+        <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
+      </div>
     </div>
-    <div class="post-card-content">
-      <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
-      <h2 class="post-card-title"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
-      <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
-      <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
-    </div>
-  </div>
+  </a>
 
     <!-- 第4篇：图4在右 -->
   {% elsif cycle_index == 4 %}
-  <div class="post-card post-card-right">
-    <div class="post-card-content">
-      <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
-      <h2 class="post-card-title"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
-      <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
-      <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
+  <a href="{{ post_href }}" class="post-card-link">
+    <div class="post-card post-card-right">
+      <div class="post-card-content">
+        <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
+        <h2 class="post-card-title">{{ post.title }}</h2>
+        <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
+        <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
+      </div>
+      <div class="post-card-image">
+        <img src="/img/posts/4.jpg" alt="{{ post.title }}" loading="lazy">
+      </div>
     </div>
-    <div class="post-card-image">
-      <img src="/img/posts/4.jpg" alt="{{ post.title }}" loading="lazy">
-    </div>
-  </div>
+  </a>
 
     <!-- 第5篇：图5在左 -->
   {% elsif cycle_index == 5 %}
-  <div class="post-card post-card-left">
-    <div class="post-card-image">
-      <img src="/img/posts/5.jpg" alt="{{ post.title }}" loading="lazy">
+  <a href="{{ post_href }}" class="post-card-link">
+    <div class="post-card post-card-left">
+      <div class="post-card-image">
+        <img src="/img/posts/5.jpg" alt="{{ post.title }}" loading="lazy">
+      </div>
+      <div class="post-card-content">
+        <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
+        <h2 class="post-card-title">{{ post.title }}</h2>
+        <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
+        <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
+      </div>
     </div>
-    <div class="post-card-content">
-      <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
-      <h2 class="post-card-title"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
-      <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
-      <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
-    </div>
-  </div>
+  </a>
 
   <!-- 第6篇：6在右 -->
   {% else %}
-  <div class="post-card post-card-right">
-    <div class="post-card-content">
-      <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
-      <h2 class="post-card-title"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
-      <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
-      <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
+  <a href="{{ post_href }}" class="post-card-link">
+    <div class="post-card post-card-right">
+      <div class="post-card-content">
+        <div class="post-card-date">{{ post.date | date: "%Y-%m-%d" }}</div>
+        <h2 class="post-card-title">{{ post.title }}</h2>
+        <div class="post-card-excerpt">{{ post.content | strip_html | truncate: 100 }}</div>
+        <div class="post-card-meta">📖 {{ post.content | number_of_words }} 字</div>
+      </div>
+      <div class="post-card-image">
+        <img src="/img/posts/6.jpg" alt="{{ post.title }}" loading="lazy">
+      </div>
     </div>
-    <div class="post-card-image">
-      <img src="/img/posts/6.jpg" alt="{{ post.title }}" loading="lazy">
-    </div>
-  </div>
+  </a>
   {% endif %}
   
 {% endfor %}
