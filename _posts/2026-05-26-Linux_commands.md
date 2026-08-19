@@ -2,7 +2,7 @@
 layout: post
 title: "Linux 命令"
 toc: true
-date: 2026-06-08
+date: 2026-08-19
 categories: 分类名称
 tags: [操作系统]
 ---
@@ -1745,6 +1745,7 @@ gzip 压缩
 本节介绍：
 
 - `tar`
+
 - `cpio`
 
 其中 `tar` 必须掌握。`cpio` 作为了解。
@@ -1900,8 +1901,11 @@ B --> G[".tar.xz"]
 本节学习：
 
 - `gzip`
+
 - `zip`
+
 - `bzip2`
+
 - `xz`
 
 ---
@@ -2123,8 +2127,11 @@ ls -l
 本节学习：
 
 - `chmod`
+
 - `chown`
+
 - `chgrp`
+
 - `umask`
 
 ------
@@ -2405,8 +2412,11 @@ Linux 核心的用户信息由四个文件共同支撑：
 本节主要介绍：
 
 - `useradd`
+
 - `usermod`
+
 - `userdel`
+
 - `passwd`
 
 ------
@@ -2533,15 +2543,261 @@ A4 --> A43["解锁账户"]
 
 ### 5.3 用户组管理
 
+Linux 中除了 User 之外，还有：Group（用户组）
+
+用户组的作用：
+
+- 方便权限管理
+- 多用户共享资源
+- 批量授权
+
+查看当前用户所属组：
+
+```bash
+groups
+```
+
+输出示例：
+
+```text
+user1 sudo docker dev
+```
+
+说明当前用户 user1 属于：sudo、docker、dev 三个用户组。
+
+查看系统所有组：
+
+```bash
+cat /etc/group
+```
+
+输出示例：
+
+```text
+root:x:0:
+sudo:x:27:
+docker:x:999:
+dev:x:1001:
+```
+
+本节主要介绍：
+
 - `groupadd`
 - `groupmod`
 - `groupdel`
 
+------
+
+  **1. `groupadd`** —— 创建用户组
+
+```bash
+sudo groupadd dev # sudo groupadd 组名
+```
+
+`groupadd -g` —— 指定 GID
+
+```bash
+sudo groupadd -g 2000 dev
+```
+
+  **2. `groupmod`** —— 修改用户组
+
+```bash
+sudo groupmod -n develop dev # sudo groupmod -n 新名 旧名
+```
+
+表示：dev $→$ develop
+
+`groupadd -g` —— 修改 GID
+
+```bash
+sudo groupmod -g 3000 develop
+```
+
+  **3. `groupdel`** —— 删除用户组
+
+```bash
+sudo groupdel develop # sudo groupdel 组名
+```
+
+⚠️ 注意：如果组中仍有成员，可能会删除失败。需要先移除用户。
+
+```mermaid
+graph TD
+
+    Info["<b>总结</b>"]
+
+A["用户组管理"]
+
+A --> B["groupadd<br/>创建用户组"]
+A --> C["groupmod<br/>修改用户组"]
+A --> D["groupdel<br/>删除用户组"]
+
+B --> B1["创建组"]
+B --> B2["指定GID"]
+
+C --> C1["修改组名"]
+C --> C2["修改GID"]
+
+D --> D1["删除组"]
+
+A --> E["用户与组关系"]
+
+E --> E1["usermod -aG<br/>添加用户到组"]
+E --> E2["groups<br/>查看所属组"]
+E --> E3["gpasswd -d<br/>移除组成员"]
+
+    style Info fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style A fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style B fill:#fff9c4,stroke:#f9a825,stroke-width:1px
+    style C fill:#fff9c4,stroke:#f9a825,stroke-width:1px
+    style D fill:#fff9c4,stroke:#f9a825,stroke-width:1px
+    style E fill:#fff9c4,stroke:#f9a825,stroke-width:1px
+```
+
+------
+
 ### 5.4 sudo 与权限提升
 
+在 Linux 中，普通用户默认只能操作自己拥有权限的资源。
+
+当需要执行管理员操作时，可以使用：
+
 - `sudo`
+
 - `visudo`
+
 - `/etc/sudoers`
+
+------
+
+  **1. `sudo`** —— 以其他用户身份执行命令
+
+`sudo` 的全称为：`Superuser Do`
+
+最常见的用途是：普通用户 → sudo 命令 → 临时以 root 权限执行
+
+基本语法：
+
+```bash
+sudo 命令
+```
+
+例如：
+
+```bash
+sudo apt update
+```
+
+普通用户可能没有权限更新系统软件包，而加上 `sudo` 后，可以临时使用管理员权限执行。
+
+**sudo 与 root 的区别**
+
+sudo 是临时执行一条管理员命令，而 root 是一直用管理员命令。sudo 命令权限使用范围更小，也更安全。
+
+**谁可以使用 sudo**
+
+并不是所有用户都能使用 `sudo`，在 Ubuntu 等系统中，通常属于 sudo 组的用户可以执行管理员命令。
+
+可以执行 `sudo -l` 命令显示当前用户允许执行那些 sudo 命令。
+
+  **2. `visudo`** —— 安全编辑 sudo 配置
+
+sudo 的配置文件是 `/etc/sudoers`
+
+理论上可以直接编辑
+
+```bash
+sudo nano /etc/sudoers
+```
+
+但是**不推荐**。
+
+因为如果配置文件语法写错，可能导致 sudo 无法使用。
+
+因此应该使用：
+
+```bash
+sudo visudo
+```
+
+`visudo` 会在保存时检查语法。
+
+基本流程：
+
+```text
+修改 sudoers
+ ↓
+保存
+ ↓
+语法检查
+ ↓
+正确 → 生效
+错误 → 提示修改
+```
+
+  **3. `/etc/sudoers`** —— sudo 权限配置文件
+
+查看配置：
+
+```bash
+sudo visudo
+```
+
+大概率会看到
+
+```text
+root ALL=(ALL:ALL) ALL # 用户名 主机=(可切换用户:可切换组) 允许执行的命令
+```
+
+ALL 是所有的意思。例如只允许 `user` 重启 Nginx：
+
+```
+user ALL=(root) /usr/bin/systemctl restart nginx
+```
+
+这样 `user` 不能随意执行其他管理员命令，只能执行：
+
+```bash
+sudo systemctl restart nginx
+```
+
+这体现了 Linux 权限管理中的 **最小权限原则**。
+
+```mermaid
+graph TD
+
+A["普通用户"]
+A --> B["sudo<br/>临时以管理员权限执行命令"]
+B --> C["sudoers<br/>检查用户是否拥有权限"]
+C --> D["允许执行"]
+C --> E["拒绝执行"]
+F["visudo"] --> G["安全编辑 /etc/sudoers"]
+G --> C
+```
+
+**使用 sudo 时需要注意**：例如类似这样的命令：`sudo rm -rf /`
+
+虽然说 sudo 避免了频繁使用高权限，但是使用时依然需要注意某些错误的命令造成的严重的后果。
+
+尤其需要谨慎使用：
+
+```bash
+sudo rm
+sudo chmod
+sudo chown
+sudo dd
+```
+
+例如递归修改权限：
+
+```bash
+sudo chmod -R 777 /
+```
+
+这种操作可能严重破坏系统的权限结构，不应该随意执行。
+
+------
 
 ## 第六部分：进程与作业管理
 
