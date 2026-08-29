@@ -120,9 +120,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (pre.closest('.mermaid-wrapper')) return;
             if (pre.querySelector('.mermaid')) return;
             if (pre.querySelector('.copy-btn')) return;
+            // 跳过行号列（Rouge 表格结构的 gutter pre）
+            if (pre.closest('.rouge-gutter') || pre.classList.contains('lineno')) return;
 
             var code = pre.querySelector('code');
-            if (!code) return;
+            var codeText = (code || pre).textContent;
 
             pre.style.position = 'relative';
 
@@ -147,9 +149,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 if (langMatch) {
                     lang = langMatch[1];
-                    if (lang === 'assembly') {
-                        lang = 'asm';
-                    }
+                }
+            }
+
+            // Rouge 不识别 assembly，构建后这些代码块会变成 language-text；
+            // 因此除类名映射外，还需按内容嗅探回退识别为 asm
+            if (lang === 'assembly') {
+                lang = 'asm';
+            }
+            if (!lang || lang === 'text' || lang === 'plaintext' || lang === 'plain') {
+                if (looksLikeAssembly(codeText)) {
+                    lang = 'asm';
                 }
             }
 
@@ -174,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 if (!text) {
-                    text = code.textContent;
+                    text = (code || pre).textContent;
                 }
                 text = text.replace(/^\s+|\s+$/g, '');
                 
@@ -201,6 +211,18 @@ document.addEventListener('DOMContentLoaded', function() {
             pre.appendChild(btn);
         });
     }, 1500);
+
+    // 内容嗅探：判断代码是否像汇编（x86/x64 通用助记符，前 30 行内 ≥3 行命中才认定）
+    function looksLikeAssembly(text) {
+        if (!text) return false;
+        var re = /^\s*(?:[a-z_][\w.$]*\s*:\s*)?(?:rep|repne|lock)?\s*(mov|movzx|movsx|lea|push|pop|call|ret|leave|jmp|je|jne|jz|jnz|jg|jge|jl|jle|ja|jae|jb|jbe|cmp|add|sub|xor|shl|shr|sar|inc|dec|nop|xchg|cdq|cdqe|cqo|proc|endp|ends|assume|segment)\b/i;
+        var count = 0;
+        var lines = text.split('\n');
+        for (var i = 0; i < lines.length && count < 3; i++) {
+            if (re.test(lines[i])) count++;
+        }
+        return count >= 3;
+    }
 
     function fallbackCopy(text, btn) {
         var textarea = document.createElement('textarea');
