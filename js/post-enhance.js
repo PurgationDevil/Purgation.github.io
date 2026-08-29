@@ -147,6 +147,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 if (langMatch) {
                     lang = langMatch[1];
+                    if (lang === 'assembly') {
+                        lang = 'asm';
+                    }
                 }
             }
 
