@@ -120,8 +120,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (pre.closest('.mermaid-wrapper')) return;
             if (pre.querySelector('.mermaid')) return;
             if (pre.querySelector('.copy-btn')) return;
-            // 跳过行号列（Rouge 表格结构的 gutter pre）
-            if (pre.closest('.rouge-gutter') || pre.classList.contains('lineno')) return;
+            // 跳过 Rouge 行号表格的内部结构（行号列 gutter / 代码列 rouge-code 里的 pre），
+            // 标签只挂在外层的 pre.highlight 上，避免同一代码块出现两个标签
+            if (pre.closest('.rouge-gutter') || pre.closest('.rouge-code') || pre.classList.contains('lineno')) return;
 
             var code = pre.querySelector('code');
             var codeText = (code || pre).textContent;
