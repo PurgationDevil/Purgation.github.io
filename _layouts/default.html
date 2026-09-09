@@ -509,21 +509,22 @@ body {
 }
 
 .mermaid svg text {
-  fill: #111827 !important;
-  color: #111827 !important;
+  fill: #000000 !important;
+  color: #000000 !important;
 }
 
 .mermaid svg .label text {
-  fill: #111827 !important;
+  fill: #000000 !important;
 }
 
 .mermaid svg .node text {
-  fill: #111827 !important;
+  fill: #000000 !important;
 }
 
-.mermaid svg foreignObject p,
-.mermaid svg foreignObject span {
-  color: #111827 !important;
+.mermaid svg foreignObject,
+.mermaid svg foreignObject * {
+  color: #000000 !important;
+  fill: #000000 !important;
 }
 
 .mermaid-card {
@@ -691,6 +692,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  touch-action: none;
+}
+
+.mermaid-fullscreen-content svg {
+  touch-action: none;
 }
 
 /* === 代码块复制按钮 === */
@@ -870,10 +876,10 @@ pre:hover .copy-btn {
   .post-card {
     border-bottom-color: rgba(255, 255, 255, 0.1) !important;
   }
-  .post-card-title a {
+  .post-card-title {
     color: #ffffff !important;
   }
-  .post-card-title a:hover {
+  .post-card-link:hover .post-card-title {
     color: #00d4ff !important;
   }
   .post-card-date,
