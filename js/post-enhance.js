@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // === 3. 代码块复制按钮 ===
     setTimeout(function() {
+        var asmBlocks = [];
         document.querySelectorAll('.post-container pre').forEach(function(pre) {
             if (pre.closest('.mermaid-wrapper')) return;
             if (pre.querySelector('.mermaid')) return;
@@ -162,6 +163,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (looksLikeAssembly(codeText)) {
                     lang = 'asm';
                 }
+            }
+
+            // 收集 asm 块，稍后用 highlight.js(x86asm) 客户端高亮
+            if (lang === 'asm') {
+                asmBlocks.push(code || pre);
             }
 
             var langBadge = document.createElement('span');
@@ -211,18 +217,54 @@ document.addEventListener('DOMContentLoaded', function() {
             pre.appendChild(langBadge);
             pre.appendChild(btn);
         });
+
+        // 汇编块客户端高亮：按需加载 highlight.js + x86asm，仅在有 asm 块时加载（不阻塞其它页面）
+        if (asmBlocks.length) {
+            (function() {
+                var CORE = 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/build/highlight.min.js';
+                var LANG = 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/build/languages/x86asm.min.js';
+                function loadScript(src, cb) {
+                    var s = document.createElement('script');
+                    s.src = src;
+                    s.onload = cb;
+                    s.onerror = function() {};
+                    document.body.appendChild(s);
+                }
+                function highlightAll() {
+                    if (!window.hljs) return;
+                    var registered = !!hljs.getLanguage('x86asm');
+                    asmBlocks.forEach(function(el) {
+                        try {
+                            if (registered) el.classList.add('language-x86asm');
+                            hljs.highlightElement(el);
+                        } catch (e) {}
+                    });
+                }
+                if (window.hljs && hljs.getLanguage('x86asm')) {
+                    highlightAll();
+                } else {
+                    loadScript(CORE, function() {
+                        loadScript(LANG, highlightAll);
+                    });
+                }
+            })();
+        }
     }, 1500);
 
-    // 内容嗅探：判断代码是否像汇编（x86/x64 通用助记符，前 30 行内 ≥3 行命中才认定）
+    // 内容嗅探：判断代码是否像 x86/x64 汇编（IDA/GDB 反汇编风格）
+    // 命中 ≥2 行即认定（覆盖短块）；前缀支持 label: / rep* / lock；助记符含 SIMD 与常见伪指令
     function looksLikeAssembly(text) {
         if (!text) return false;
-        var re = /^\s*(?:[a-z_][\w.$]*\s*:\s*)?(?:rep|repne|lock)?\s*(mov|movzx|movsx|lea|push|pop|call|ret|leave|jmp|je|jne|jz|jnz|jg|jge|jl|jle|ja|jae|jb|jbe|cmp|add|sub|xor|shl|shr|sar|inc|dec|nop|xchg|cdq|cdqe|cqo|proc|endp|ends|assume|segment)\b/i;
+        var re = /^\s*(?:[a-z_.$][\w.$]*\s*:\s*)?(?:rep|repe|repz|repne|repnz|lock)?\s*(mov|movzx|movsx|movsxd|movq|movaps|movdqa|movdqu|lea|push|pop|call|ret|retq|leave|iret|iretq|jmp|je|jne|jz|jnz|jg|jge|jl|jle|ja|jae|jb|jbe|jcxz|jecxz|jrcxz|cmp|test|add|sub|xor|and|or|not|neg|shl|shr|sar|sal|inc|dec|nop|xchg|cdq|cdqe|cqo|cbw|cwde|movsb|stosb|lodsb|cmpsb|scasb|int|syscall|sysenter|sysret|cli|sti|hlt|imul|mul|div|idiv|enter|pushad|popad|pushfd|popfd|pxor|pand|por|paddb|psubb|pcmpeqb|pshufb|shufps|unpcklps|maxps|minps|movss|addss|mulss|cvtsi2ss|cvtss2si|endp|ends|assume|segment|extern|global|section|db|dw|dd|dq)\b/i;
         var count = 0;
         var lines = text.split('\n');
-        for (var i = 0; i < lines.length && count < 3; i++) {
-            if (re.test(lines[i])) count++;
+        for (var i = 0; i < lines.length; i++) {
+            if (re.test(lines[i])) {
+                count++;
+                if (count >= 2) return true;
+            }
         }
-        return count >= 3;
+        return false;
     }
 
     function fallbackCopy(text, btn) {
