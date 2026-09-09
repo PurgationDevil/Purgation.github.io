@@ -221,8 +221,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // 汇编块客户端高亮：按需加载 highlight.js + x86asm，仅在有 asm 块时加载（不阻塞其它页面）
         if (asmBlocks.length) {
             (function() {
-                var CORE = 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/build/highlight.min.js';
-                var LANG = 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/build/languages/x86asm.min.js';
+                var CORE = 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js';
+                var LANG = 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/x86asm.min.js';
                 function loadScript(src, cb) {
                     var s = document.createElement('script');
                     s.src = src;
