@@ -138,6 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         svg.style.height = '100%';
         svg.style.maxWidth = 'none';
         svg.style.maxHeight = 'none';
+        svg.style.touchAction = 'none';
 
         content.appendChild(clone);
         document.body.appendChild(fullscreenOverlay);
