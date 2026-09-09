@@ -116,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // === 3. 代码块复制按钮 ===
     setTimeout(function() {
-        var asmBlocks = [];
         document.querySelectorAll('.post-container pre').forEach(function(pre) {
             if (pre.closest('.mermaid-wrapper')) return;
             if (pre.querySelector('.mermaid')) return;
@@ -154,22 +153,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            // Rouge 不识别 assembly，构建后这些代码块会变成 language-text；
-            // 因此除类名映射外，还需按内容嗅探回退识别为 asm
-            if (lang === 'assembly') {
+            // 构建时 _plugins/asm_alias.rb 已把 asm/assembly 映射到 Rouge 的 nasm 高亮器，
+            // 构建输出 language-nasm；这里把标签统一显示为 asm
+            if (lang === 'nasm' || lang === 'assembly') {
                 lang = 'asm';
             }
+            // 兜底：未标注语言但内容是汇编的纯文本块
             if (!lang || lang === 'text' || lang === 'plaintext' || lang === 'plain') {
                 if (looksLikeAssembly(codeText)) {
                     lang = 'asm';
                 }
-            }
-
-            // 收集 asm 块，稍后用 highlight.js(x86asm) 客户端高亮
-            if (lang === 'asm') {
-                // 复用 Rouge 代码块样式（深色背景 #282c34、圆角、padding）
-                pre.classList.add('highlight');
-                asmBlocks.push(code || pre);
             }
 
             var langBadge = document.createElement('span');
@@ -219,43 +212,6 @@ document.addEventListener('DOMContentLoaded', function() {
             pre.appendChild(langBadge);
             pre.appendChild(btn);
         });
-
-        // 汇编块客户端高亮：按需加载 highlight.js + x86asm，仅在有 asm 块时加载（不阻塞其它页面）
-        if (asmBlocks.length) {
-            (function() {
-                var CORE = 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js';
-                var LANG = 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/x86asm.min.js';
-                function loadScript(src, cb) {
-                    var s = document.createElement('script');
-                    s.src = src;
-                    s.onload = cb;
-                    s.onerror = function() {};
-                    document.body.appendChild(s);
-                }
-                function highlightAll() {
-                    if (!window.hljs) return;
-                    var registered = !!hljs.getLanguage('x86asm');
-                    if (!registered) return;
-                    asmBlocks.forEach(function(el) {
-                        try {
-                            // 显式指定语言高亮，彻底绕开 class 匹配（Rouge 残留的 language-asm
-                            // 会导致 highlight.js 找不到 'asm' 语言而回退到无高亮模式）
-                            var raw = el.textContent;
-                            var result = hljs.highlight(raw, { language: 'x86asm', ignoreIllegals: true });
-                            el.innerHTML = result.value;
-                            el.classList.add('hljs');
-                        } catch (e) {}
-                    });
-                }
-                if (window.hljs && hljs.getLanguage('x86asm')) {
-                    highlightAll();
-                } else {
-                    loadScript(CORE, function() {
-                        loadScript(LANG, highlightAll);
-                    });
-                }
-            })();
-        }
     }, 1500);
 
     // 内容嗅探：判断代码是否像 x86/x64 汇编（IDA/GDB 反汇编风格）
