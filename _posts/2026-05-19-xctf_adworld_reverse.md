@@ -2014,10 +2014,10 @@ jmp 0x4116E4
 *↓ 这才是真正要执行的指令 ↓*
 
 ```asm
-.text:004116E3 byte_4116E3     db 8Dh                  ; DATA XREF: sub_4116CE+5↑o
-.text:004116E4                 dd 0FF2748E8h, 74C085FFh, 539680Ah, 0F2E80000h, 0E8FFFF23h
-.text:004116F8                 dd 1
-.text:004116FC                 db 0C7h
+db 8Dh                  ; DATA XREF: sub_4116CE+5↑o
+dd 0FF2748E8h, 74C085FFh, 539680Ah, 0F2E80000h, 0E8FFFF23h
+dd 1
+db 0C7h
 ```
 
 **混淆的目的**：让 IDA 误以为 `0x4116E4` 不是代码，从而无法反编译。
