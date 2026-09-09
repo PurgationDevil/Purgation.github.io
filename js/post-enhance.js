@@ -167,6 +167,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 收集 asm 块，稍后用 highlight.js(x86asm) 客户端高亮
             if (lang === 'asm') {
+                // 复用 Rouge 代码块样式（深色背景 #282c34、圆角、padding）
+                pre.classList.add('highlight');
                 asmBlocks.push(code || pre);
             }
 
