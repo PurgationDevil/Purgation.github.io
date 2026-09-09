@@ -235,15 +235,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 function highlightAll() {
                     if (!window.hljs) return;
                     var registered = !!hljs.getLanguage('x86asm');
+                    if (!registered) return;
                     asmBlocks.forEach(function(el) {
                         try {
-                            if (registered) {
-                                // 移除 highlight.js 不认识的语言类名（Rouge 构建残留：asm/text/plaintext），
-                                // 否则 highlight.js 会先匹配到 'asm'，找不到该语言后回退到无高亮模式
-                                el.classList.remove('language-asm', 'language-text', 'language-plaintext', 'language-plain');
-                                el.classList.add('language-x86asm');
-                            }
-                            hljs.highlightElement(el);
+                            // 显式指定语言高亮，彻底绕开 class 匹配（Rouge 残留的 language-asm
+                            // 会导致 highlight.js 找不到 'asm' 语言而回退到无高亮模式）
+                            var raw = el.textContent;
+                            var result = hljs.highlight(raw, { language: 'x86asm', ignoreIllegals: true });
+                            el.innerHTML = result.value;
+                            el.classList.add('hljs');
                         } catch (e) {}
                     });
                 }
